@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Playnite.SDK.Controls;
 
@@ -44,6 +45,7 @@ namespace PlayniteAudioSwitcher
                     };
 
                     button.Click += DeviceButton_Click;
+                    button.PreviewKeyDown += DeviceButton_PreviewKeyDown;
                     DeviceButtonsPanel.Children.Add(button);
                 }
             }
@@ -64,9 +66,43 @@ namespace PlayniteAudioSwitcher
             }), DispatcherPriority.ApplicationIdle);
         }
 
+        public bool ActivateFocusedDevice()
+        {
+            var focusedButton = Keyboard.FocusedElement as Button;
+            if (focusedButton == null || !DeviceButtonsPanel.Children.Contains(focusedButton))
+            {
+                focusedButton = DeviceButtonsPanel.Children
+                    .OfType<Button>()
+                    .FirstOrDefault(a => a.IsKeyboardFocusWithin || a.IsFocused);
+            }
+
+            if (focusedButton == null)
+            {
+                return false;
+            }
+
+            SelectDevice(focusedButton);
+            return true;
+        }
+
+        private void DeviceButton_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter && e.Key != Key.Space)
+            {
+                return;
+            }
+
+            e.Handled = true;
+            SelectDevice(sender as Button);
+        }
+
         private void DeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
+            SelectDevice(sender as Button);
+        }
+
+        private void SelectDevice(Button button)
+        {
             var deviceId = button?.Tag as string;
             if (string.IsNullOrWhiteSpace(deviceId))
             {

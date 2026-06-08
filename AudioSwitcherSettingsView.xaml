@@ -17,6 +17,7 @@
             <Setter Property="Margin" Value="0,0,0,10" />
         </Style>
         <Style x:Key="SectionHeaderText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
     </UserControl.Resources>

@@ -26,6 +26,8 @@ namespace PlayniteAudioSwitcher
         private GameAudioProfileStore gameProfiles;
         private DateTime lastQuickSwitch = DateTime.MinValue;
         private ResourceDictionary englishFallbackResources;
+        private Window activeThemeSelectorWindow;
+        private AudioDeviceListControl activeThemeSelectorList;
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -332,6 +334,13 @@ namespace PlayniteAudioSwitcher
             TrackControllerInput(args);
             if (args.State == ControllerInputState.Pressed &&
                 args.Button == ControllerInput.A &&
+                ActivateOpenThemeSelectorDevice())
+            {
+                return;
+            }
+
+            if (args.State == ControllerInputState.Pressed &&
+                args.Button == ControllerInput.A &&
                 IsThemeSelectorFocused())
             {
                 OpenThemeDeviceSelector();
@@ -497,6 +506,16 @@ namespace PlayniteAudioSwitcher
                 TextElement.SetForeground(border, Application.Current?.TryFindResource("TextBrush") as Brush ?? Brushes.White);
 
                 window.Content = border;
+                activeThemeSelectorWindow = window;
+                activeThemeSelectorList = list;
+                window.Closed += (_, __) =>
+                {
+                    if (ReferenceEquals(activeThemeSelectorWindow, window))
+                    {
+                        activeThemeSelectorWindow = null;
+                        activeThemeSelectorList = null;
+                    }
+                };
                 window.ContentRendered += (_, __) => list.FocusFirstDevice();
                 window.Dispatcher.BeginInvoke(new Action(list.FocusFirstDevice), DispatcherPriority.ApplicationIdle);
                 window.ShowDialog();
@@ -617,6 +636,18 @@ namespace PlayniteAudioSwitcher
             {
                 pressedInputs.Remove(args.Button);
             }
+        }
+
+        private bool ActivateOpenThemeSelectorDevice()
+        {
+            if (activeThemeSelectorWindow == null ||
+                activeThemeSelectorList == null ||
+                !activeThemeSelectorWindow.IsVisible)
+            {
+                return false;
+            }
+
+            return activeThemeSelectorList.ActivateFocusedDevice();
         }
 
         private string GetOutputNotificationText(string deviceName)
