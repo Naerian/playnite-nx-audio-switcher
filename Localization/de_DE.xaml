@@ -1,7 +1,7 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <sys:String x:Key="LOCAS_PluginName">Audio-Umschalter</sys:String>
+    <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Benutzerdefinierte Namen</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Gib jeder Ausgabe, die du in Playnite verwenden moechtest, einen einfachen Namen. Geraete ohne benutzerdefinierten Namen erscheinen weiterhin in der vollstaendigen Auswahl.</sys:String>
@@ -13,7 +13,7 @@
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Text und Symbol</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeIcon">Nur Symbol</sys:String>
     <sys:String x:Key="LOCAS_FullscreenPreferredDevice">Bevorzugtes Vollbildgeraet</sys:String>
-    <sys:String x:Key="LOCAS_EnableQuickSwitch">Schnellwechsel im Vollbild aktivieren (Back + Y)</sys:String>
+    <sys:String x:Key="LOCAS_EnableQuickSwitch">Schnellwechsel im Vollbild aktivieren (Back + RB)</sys:String>
     <sys:String x:Key="LOCAS_ShowOnlyCustom">Nur benutzerdefinierte Geraete im Vollbild-Schnellmenue anzeigen</sys:String>
     <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Bevorzugtes Geraet anwenden, wenn Playnite im Vollbild startet</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Vorheriges Geraet nach einem spielspezifischen Profil wiederherstellen</sys:String>
@@ -46,4 +46,9 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Zum Wechseln sind mindestens zwei aktive Audiogeraete erforderlich.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Waehle das Ausgabegeraet, das Windows als Standardaudio verwenden soll.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">Kein Symbol</sys:String>
+    <sys:String x:Key="LOCAS_GameAudioDevice">Audio device</sys:String>
+    <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
 </ResourceDictionary>
+
+
+

@@ -19,7 +19,7 @@ namespace PlayniteAudioSwitcher
         private string deviceDisplayMode = "TextAndIcon";
         private bool showNotifications = true;
         private bool fullscreenOnlyFavorites = true;
-        private bool quickSwitchEnabled = true;
+        private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
         private bool applyFullscreenPreferredOnStartup = true;
         private bool restoreDeviceAfterGameProfile = true;

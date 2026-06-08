@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -187,19 +188,13 @@ namespace PlayniteAudioSwitcher
 
             var game = games[0];
             var currentProfile = gameProfiles.GetDeviceId(game);
-            var currentDeviceId = GetCurrentDeviceId();
+            var root = PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Fullscreen ? $"@{Loc("LOCAS_GameAudioDevice")}" : "@Audio";
             var items = new List<GameMenuItem>
             {
                 new GameMenuItem
                 {
-                    MenuSection = "@Audio",
-                    Description = string.IsNullOrEmpty(currentProfile) ? Loc("LOCAS_GameAudioDefault") : $"{Loc("LOCAS_GameAudio")}: {GetDeviceDisplayName(currentProfile)}",
-                    Action = _ => { }
-                },
-                new GameMenuItem
-                {
-                    MenuSection = $"@Audio|{Loc("LOCAS_GameAudioProfile")}",
-                    Description = Loc("LOCAS_UseDefaultDevice"),
+                    MenuSection = root,
+                    Description = GetCheckedMenuText(Loc("LOCAS_DefaultProfile"), string.IsNullOrWhiteSpace(currentProfile)),
                     Action = _ =>
                     {
                         gameProfiles.SetDevice(game, null);
@@ -214,8 +209,8 @@ namespace PlayniteAudioSwitcher
                 var displayName = GetDeviceDisplayName(device);
                 items.Add(new GameMenuItem
                 {
-                    MenuSection = $"@Audio|{Loc("LOCAS_GameAudioProfile")}",
-                    Description = GetMenuDeviceName(deviceId, displayName, currentDeviceId, string.Equals(currentProfile, deviceId, StringComparison.OrdinalIgnoreCase)),
+                    MenuSection = root,
+                    Description = GetCheckedMenuText(FormatDeviceVisual(device.Icon, displayName), string.Equals(currentProfile, deviceId, StringComparison.OrdinalIgnoreCase)),
                     Action = _ =>
                     {
                         gameProfiles.SetDevice(game, deviceId);
@@ -334,15 +329,23 @@ namespace PlayniteAudioSwitcher
 
         public override void OnControllerButtonStateChanged(OnControllerButtonStateChangedArgs args)
         {
+            TrackControllerInput(args);
+            if (args.State == ControllerInputState.Pressed &&
+                args.Button == ControllerInput.A &&
+                IsThemeSelectorFocused())
+            {
+                OpenThemeDeviceSelector();
+                return;
+            }
+
             if (!settings.QuickSwitchEnabled)
             {
                 return;
             }
 
-            TrackControllerInput(args);
             if (args.State == ControllerInputState.Pressed &&
                 pressedInputs.Contains(ControllerInput.Back) &&
-                pressedInputs.Contains(ControllerInput.Y) &&
+                pressedInputs.Contains(ControllerInput.RightShoulder) &&
                 DateTime.UtcNow - lastQuickSwitch > TimeSpan.FromMilliseconds(800))
             {
                 lastQuickSwitch = DateTime.UtcNow;
@@ -361,32 +364,9 @@ namespace PlayniteAudioSwitcher
                 var deviceName = GetDeviceDisplayName(device);
                 items.Add(new MainMenuItem
                 {
-                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_AudioDevices")}",
-                    Description = GetFullscreenDeviceMenuText(device, currentDeviceId, false),
+                    MenuSection = MenuRoot,
+                    Description = GetFullscreenDeviceMenuText(device, currentDeviceId, settings.FullscreenPreferredDeviceId),
                     Action = _ => SetDevice(deviceId, deviceName)
-                });
-            }
-
-            items.Add(new MainMenuItem
-            {
-                MenuSection = $"{MenuRoot}|{Loc("LOCAS_DefaultDevice")}",
-                Description = Loc("LOCAS_DefaultDeviceHelp"),
-                Action = _ => { }
-            });
-
-            foreach (var device in SafeGetDevices())
-            {
-                var deviceId = device.Id;
-                items.Add(new MainMenuItem
-                {
-                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_DefaultDevice")}",
-                    Description = GetFullscreenDeviceMenuText(device, settings.FullscreenPreferredDeviceId, true),
-                    Action = _ =>
-                    {
-                        settings.FullscreenPreferredDeviceId = deviceId;
-                        SavePluginSettings(settings);
-                        ShowMessage($"{Loc("LOCAS_PreferredFullscreen")}: {GetDeviceDisplayName(device)}");
-                    }
                 });
             }
 
@@ -705,7 +685,61 @@ namespace PlayniteAudioSwitcher
             return name;
         }
 
-        private string GetFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)
+        private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId, string preferredDeviceId)
+        {
+            var name = FormatDeviceVisual(device.Icon, GetDeviceDisplayName(device));
+            if (!string.IsNullOrWhiteSpace(device.CustomName) &&
+                !string.Equals(device.CustomName, device.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                name = $"{name} - {device.Name}";
+            }
+
+            if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
+            {
+                name = "\u2713 " + name;
+            }
+
+            if (string.Equals(device.Id, preferredDeviceId, StringComparison.OrdinalIgnoreCase))
+            {
+                name = $"{name} \u2605";
+            }
+
+            return name;
+        }
+
+        private string GetCheckedMenuText(string text, bool isChecked)
+        {
+            return isChecked ? "\u2713 " + text : text;
+        }
+
+        private bool IsThemeSelectorFocused()
+        {
+            var focused = Keyboard.FocusedElement as DependencyObject;
+            return IsElementOrParentNamed(focused, "AudioSwitcherThemeOpenSelectorButton");
+        }
+
+        private bool IsElementOrParentNamed(DependencyObject element, string name)
+        {
+            while (element != null)
+            {
+                if (element is FrameworkElement frameworkElement &&
+                    string.Equals(frameworkElement.Name, name, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                element = VisualTreeHelper.GetParent(element);
+            }
+
+            return false;
+        }
+
+        private string GetLegacyFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)
+        {
+            return GetFullscreenDeviceMenuText(device, useStarForSelected ? null : selectedDeviceId, useStarForSelected ? selectedDeviceId : null);
+        }
+
+        private string GetUnusedFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)
         {
             var name = FormatDeviceVisual(device.Icon, GetDeviceDisplayName(device));
             var isSelected = string.Equals(device.Id, selectedDeviceId, StringComparison.OrdinalIgnoreCase);

@@ -43,12 +43,12 @@ namespace PlayniteAudioSwitcher
             try
             {
                 DeviceIconPath.Data = GetCurrentIconGeometry();
-                OpenButton.ToolTip = plugin.GetCurrentDeviceDisplayName();
+                AudioSwitcherThemeOpenSelectorButton.ToolTip = plugin.GetCurrentDeviceDisplayName();
             }
             catch (Exception)
             {
                 DeviceIconPath.Data = plugin.GetIconGeometry("volume-2");
-                OpenButton.ToolTip = plugin.Loc("LOCAS_Audio");
+                AudioSwitcherThemeOpenSelectorButton.ToolTip = plugin.Loc("LOCAS_Audio");
             }
         }
 

@@ -1,7 +1,7 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <sys:String x:Key="LOCAS_PluginName">Changeur audio</sys:String>
+    <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Noms personnalises</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Saisissez un nom simple pour chaque sortie que vous voulez utiliser depuis Playnite. Les peripheriques sans nom personnalise apparaitront toujours dans le selecteur complet.</sys:String>
@@ -13,7 +13,7 @@
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Texte et icone</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeIcon">Icone seule</sys:String>
     <sys:String x:Key="LOCAS_FullscreenPreferredDevice">Peripherique plein ecran prefere</sys:String>
-    <sys:String x:Key="LOCAS_EnableQuickSwitch">Activer le changement rapide en plein ecran (Back + Y)</sys:String>
+    <sys:String x:Key="LOCAS_EnableQuickSwitch">Activer le changement rapide en plein ecran (Back + RB)</sys:String>
     <sys:String x:Key="LOCAS_ShowOnlyCustom">Afficher seulement les peripheriques personnalises dans le menu rapide plein ecran</sys:String>
     <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Appliquer le peripherique prefere au demarrage de Playnite en plein ecran</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Restaurer le peripherique precedent apres l'arret d'un profil specifique au jeu</sys:String>
@@ -46,4 +46,9 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Au moins deux peripheriques audio actifs sont requis pour changer.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Choisissez le peripherique de sortie que Windows utilisera comme sortie audio par defaut.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">Aucune icone</sys:String>
+    <sys:String x:Key="LOCAS_GameAudioDevice">Audio device</sys:String>
+    <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
 </ResourceDictionary>
+
+
+

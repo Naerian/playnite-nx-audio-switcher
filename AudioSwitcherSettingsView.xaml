@@ -6,16 +6,35 @@
              mc:Ignorable="d"
              d:DesignHeight="720"
              d:DesignWidth="900">
+    <UserControl.Resources>
+        <Style x:Key="SectionHeaderBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="#666666" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="Padding" Value="0,0,0,6" />
+            <Setter Property="Margin" Value="0,18,0,10" />
+        </Style>
+        <Style x:Key="FirstSectionHeaderBorder" TargetType="Border" BasedOn="{StaticResource SectionHeaderBorder}">
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style x:Key="SectionHeaderText" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </UserControl.Resources>
     <Grid Margin="12">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="8" MaxWidth="820">
-                <TextBlock Text="{DynamicResource LOCAS_CustomNamesTitle}" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <Border Style="{StaticResource FirstSectionHeaderBorder}">
+                    <TextBlock Text="{DynamicResource LOCAS_CustomNamesTitle}" Style="{StaticResource SectionHeaderText}" />
+                </Border>
                 <TextBlock Text="{DynamicResource LOCAS_CustomNamesHelp}"
                            TextWrapping="Wrap"
                            Margin="0,0,0,12" />
 
                 <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
 
+                <Border Style="{StaticResource SectionHeaderBorder}">
+                    <TextBlock Text="{DynamicResource LOCAS_FullscreenDisplayMode}" Style="{StaticResource SectionHeaderText}" />
+                </Border>
                 <TextBlock Text="{DynamicResource LOCAS_FullscreenDisplayMode}" />
                 <ComboBox ItemsSource="{Binding DeviceDisplayModeOptions}"
                           DisplayMemberPath="Name"
@@ -23,6 +42,9 @@
                           SelectedValue="{Binding DeviceDisplayMode}"
                           Margin="0,2,0,10" />
 
+                <Border Style="{StaticResource SectionHeaderBorder}">
+                    <TextBlock Text="{DynamicResource LOCAS_FullscreenPreferredDevice}" Style="{StaticResource SectionHeaderText}" />
+                </Border>
                 <TextBlock Text="{DynamicResource LOCAS_FullscreenPreferredDevice}" Margin="0,4,0,0" />
                 <ComboBox ItemsSource="{Binding AvailablePlaybackDevices}"
                           DisplayMemberPath="DisplayName"
@@ -30,6 +52,9 @@
                           SelectedValue="{Binding FullscreenPreferredDeviceId}"
                           Margin="0,2,0,10" />
 
+                <Border Style="{StaticResource SectionHeaderBorder}">
+                    <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
+                </Border>
                 <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
                           IsChecked="{Binding QuickSwitchEnabled}"
                           Margin="0,2,0,8" />
