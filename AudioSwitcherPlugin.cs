@@ -413,6 +413,26 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public Geometry GetCurrentDeviceIconGeometry()
+        {
+            try
+            {
+                var current = AudioDevices.GetDefaultPlaybackDevice();
+                var icon = settings.GetIcon(current?.Id);
+                return string.IsNullOrWhiteSpace(icon) ? null : GetIconGeometry(icon);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public Geometry GetIconGeometry(string icon)
+        {
+            var data = settings.IconOptions.FirstOrDefault(a => string.Equals(a.Id, icon, StringComparison.OrdinalIgnoreCase))?.GeometryData;
+            return string.IsNullOrWhiteSpace(data) ? null : Geometry.Parse(data);
+        }
+
         private IEnumerable<AudioDevice> SafeGetDevices()
         {
             try

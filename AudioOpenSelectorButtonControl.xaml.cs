@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Playnite.SDK.Controls;
 
 namespace PlayniteAudioSwitcher
@@ -7,7 +10,6 @@ namespace PlayniteAudioSwitcher
     public partial class AudioOpenSelectorButtonControl : PluginUserControl
     {
         private readonly AudioSwitcherPlugin plugin;
-        private AudioDeviceListControl deviceListControl;
 
         public AudioOpenSelectorButtonControl(AudioSwitcherPlugin plugin)
         {
@@ -23,20 +25,36 @@ namespace PlayniteAudioSwitcher
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            if (deviceListControl == null)
+            var menu = new ContextMenu
             {
-                deviceListControl = new AudioDeviceListControl(plugin);
-                deviceListControl.DeviceSelected += DeviceListControl_DeviceSelected;
-                SelectorPopupContent.Child = deviceListControl;
+                PlacementTarget = OpenButton
+            };
+
+            foreach (var device in plugin.GetThemeSelectorDevices().OrderBy(a => a.EffectiveName))
+            {
+                var item = new MenuItem
+                {
+                    Header = device.SettingsDisplayName,
+                    Tag = device.Id
+                };
+                item.Click += DeviceMenuItem_Click;
+                menu.Items.Add(item);
             }
 
-            deviceListControl.Refresh();
-            SelectorPopup.IsOpen = true;
+            OpenButton.ContextMenu = menu;
+            menu.IsOpen = true;
         }
 
-        private void DeviceListControl_DeviceSelected(object sender, EventArgs e)
+        private void DeviceMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            SelectorPopup.IsOpen = false;
+            var item = sender as MenuItem;
+            var deviceId = item?.Tag as string;
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                return;
+            }
+
+            plugin.SetThemeSelectedDevice(deviceId);
             Refresh();
         }
 
@@ -44,12 +62,21 @@ namespace PlayniteAudioSwitcher
         {
             try
             {
-                OpenButton.Content = plugin.GetCurrentDeviceDisplayLabel();
+                DeviceIconPath.Data = GetCurrentIconGeometry();
+                OpenButton.ToolTip = plugin.GetCurrentDeviceDisplayName();
             }
             catch (Exception)
             {
-                OpenButton.Content = plugin.Loc("LOCAS_Audio");
+                DeviceIconPath.Data = plugin.GetIconGeometry("volume-2");
+                OpenButton.ToolTip = plugin.Loc("LOCAS_Audio");
             }
+        }
+
+        private Geometry GetCurrentIconGeometry()
+        {
+            var themeIcon = TryFindResource("AudioSwitcher_DefaultIconGeometry") as Geometry;
+            var iconGeometry = plugin.GetCurrentDeviceIconGeometry();
+            return iconGeometry ?? themeIcon ?? plugin.GetIconGeometry("volume-2");
         }
     }
 }

@@ -106,6 +106,8 @@ Place a button that opens a compact output selector:
 <ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
 ```
 
+This button renders as an icon-only control. It uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
+
 Place a full dropdown selector:
 
 ```xml
