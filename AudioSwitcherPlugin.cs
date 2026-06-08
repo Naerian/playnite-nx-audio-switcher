@@ -28,6 +28,8 @@ namespace PlayniteAudioSwitcher
         private ResourceDictionary englishFallbackResources;
         private Window activeThemeSelectorWindow;
         private AudioDeviceListControl activeThemeSelectorList;
+        private Func<bool> isThemeSelectorOpen;
+        private Action closeThemeSelector;
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -340,10 +342,16 @@ namespace PlayniteAudioSwitcher
             }
 
             if (args.State == ControllerInputState.Pressed &&
-                args.Button == ControllerInput.A &&
-                IsThemeSelectorFocused())
+                args.Button == ControllerInput.B &&
+                CloseOpenThemeSelector())
             {
-                OpenThemeDeviceSelector();
+                return;
+            }
+
+            if (args.State == ControllerInputState.Pressed &&
+                args.Button == ControllerInput.A &&
+                TryOpenFocusedThemeSelector())
+            {
                 return;
             }
 
@@ -483,15 +491,15 @@ namespace PlayniteAudioSwitcher
 
                 window.Background = ResolvePanelBrush();
                 window.Content = border;
+                RegisterThemeSelector(list, () => window.IsVisible, window.Close);
                 activeThemeSelectorWindow = window;
-                activeThemeSelectorList = list;
                 window.Closed += (_, __) =>
                 {
                     if (ReferenceEquals(activeThemeSelectorWindow, window))
                     {
                         activeThemeSelectorWindow = null;
-                        activeThemeSelectorList = null;
                     }
+                    ClearThemeSelector(list);
                 };
                 window.ContentRendered += (_, __) => list.FocusFirstDevice();
                 window.Dispatcher.BeginInvoke(new Action(list.FocusFirstDevice), DispatcherPriority.ApplicationIdle);
@@ -502,6 +510,25 @@ namespace PlayniteAudioSwitcher
                 logger.Error(ex, "Failed to open theme audio device selector.");
                 ShowMessage($"{Loc("LOCAS_AudioSwitchFailed")}: {ex.Message}");
             }
+        }
+
+        public void RegisterThemeSelector(AudioDeviceListControl list, Func<bool> isOpen, Action close)
+        {
+            activeThemeSelectorList = list;
+            isThemeSelectorOpen = isOpen;
+            closeThemeSelector = close;
+        }
+
+        public void ClearThemeSelector(AudioDeviceListControl list)
+        {
+            if (!ReferenceEquals(activeThemeSelectorList, list))
+            {
+                return;
+            }
+
+            activeThemeSelectorList = null;
+            isThemeSelectorOpen = null;
+            closeThemeSelector = null;
         }
 
         public string GetCurrentDeviceDisplayName()
@@ -617,14 +644,25 @@ namespace PlayniteAudioSwitcher
 
         private bool ActivateOpenThemeSelectorDevice()
         {
-            if (activeThemeSelectorWindow == null ||
-                activeThemeSelectorList == null ||
-                !activeThemeSelectorWindow.IsVisible)
+            if (activeThemeSelectorList == null ||
+                isThemeSelectorOpen?.Invoke() != true)
             {
                 return false;
             }
 
             return activeThemeSelectorList.ActivateFocusedDevice();
+        }
+
+        private bool CloseOpenThemeSelector()
+        {
+            if (activeThemeSelectorList == null ||
+                isThemeSelectorOpen?.Invoke() != true)
+            {
+                return false;
+            }
+
+            closeThemeSelector?.Invoke();
+            return true;
         }
 
         private void ApplyFullscreenMenuPanelStyle(Border border)
@@ -749,10 +787,17 @@ namespace PlayniteAudioSwitcher
             return isChecked ? "\u2713 " + text : text;
         }
 
-        private bool IsThemeSelectorFocused()
+        private bool TryOpenFocusedThemeSelector()
         {
             var focused = Keyboard.FocusedElement as DependencyObject;
-            return IsElementOrParentNamed(focused, "AudioSwitcherThemeOpenSelectorButton");
+            var selector = GetElementOrParent<AudioOpenSelectorButtonControl>(focused);
+            if (selector == null || !IsElementOrParentNamed(focused, "AudioSwitcherThemeOpenSelectorButton"))
+            {
+                return false;
+            }
+
+            selector.OpenSelector();
+            return true;
         }
 
         private bool IsElementOrParentNamed(DependencyObject element, string name)
@@ -769,6 +814,21 @@ namespace PlayniteAudioSwitcher
             }
 
             return false;
+        }
+
+        private T GetElementOrParent<T>(DependencyObject element) where T : DependencyObject
+        {
+            while (element != null)
+            {
+                if (element is T match)
+                {
+                    return match;
+                }
+
+                element = VisualTreeHelper.GetParent(element);
+            }
+
+            return null;
         }
 
         private string GetLegacyFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)

@@ -100,13 +100,13 @@ Place a compact quick-switch button that cycles through configured custom device
 <ContentControl x:Name="AudioSwitcher_AudioSwitcherButton" />
 ```
 
-Place a button that opens a compact output selector:
+Place an icon button with a built-in output selector panel:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
 ```
 
-This button renders as an icon-only control. It uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
+This control is self-contained: it renders as an icon-only button and opens its own controller-friendly device panel, without requiring the theme to create a separate popup or window. It uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
 
 Place a full dropdown selector:
 
