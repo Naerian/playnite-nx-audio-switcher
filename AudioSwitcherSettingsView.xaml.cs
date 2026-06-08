@@ -25,32 +25,32 @@ namespace PlayniteAudioSwitcher
                 var border = new Border
                 {
                     BorderBrush = System.Windows.Media.Brushes.Gray,
-                    BorderThickness = new Thickness(1),
-                    Padding = new Thickness(10),
-                    Margin = new Thickness(0, 0, 0, 8)
+                    BorderThickness = new Thickness(0, 0, 0, 1),
+                    Padding = new Thickness(0, 0, 0, 12),
+                    Margin = new Thickness(0, 0, 0, 12)
                 };
 
                 var grid = new Grid();
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(72) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(240) });
 
                 var namePanel = new StackPanel { Margin = new Thickness(0, 0, 14, 0) };
+                var windowsName = new TextBlock
+                {
+                    FontSize = 11,
+                    Opacity = 0.7,
+                    Margin = new Thickness(0, 0, 0, 3)
+                };
+                windowsName.SetResourceReference(TextBlock.TextProperty, "LOCAS_WindowsName");
+                namePanel.Children.Add(windowsName);
                 var deviceName = new TextBlock
                 {
                     Text = device.SettingsDisplayName,
                     FontWeight = FontWeights.SemiBold,
                     TextWrapping = TextWrapping.Wrap
                 };
-                var windowsName = new TextBlock
-                {
-                    FontSize = 11,
-                    Opacity = 0.7,
-                    Margin = new Thickness(0, 2, 0, 0)
-                };
-                windowsName.SetResourceReference(TextBlock.TextProperty, "LOCAS_WindowsName");
                 namePanel.Children.Add(deviceName);
-                namePanel.Children.Add(windowsName);
                 Grid.SetColumn(namePanel, 0);
                 grid.Children.Add(namePanel);
 
@@ -65,9 +65,11 @@ namespace PlayniteAudioSwitcher
                 var iconBox = new ComboBox
                 {
                     ItemsSource = settings.IconOptions,
-                    SelectedItem = device.Icon ?? string.Empty
+                    DisplayMemberPath = "DisplayName",
+                    SelectedValuePath = "Id",
+                    SelectedValue = device.Icon ?? string.Empty
                 };
-                iconBox.SelectionChanged += (_, __) => device.Icon = iconBox.SelectedItem?.ToString();
+                iconBox.SelectionChanged += (_, __) => device.Icon = iconBox.SelectedValue?.ToString();
                 iconPanel.Children.Add(iconLabel);
                 iconPanel.Children.Add(iconBox);
                 Grid.SetColumn(iconPanel, 1);

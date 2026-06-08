@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Playnite.SDK;
 using Playnite.SDK.Controls;
 using Playnite.SDK.Events;
@@ -202,7 +203,8 @@ namespace PlayniteAudioSwitcher
                 Title = Loc("LOCAS_Audio"),
                 Icon = new TextBlock
                 {
-                    Text = Loc("LOCAS_Audio")
+                    Text = "\uE995",
+                    FontFamily = new FontFamily("Segoe MDL2 Assets")
                 },
                 Visible = true,
                 Activated = ToggleCustomDevices
@@ -217,10 +219,11 @@ namespace PlayniteAudioSwitcher
                 Type = SiderbarItemType.View,
                 Icon = new TextBlock
                 {
-                    Text = Loc("LOCAS_Audio")
+                    Text = "\uE995",
+                    FontFamily = new FontFamily("Segoe MDL2 Assets")
                 },
                 Visible = true,
-                Opened = () => new AudioDeviceSelectorControl(this)
+                Opened = () => new AudioDeviceSelectorPanelControl(this)
             };
         }
 
@@ -289,60 +292,39 @@ namespace PlayniteAudioSwitcher
         private IEnumerable<MainMenuItem> GetFullscreenMenuItems()
         {
             var currentDeviceId = GetCurrentDeviceId();
-            var items = new List<MainMenuItem>
-            {
-                new MainMenuItem
-                {
-                    MenuSection = MenuRoot,
-                    Description = Loc("LOCAS_MenuSwitchCustom"),
-                    Action = _ => ToggleCustomDevices()
-                }
-            };
+            var items = new List<MainMenuItem>();
 
-            if (!string.IsNullOrWhiteSpace(settings.FullscreenPreferredDeviceId))
-            {
-                items.Add(new MainMenuItem
-                {
-                    MenuSection = MenuRoot,
-                    Description = $"{Loc("LOCAS_UsePreferred")}: {GetDeviceLabel(settings.FullscreenPreferredDeviceId, false)}",
-                    Action = _ => SetConfiguredDevice(settings.FullscreenPreferredDeviceId, true)
-                });
-            }
-
-            foreach (var device in SafeGetDevicesForMenus())
+            foreach (var device in SafeGetDevices())
             {
                 var deviceId = device.Id;
+                var deviceName = GetDeviceDisplayName(device);
                 items.Add(new MainMenuItem
                 {
-                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_CustomDevices")}",
-                    Description = GetDeviceLabel(deviceId, true),
-                    Action = _ => SetDevice(deviceId, GetDeviceDisplayName(device))
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_AudioDevices")}",
+                    Description = GetFullscreenDeviceMenuText(device, currentDeviceId, false),
+                    Action = _ => SetDevice(deviceId, deviceName)
                 });
             }
+
+            items.Add(new MainMenuItem
+            {
+                MenuSection = $"{MenuRoot}|{Loc("LOCAS_DefaultDevice")}",
+                Description = Loc("LOCAS_DefaultDeviceHelp"),
+                Action = _ => { }
+            });
 
             foreach (var device in SafeGetDevices())
             {
                 var deviceId = device.Id;
                 items.Add(new MainMenuItem
                 {
-                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_AllOutputDevices")}",
-                    Description = GetDeviceLabel(deviceId, true, includeDefaultStar: true),
-                    Action = _ => SetDevice(deviceId, GetDeviceDisplayName(device))
-                });
-            }
-
-            foreach (var device in SafeGetDevices())
-            {
-                var deviceId = device.Id;
-                items.Add(new MainMenuItem
-                {
-                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_FullscreenPreferredDevice")}",
-                    Description = GetDeviceLabel(deviceId, false),
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_DefaultDevice")}",
+                    Description = GetFullscreenDeviceMenuText(device, settings.FullscreenPreferredDeviceId, true),
                     Action = _ =>
                     {
                         settings.FullscreenPreferredDeviceId = deviceId;
                         SavePluginSettings(settings);
-                        ShowMessage($"{Loc("LOCAS_PreferredFullscreen")}: {GetDeviceLabel(deviceId, false)}");
+                        ShowMessage($"{Loc("LOCAS_PreferredFullscreen")}: {GetDeviceDisplayName(device)}");
                     }
                 });
             }
@@ -352,13 +334,13 @@ namespace PlayniteAudioSwitcher
 
         public void ToggleCustomDevices()
         {
-            var customDevices = SafeGetDevices()
-                .Where(a => settings.HasCustomName(a.Id))
+            var switchDevices = SafeGetDevices()
+                .Where(a => settings.QuickSwitchAllDevices || settings.HasCustomName(a.Id))
                 .OrderBy(a => a.EffectiveName)
                 .ToList();
-            if (customDevices.Count < 2)
+            if (switchDevices.Count < 2)
             {
-                ShowMessage(Loc("LOCAS_NeedTwoCustomDevices"));
+                ShowMessage(Loc("LOCAS_NeedTwoSwitchDevices"));
                 OpenSettingsView();
                 return;
             }
@@ -366,8 +348,8 @@ namespace PlayniteAudioSwitcher
             try
             {
                 var current = AudioDevices.GetDefaultPlaybackDevice();
-                var currentIndex = customDevices.FindIndex(a => string.Equals(a.Id, current?.Id, StringComparison.OrdinalIgnoreCase));
-                var target = customDevices[(currentIndex + 1 + customDevices.Count) % customDevices.Count];
+                var currentIndex = switchDevices.FindIndex(a => string.Equals(a.Id, current?.Id, StringComparison.OrdinalIgnoreCase));
+                var target = switchDevices[(currentIndex + 1 + switchDevices.Count) % switchDevices.Count];
 
                 SetDevice(target.Id, GetDeviceDisplayName(target));
             }
@@ -534,7 +516,7 @@ namespace PlayniteAudioSwitcher
             var device = SafeGetDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase));
             var name = GetDeviceDisplayName(deviceId);
             var text = FormatDeviceVisual(settings.GetIcon(deviceId), name);
-            if (includeActiveMarker && string.Equals(deviceId, GetCurrentDeviceId(), StringComparison.OrdinalIgnoreCase))
+            if (false && includeActiveMarker && string.Equals(deviceId, GetCurrentDeviceId(), StringComparison.OrdinalIgnoreCase))
             {
                 text = "✕ " + text;
             }
@@ -549,24 +531,75 @@ namespace PlayniteAudioSwitcher
 
         private string FormatDeviceVisual(string icon, string name)
         {
-            var hasIcon = !string.IsNullOrWhiteSpace(icon);
+            var iconText = GetIconText(icon);
+            var hasIcon = !string.IsNullOrWhiteSpace(iconText);
             if (settings.DeviceDisplayMode == "Icon" && hasIcon)
             {
-                return icon;
+                return iconText;
             }
 
             if (settings.DeviceDisplayMode == "TextAndIcon" && hasIcon)
             {
-                return $"{icon} {name}";
+                return $"{iconText} {name}";
             }
 
             return name;
         }
 
+        private string GetFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)
+        {
+            var name = FormatDeviceVisual(device.Icon, GetDeviceDisplayName(device));
+            var isSelected = string.Equals(device.Id, selectedDeviceId, StringComparison.OrdinalIgnoreCase);
+            if (isSelected && useStarForSelected)
+            {
+                name = "â˜… " + name;
+            }
+
+            if (isSelected && !useStarForSelected)
+            {
+                name = $"{name} ({Loc("LOCAS_CurrentDevice")})";
+            }
+
+            if (!string.IsNullOrWhiteSpace(device.CustomName) &&
+                !string.Equals(device.CustomName, device.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                name = $"{name} - {device.Name}";
+            }
+
+            return name;
+        }
+
+        private string GetIconText(string icon)
+        {
+            switch (icon)
+            {
+                case "volume-2":
+                    return "V+";
+                case "volume-1":
+                    return "V";
+                case "headphones":
+                    return "HP";
+                case "speaker":
+                    return "SP";
+                case "tv":
+                    return "TV";
+                case "monitor":
+                    return "PC";
+                case "gamepad-2":
+                    return "GP";
+                case "bluetooth":
+                    return "BT";
+                case "usb":
+                    return "USB";
+                default:
+                    return icon;
+            }
+        }
+
         private string GetMenuDeviceName(string deviceId, string displayName, string currentDeviceId, bool isSelectedProfile)
         {
             var prefix = string.Empty;
-            if (string.Equals(deviceId, currentDeviceId, StringComparison.OrdinalIgnoreCase))
+            if (false && string.Equals(deviceId, currentDeviceId, StringComparison.OrdinalIgnoreCase))
             {
                 prefix += "✕ ";
             }

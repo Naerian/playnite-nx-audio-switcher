@@ -20,6 +20,7 @@ namespace PlayniteAudioSwitcher
         private bool showNotifications = true;
         private bool fullscreenOnlyFavorites = true;
         private bool quickSwitchEnabled = true;
+        private bool quickSwitchAllDevices = true;
         private bool applyFullscreenPreferredOnStartup = true;
         private bool restoreDeviceAfterGameProfile = true;
 
@@ -43,6 +44,7 @@ namespace PlayniteAudioSwitcher
                 ShowNotifications = savedSettings.ShowNotifications;
                 FullscreenOnlyFavorites = savedSettings.FullscreenOnlyFavorites;
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
+                QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
                 ApplyFullscreenPreferredOnStartup = savedSettings.ApplyFullscreenPreferredOnStartup;
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
             }
@@ -102,7 +104,7 @@ namespace PlayniteAudioSwitcher
         };
 
         [DontSerialize]
-        public List<string> IconOptions => new List<string>
+        private List<string> LegacyIconOptions => new List<string>
         {
             string.Empty,
             "🔊",
@@ -113,6 +115,21 @@ namespace PlayniteAudioSwitcher
             "🎮",
             "🔵",
             "⭐"
+        };
+
+        [DontSerialize]
+        public List<AudioIconOption> IconOptions => new List<AudioIconOption>
+        {
+            new AudioIconOption { Id = string.Empty, Name = plugin?.Loc("LOCAS_NoIcon") ?? "None", Glyph = string.Empty },
+            new AudioIconOption { Id = "volume-2", Name = "volume-2", Glyph = "V+" },
+            new AudioIconOption { Id = "volume-1", Name = "volume-1", Glyph = "V" },
+            new AudioIconOption { Id = "headphones", Name = "headphones", Glyph = "HP" },
+            new AudioIconOption { Id = "speaker", Name = "speaker", Glyph = "SP" },
+            new AudioIconOption { Id = "tv", Name = "tv", Glyph = "TV" },
+            new AudioIconOption { Id = "monitor", Name = "monitor", Glyph = "PC" },
+            new AudioIconOption { Id = "gamepad-2", Name = "gamepad-2", Glyph = "GP" },
+            new AudioIconOption { Id = "bluetooth", Name = "bluetooth", Glyph = "BT" },
+            new AudioIconOption { Id = "usb", Name = "usb", Glyph = "USB" }
         };
 
         public bool ShowNotifications
@@ -131,6 +148,12 @@ namespace PlayniteAudioSwitcher
         {
             get => quickSwitchEnabled;
             set => SetValue(ref quickSwitchEnabled, value);
+        }
+
+        public bool QuickSwitchAllDevices
+        {
+            get => quickSwitchAllDevices;
+            set => SetValue(ref quickSwitchAllDevices, value);
         }
 
         public bool ApplyFullscreenPreferredOnStartup
@@ -287,6 +310,7 @@ namespace PlayniteAudioSwitcher
                 ShowNotifications = ShowNotifications,
                 FullscreenOnlyFavorites = FullscreenOnlyFavorites,
                 QuickSwitchEnabled = QuickSwitchEnabled,
+                QuickSwitchAllDevices = QuickSwitchAllDevices,
                 ApplyFullscreenPreferredOnStartup = ApplyFullscreenPreferredOnStartup,
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile
             };

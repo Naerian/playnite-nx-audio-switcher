@@ -37,4 +37,13 @@
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">Skonfigurowane urządzenie audio nie jest obecnie aktywne.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Wyjście audio</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Nieznane urządzenie</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Szybkie przelaczanie obejmuje wszystkie aktywne urzadzenia</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Szybkie przelaczanie moze obejmowac wszystkie aktywne urzadzenia albo tylko urzadzenia z nazwami niestandardowymi.</sys:String>
+    <sys:String x:Key="LOCAS_AudioDevices">Urzadzenia audio</sys:String>
+    <sys:String x:Key="LOCAS_DefaultDevice">Urzadzenie domyslne</sys:String>
+    <sys:String x:Key="LOCAS_DefaultDeviceHelp">To urzadzenie bedzie uzywane przy kazdym uruchomieniu Playnite w trybie pelnoekranowym.</sys:String>
+    <sys:String x:Key="LOCAS_CurrentDevice">aktywne</sys:String>
+    <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Do przelaczania potrzebne sa co najmniej dwa aktywne urzadzenia audio.</sys:String>
+    <sys:String x:Key="LOCAS_SelectorPanelHelp">Wybierz urzadzenie wyjsciowe, ktore Windows ma ustawic jako domyslne audio.</sys:String>
+    <sys:String x:Key="LOCAS_NoIcon">Bez ikony</sys:String>
 </ResourceDictionary>

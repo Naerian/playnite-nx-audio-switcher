@@ -37,4 +37,13 @@
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">The configured audio device is not currently active.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Audio output</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Unknown device</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Quick switch cycles through all active devices</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Quick switch can cycle through all active devices or only devices with custom names.</sys:String>
+    <sys:String x:Key="LOCAS_AudioDevices">Audio devices</sys:String>
+    <sys:String x:Key="LOCAS_DefaultDevice">Default device</sys:String>
+    <sys:String x:Key="LOCAS_DefaultDeviceHelp">This device will be used every time Playnite opens in Fullscreen mode.</sys:String>
+    <sys:String x:Key="LOCAS_CurrentDevice">current</sys:String>
+    <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">At least two active audio devices are required to switch.</sys:String>
+    <sys:String x:Key="LOCAS_SelectorPanelHelp">Choose the output device Windows will use as the default audio output.</sys:String>
+    <sys:String x:Key="LOCAS_NoIcon">No icon</sys:String>
 </ResourceDictionary>

@@ -37,4 +37,13 @@
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">El dispositivo de audio configurado no está activo ahora mismo.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Salida de audio</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Dispositivo desconocido</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevices">El acceso rapido alterna entre todos los dispositivos activos</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchHelpAll">El acceso rapido puede alternar entre todos los dispositivos activos o solo entre los que tengan nombre personalizado.</sys:String>
+    <sys:String x:Key="LOCAS_AudioDevices">Dispositivos de audio</sys:String>
+    <sys:String x:Key="LOCAS_DefaultDevice">Dispositivo predeterminado</sys:String>
+    <sys:String x:Key="LOCAS_DefaultDeviceHelp">Este dispositivo se usara cada vez que se abra la pantalla completa de Playnite.</sys:String>
+    <sys:String x:Key="LOCAS_CurrentDevice">actual</sys:String>
+    <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Se necesitan al menos dos dispositivos de audio activos para alternar.</sys:String>
+    <sys:String x:Key="LOCAS_SelectorPanelHelp">Elige el dispositivo de salida que Windows usara como audio predeterminado.</sys:String>
+    <sys:String x:Key="LOCAS_NoIcon">Sin icono</sys:String>
 </ResourceDictionary>
