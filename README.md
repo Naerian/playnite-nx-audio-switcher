@@ -86,7 +86,61 @@ Some games keep using the audio device they opened on startup. If a running game
 
 ## Theme Integration
 
-Theme authors can place Audio Switcher controls anywhere Playnite supports custom plugin elements.
+Theme authors can integrate Audio Switcher through `PluginSettings` bindings. This is the recommended path for Fullscreen themes because the theme owns the layout, focus behavior, and overlays.
+
+Available binding source:
+
+```xml
+{PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceName}
+```
+
+Useful properties:
+
+- `CurrentDeviceName`
+- `CurrentDeviceLabel`
+- `CurrentDeviceIconGeometry`
+- `CurrentDeviceId`
+- `PreferredDeviceName`
+- `Devices`
+- `HasDevices`
+- `IsSelectorOpen`
+
+Useful commands:
+
+- `ToggleSelectorCommand`
+- `OpenSelectorCommand`
+- `CloseSelectorCommand`
+- `NextDeviceCommand`
+- `RefreshDevicesCommand`
+- `SetDeviceCommand`
+- `SetPreferredDeviceCommand`
+
+Example icon button:
+
+```xml
+<Button Command="{PluginSettings Plugin=AudioSwitcher, Path=ToggleSelectorCommand}">
+    <Path Data="{PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceIconGeometry}" />
+</Button>
+```
+
+Example device list:
+
+```xml
+<ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=Devices}">
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=SetDeviceCommand}"
+                    CommandParameter="{Binding Id}">
+                <TextBlock Text="{Binding DisplayName}" />
+            </Button>
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+</ItemsControl>
+```
+
+Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsPreferred`, `CurrentMarker`, and `PreferredMarker`.
+
+Custom controls are still available for simpler placements, but they should be treated as convenience controls rather than the primary Fullscreen integration path.
 
 Show the current output device without interaction:
 
@@ -100,13 +154,13 @@ Place a compact quick-switch button that cycles through configured custom device
 <ContentControl x:Name="AudioSwitcher_AudioSwitcherButton" />
 ```
 
-Place an icon button with a built-in output selector panel:
+Place an icon button that toggles `IsSelectorOpen`:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
 ```
 
-This control is self-contained: it renders as an icon-only button and opens its own controller-friendly device panel by injecting an overlay into the theme visual tree. It does not require the theme to create a separate popup or window. It uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
+This control renders as an icon-only button and toggles the exposed selector state. The theme should render the actual selector panel using the `Devices` collection and commands above. The icon uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
 
 Place a full dropdown selector:
 

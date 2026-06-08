@@ -35,6 +35,8 @@ namespace PlayniteAudioSwitcher
 
         public AudioDeviceManager AudioDevices { get; } = new AudioDeviceManager();
 
+        public AudioSwitcherThemeApi Theme { get; }
+
         public AudioSwitcherPlugin(IPlayniteAPI playniteApi) : base(playniteApi)
         {
             logger = LogManager.GetLogger();
@@ -42,6 +44,7 @@ namespace PlayniteAudioSwitcher
             {
                 HasSettings = true
             };
+            Theme = new AudioSwitcherThemeApi(this);
 
             EnsureEnglishFallbackResources();
 
@@ -60,8 +63,8 @@ namespace PlayniteAudioSwitcher
 
             AddSettingsSupport(new AddSettingsSupportArgs
             {
-                SourceName = Loc("LOCAS_PluginName"),
-                SettingsRoot = "Settings"
+                SourceName = "AudioSwitcher",
+                SettingsRoot = "Theme"
             });
 
             ReloadSettings();
@@ -134,6 +137,7 @@ namespace PlayniteAudioSwitcher
         public void ReloadSettings()
         {
             settings = new AudioSwitcherSettings(this);
+            Theme?.Refresh();
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
@@ -343,7 +347,7 @@ namespace PlayniteAudioSwitcher
 
             if (args.State == ControllerInputState.Pressed &&
                 args.Button == ControllerInput.B &&
-                CloseOpenThemeSelector())
+                (CloseOpenThemeSelector() || CloseThemeApiSelector()))
             {
                 return;
             }
@@ -448,6 +452,18 @@ namespace PlayniteAudioSwitcher
         public void SetThemeSelectedDevice(string deviceId)
         {
             SetConfiguredDevice(deviceId, true);
+        }
+
+        public void SetThemePreferredDevice(string deviceId)
+        {
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                return;
+            }
+
+            settings.FullscreenPreferredDeviceId = deviceId;
+            SavePluginSettings(settings);
+            Theme?.Refresh();
         }
 
         public void OpenThemeDeviceSelector(Action onDeviceSelected = null)
@@ -555,6 +571,11 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public string GetDeviceDisplayNameForTheme(string deviceId)
+        {
+            return GetDeviceDisplayName(deviceId);
+        }
+
         public Geometry GetCurrentDeviceIconGeometry()
         {
             try
@@ -618,6 +639,7 @@ namespace PlayniteAudioSwitcher
             {
                 AudioDevices.SetDefaultPlaybackDevice(deviceId);
                 settings.RefreshDevices();
+                Theme?.Refresh();
                 if (notify && settings.ShowNotifications)
                 {
                     ShowMessage(GetOutputNotificationText(deviceName));
@@ -662,6 +684,17 @@ namespace PlayniteAudioSwitcher
             }
 
             closeThemeSelector?.Invoke();
+            return true;
+        }
+
+        private bool CloseThemeApiSelector()
+        {
+            if (Theme?.IsSelectorOpen != true)
+            {
+                return false;
+            }
+
+            Theme.CloseSelector();
             return true;
         }
 
@@ -713,7 +746,7 @@ namespace PlayniteAudioSwitcher
                 Loc("LOCAS_UnknownDevice");
         }
 
-        private string GetCurrentDeviceId()
+        public string GetCurrentDeviceId()
         {
             try
             {
