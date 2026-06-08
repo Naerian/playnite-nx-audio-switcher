@@ -16,6 +16,7 @@
                     Background="{DynamicResource NormalBrush}"
                     BorderBrush="{DynamicResource NormalBorderBrush}"
                     BorderThickness="1"
+                    TextElement.Foreground="{DynamicResource TextBrush}"
                     Padding="12"
                     MinWidth="320"
                     MaxHeight="520" />
