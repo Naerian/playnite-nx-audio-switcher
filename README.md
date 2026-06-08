@@ -130,4 +130,6 @@ Community translation contributions are welcome.
 
 ## Support
 
-If this plugin is useful to you, you can support the project by buying the author a coffee on [Ko-fi](https://ko-fi.com/naerian).
+If you find this project useful and want to support its development, consider buying me a coffee!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/naerian)
