@@ -425,10 +425,13 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioDevice> GetThemeSelectorDevices()
         {
-            return SafeGetDevices()
+            var currentDeviceId = GetCurrentDeviceId();
+            var preferredDeviceId = settings.FullscreenPreferredDeviceId;
+
+            return SafeGetDevicesForMenus()
                 .Select(device =>
                 {
-                    device.SettingsDisplayName = GetDeviceLabel(device.Id, false, includeDefaultStar: true);
+                    device.SettingsDisplayName = GetFullscreenDeviceMenuText(device, currentDeviceId, preferredDeviceId);
                     return device;
                 })
                 .ToList();
@@ -471,40 +474,14 @@ namespace PlayniteAudioSwitcher
                     window.Close();
                 };
 
-                var title = new TextBlock
-                {
-                    Text = Loc("LOCAS_AudioDevices"),
-                    FontSize = 22,
-                    FontWeight = FontWeights.SemiBold,
-                    Margin = new Thickness(0, 0, 0, 8)
-                };
-                title.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
-
-                var help = new TextBlock
-                {
-                    Text = Loc("LOCAS_SelectorPanelHelp"),
-                    TextWrapping = TextWrapping.Wrap,
-                    Opacity = 0.75,
-                    Margin = new Thickness(0, 0, 0, 16)
-                };
-                help.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
-
-                var panel = new StackPanel
-                {
-                    Margin = new Thickness(24)
-                };
-                panel.Children.Add(title);
-                panel.Children.Add(help);
-                panel.Children.Add(list);
-
                 var border = new Border
                 {
-                    Padding = new Thickness(6),
-                    Child = panel
+                    Child = list
                 };
-                border.SetResourceReference(Border.BackgroundProperty, "NormalBrush");
+                ApplyFullscreenMenuPanelStyle(border);
                 TextElement.SetForeground(border, Application.Current?.TryFindResource("TextBrush") as Brush ?? Brushes.White);
 
+                window.Background = ResolvePanelBrush();
                 window.Content = border;
                 activeThemeSelectorWindow = window;
                 activeThemeSelectorList = list;
@@ -648,6 +625,35 @@ namespace PlayniteAudioSwitcher
             }
 
             return activeThemeSelectorList.ActivateFocusedDevice();
+        }
+
+        private void ApplyFullscreenMenuPanelStyle(Border border)
+        {
+            var style = Application.Current?.TryFindResource("ExtensionsBorder") as Style;
+            if (style != null && (style.TargetType == null || style.TargetType.IsAssignableFrom(typeof(Border))))
+            {
+                border.Style = style;
+                return;
+            }
+
+            border.MinWidth = 430;
+            border.MaxWidth = 560;
+            border.MaxHeight = 650;
+            border.Padding = new Thickness(22);
+            border.BorderThickness = new Thickness(1);
+            border.CornerRadius = new CornerRadius(12);
+            border.Background = ResolvePanelBrush();
+            border.BorderBrush = Application.Current?.TryFindResource("GlyphBrush") as Brush ??
+                                 Application.Current?.TryFindResource("SelectionBrush") as Brush ??
+                                 Brushes.White;
+        }
+
+        private Brush ResolvePanelBrush()
+        {
+            return Application.Current?.TryFindResource("OverlayMenuBackgroundBrush") as Brush ??
+                   Application.Current?.TryFindResource("ControlBackgroundDarkBrush") as Brush ??
+                   Application.Current?.TryFindResource("ControlBackgroundBrush") as Brush ??
+                   new SolidColorBrush(Color.FromArgb(242, 10, 13, 20));
         }
 
         private string GetOutputNotificationText(string deviceName)
