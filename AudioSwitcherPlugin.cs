@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using Playnite.SDK;
 using Playnite.SDK.Controls;
@@ -19,6 +22,7 @@ namespace PlayniteAudioSwitcher
         private AudioSwitcherSettings settings;
         private GameAudioProfileStore gameProfiles;
         private DateTime lastQuickSwitch = DateTime.MinValue;
+        private ResourceDictionary englishFallbackResources;
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -31,6 +35,8 @@ namespace PlayniteAudioSwitcher
             {
                 HasSettings = true
             };
+
+            EnsureEnglishFallbackResources();
 
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
@@ -62,7 +68,60 @@ namespace PlayniteAudioSwitcher
         public string Loc(string key)
         {
             var value = PlayniteApi.Resources.GetString(key);
-            return string.IsNullOrWhiteSpace(value) || value == key ? key : value;
+            if (!string.IsNullOrWhiteSpace(value) && value != key)
+            {
+                return value;
+            }
+
+            return GetEnglishFallbackString(key) ?? key;
+        }
+
+        private void EnsureEnglishFallbackResources()
+        {
+            try
+            {
+                englishFallbackResources = LoadEnglishFallbackResources();
+                if (englishFallbackResources == null || Application.Current?.Resources == null)
+                {
+                    return;
+                }
+
+                var alreadyLoaded = Application.Current.Resources.MergedDictionaries
+                    .OfType<ResourceDictionary>()
+                    .Any(a => ReferenceEquals(a, englishFallbackResources) || a.Contains("LOCAS_PluginName") && Equals(a["LOCAS_PluginName"], "Audio Switcher"));
+                if (!alreadyLoaded)
+                {
+                    Application.Current.Resources.MergedDictionaries.Insert(0, englishFallbackResources);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.Warn(ex, "Failed to load English fallback resources.");
+            }
+        }
+
+        private ResourceDictionary LoadEnglishFallbackResources()
+        {
+            var path = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "Localization", "en_US.xaml");
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            using (var stream = File.OpenRead(path))
+            {
+                return XamlReader.Load(stream) as ResourceDictionary;
+            }
+        }
+
+        private string GetEnglishFallbackString(string key)
+        {
+            if (englishFallbackResources == null)
+            {
+                englishFallbackResources = LoadEnglishFallbackResources();
+            }
+
+            return englishFallbackResources?.Contains(key) == true ? englishFallbackResources[key]?.ToString() : null;
         }
 
         public void ReloadSettings()
