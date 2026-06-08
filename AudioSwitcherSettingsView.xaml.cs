@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -65,9 +66,9 @@ namespace PlayniteAudioSwitcher
                 var iconBox = new ComboBox
                 {
                     ItemsSource = settings.IconOptions,
-                    DisplayMemberPath = "DisplayName",
                     SelectedValuePath = "Id",
-                    SelectedValue = device.Icon ?? string.Empty
+                    SelectedValue = device.Icon ?? string.Empty,
+                    ItemTemplate = CreateIconTemplate()
                 };
                 iconBox.SelectionChanged += (_, __) => device.Icon = iconBox.SelectedValue?.ToString();
                 iconPanel.Children.Add(iconLabel);
@@ -114,6 +115,41 @@ namespace PlayniteAudioSwitcher
 
                 DeviceRowsPanel.Children.Add(row);
             }
+        }
+
+        private static DataTemplate CreateIconTemplate()
+        {
+            var template = new DataTemplate(typeof(AudioIconOption));
+
+            var panel = new FrameworkElementFactory(typeof(StackPanel));
+            panel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+            panel.SetValue(FrameworkElement.MinHeightProperty, 24d);
+
+            var viewbox = new FrameworkElementFactory(typeof(Viewbox));
+            viewbox.SetValue(FrameworkElement.WidthProperty, 20d);
+            viewbox.SetValue(FrameworkElement.HeightProperty, 20d);
+            viewbox.SetValue(FrameworkElement.MarginProperty, new Thickness(0, 0, 8, 0));
+            viewbox.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+
+            var path = new FrameworkElementFactory(typeof(Path));
+            path.SetValue(Path.StretchProperty, Stretch.Uniform);
+            path.SetValue(Path.StrokeProperty, Brushes.Gray);
+            path.SetValue(Path.StrokeThicknessProperty, 2d);
+            path.SetValue(Path.StrokeStartLineCapProperty, PenLineCap.Round);
+            path.SetValue(Path.StrokeEndLineCapProperty, PenLineCap.Round);
+            path.SetValue(Path.StrokeLineJoinProperty, PenLineJoin.Round);
+            path.SetValue(Path.FillProperty, Brushes.Transparent);
+            path.SetBinding(Path.DataProperty, new Binding("GeometryData") { Converter = new IconGeometryConverter() });
+            viewbox.AppendChild(path);
+            panel.AppendChild(viewbox);
+
+            var text = new FrameworkElementFactory(typeof(TextBlock));
+            text.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            text.SetBinding(TextBlock.TextProperty, new Binding("DisplayName"));
+            panel.AppendChild(text);
+
+            template.VisualTree = panel;
+            return template;
         }
     }
 }

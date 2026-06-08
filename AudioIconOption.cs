@@ -8,6 +8,8 @@ namespace PlayniteAudioSwitcher
 
         public string Glyph { get; set; }
 
-        public string DisplayName => string.IsNullOrWhiteSpace(Glyph) ? Name : $"{Glyph} {Name}";
+        public string GeometryData { get; set; }
+
+        public string DisplayName => Name;
     }
 }
