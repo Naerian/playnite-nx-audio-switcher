@@ -6,4 +6,4 @@ Module: PlayniteAudioSwitcher.dll
 Type: GenericPlugin
 Links:
   - Name: Source
-    Url: https://local.dev/playnite-audio-switcher
+    Url: https://github.com/Naerian/playnite-nx-audio-switcher
