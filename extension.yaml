@@ -1,0 +1,9 @@
+Id: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
+Name: Alternador de audio
+Author: Codex
+Version: 0.5.0
+Module: PlayniteAudioSwitcher.dll
+Type: GenericPlugin
+Links:
+  - Name: Source
+    Url: https://local.dev/playnite-audio-switcher

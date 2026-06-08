@@ -1,0 +1,10 @@
+<playnite:PluginUserControl x:Class="PlayniteAudioSwitcher.AudioDeviceSelectorControl"
+                            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                            xmlns:playnite="clr-namespace:Playnite.SDK.Controls;assembly=Playnite.SDK">
+    <ComboBox x:Name="DevicesComboBox"
+              MinWidth="220"
+              DisplayMemberPath="SettingsDisplayName"
+              SelectedValuePath="Id"
+              SelectionChanged="DevicesComboBox_SelectionChanged" />
+</playnite:PluginUserControl>
