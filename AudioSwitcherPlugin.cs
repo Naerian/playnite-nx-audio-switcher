@@ -37,7 +37,10 @@ namespace PlayniteAudioSwitcher
                 ElementList = new List<string>
                 {
                     "AudioSwitcherButton",
-                    "AudioDeviceSelector"
+                    "AudioDeviceSelector",
+                    "CurrentDevice",
+                    "OpenSelectorButton",
+                    "DeviceList"
                 }
             });
 
@@ -172,6 +175,21 @@ namespace PlayniteAudioSwitcher
             if (args.Name == "AudioDeviceSelector")
             {
                 return new AudioDeviceSelectorControl(this);
+            }
+
+            if (args.Name == "CurrentDevice")
+            {
+                return new AudioCurrentDeviceControl(this);
+            }
+
+            if (args.Name == "OpenSelectorButton")
+            {
+                return new AudioOpenSelectorButtonControl(this);
+            }
+
+            if (args.Name == "DeviceList")
+            {
+                return new AudioDeviceListControl(this);
             }
 
             return null;

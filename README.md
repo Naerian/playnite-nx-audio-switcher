@@ -86,19 +86,39 @@ Some games keep using the audio device they opened on startup. If a running game
 
 ## Theme Integration
 
-Theme authors can place a compact quick-switch button anywhere with:
+Theme authors can place Audio Switcher controls anywhere Playnite supports custom plugin elements.
+
+Show the current output device without interaction:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_CurrentDevice" />
+```
+
+Place a compact quick-switch button that cycles through configured custom devices:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_AudioSwitcherButton" />
 ```
 
-Theme authors can place a full device selector anywhere with:
+Place a button that opens a compact output selector:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
+```
+
+Place a full dropdown selector:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_AudioDeviceSelector" />
 ```
 
-The controls respect the plugin's display mode setting: text, text plus icon, or icon only.
+Place a controller-friendly device list:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_DeviceList" />
+```
+
+All controls respect the plugin's display mode setting: text, text plus icon, or icon only. The device selector and device list show the active output marker and use the user's custom names and icons when configured.
 
 ## Localization
 
