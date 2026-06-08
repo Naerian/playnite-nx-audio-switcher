@@ -106,7 +106,7 @@ Place an icon button with a built-in output selector panel:
 <ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
 ```
 
-This control is self-contained: it renders as an icon-only button and opens its own controller-friendly device panel, without requiring the theme to create a separate popup or window. It uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
+This control is self-contained: it renders as an icon-only button and opens its own controller-friendly device panel by injecting an overlay into the theme visual tree. It does not require the theme to create a separate popup or window. It uses the current device icon when configured, and falls back to the bundled speaker icon. Theme authors can override the fallback icon by defining an `AudioSwitcher_DefaultIconGeometry` geometry resource.
 
 Place a full dropdown selector:
 
