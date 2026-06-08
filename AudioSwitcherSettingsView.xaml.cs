@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace PlayniteAudioSwitcher
 {
@@ -24,10 +26,8 @@ namespace PlayniteAudioSwitcher
             {
                 var border = new Border
                 {
-                    BorderBrush = System.Windows.Media.Brushes.Gray,
-                    BorderThickness = new Thickness(0, 0, 0, 1),
-                    Padding = new Thickness(0, 0, 0, 12),
-                    Margin = new Thickness(0, 0, 0, 12)
+                    BorderThickness = new Thickness(0),
+                    Padding = new Thickness(0, 0, 0, 12)
                 };
 
                 var grid = new Grid();
@@ -94,7 +94,25 @@ namespace PlayniteAudioSwitcher
                 grid.Children.Add(customNamePanel);
 
                 border.Child = grid;
-                DeviceRowsPanel.Children.Add(border);
+                var row = new Grid { Margin = new Thickness(0, 0, 0, 12) };
+                row.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                row.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1) });
+                row.Children.Add(border);
+
+                var separator = new Line
+                {
+                    X1 = 0,
+                    X2 = 1,
+                    Stretch = Stretch.Fill,
+                    Stroke = Brushes.Gray,
+                    StrokeThickness = 1,
+                    StrokeDashArray = new DoubleCollection { 2, 3 },
+                    Opacity = 0.35
+                };
+                Grid.SetRow(separator, 1);
+                row.Children.Add(separator);
+
+                DeviceRowsPanel.Children.Add(row);
             }
         }
     }
