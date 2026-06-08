@@ -20,10 +20,7 @@ It is designed for couch and console-like setups where users often move between 
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Optional preferred audio device when Playnite starts in Fullscreen mode.
 - Theme integration controls for theme authors.
-- Localization resources included for:
-  - English (`en_US`)
-  - Spanish (`es_ES`)
-  - Polish (`pl_PL`)
+- Localizable UI through Playnite resource dictionaries.
 
 ## Requirements
 
@@ -107,26 +104,6 @@ The controls respect the plugin's display mode setting: text, text plus icon, or
 
 The plugin uses Playnite localization resource dictionaries under `Localization/`.
 
-Current languages:
+Translations are stored as locale-specific XAML resource dictionaries. To add or update a translation, copy an existing locale file, rename it to the target locale, and translate the string values while keeping the same resource keys.
 
-- `en_US.xaml`
-- `es_ES.xaml`
-- `pl_PL.xaml`
-
-To add a translation, copy `Localization/en_US.xaml`, rename it to the target locale, and translate the string values while keeping the same resource keys.
-
-## Development
-
-Build with:
-
-```powershell
-dotnet build .\PlayniteAudioSwitcher.csproj -c Release
-```
-
-The extension manifest is `extension.yaml`.
-
-The plugin ID is:
-
-```text
-PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
-```
+Community translation contributions are welcome.
