@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Playnite.SDK;
 using Playnite.SDK.Controls;
 using Playnite.SDK.Events;
@@ -446,6 +448,84 @@ namespace PlayniteAudioSwitcher
         public void SetThemeSelectedDevice(string deviceId)
         {
             SetConfiguredDevice(deviceId, true);
+        }
+
+        public void OpenThemeDeviceSelector(Action onDeviceSelected = null)
+        {
+            try
+            {
+                var window = PlayniteApi.Dialogs.CreateWindow(new WindowCreationOptions
+                {
+                    ShowMinimizeButton = false,
+                    ShowMaximizeButton = false
+                });
+                var parent = PlayniteApi.Dialogs.GetCurrentAppWindow();
+                if (parent != null)
+                {
+                    window.Owner = parent;
+                    window.Width = Math.Min(720, Math.Max(480, parent.Width * 0.42));
+                    window.Height = Math.Min(680, Math.Max(420, parent.Height * 0.62));
+                }
+                else
+                {
+                    window.Width = 620;
+                    window.Height = 560;
+                }
+
+                window.Title = Loc("LOCAS_AudioDevices");
+                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+                var list = new AudioDeviceListControl(this);
+                list.DeviceSelected += (_, __) =>
+                {
+                    onDeviceSelected?.Invoke();
+                    window.Close();
+                };
+
+                var title = new TextBlock
+                {
+                    Text = Loc("LOCAS_AudioDevices"),
+                    FontSize = 22,
+                    FontWeight = FontWeights.SemiBold,
+                    Margin = new Thickness(0, 0, 0, 8)
+                };
+                title.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
+
+                var help = new TextBlock
+                {
+                    Text = Loc("LOCAS_SelectorPanelHelp"),
+                    TextWrapping = TextWrapping.Wrap,
+                    Opacity = 0.75,
+                    Margin = new Thickness(0, 0, 0, 16)
+                };
+                help.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
+
+                var panel = new StackPanel
+                {
+                    Margin = new Thickness(24)
+                };
+                panel.Children.Add(title);
+                panel.Children.Add(help);
+                panel.Children.Add(list);
+
+                var border = new Border
+                {
+                    Padding = new Thickness(6),
+                    Child = panel
+                };
+                border.SetResourceReference(Border.BackgroundProperty, "NormalBrush");
+                TextElement.SetForeground(border, Application.Current?.TryFindResource("TextBrush") as Brush ?? Brushes.White);
+
+                window.Content = border;
+                window.ContentRendered += (_, __) => list.FocusFirstDevice();
+                window.Dispatcher.BeginInvoke(new Action(list.FocusFirstDevice), DispatcherPriority.ApplicationIdle);
+                window.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to open theme audio device selector.");
+                ShowMessage($"{Loc("LOCAS_AudioSwitchFailed")}: {ex.Message}");
+            }
         }
 
         public string GetCurrentDeviceDisplayName()

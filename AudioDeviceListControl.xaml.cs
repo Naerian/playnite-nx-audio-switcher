@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Playnite.SDK.Controls;
 
 namespace PlayniteAudioSwitcher
@@ -50,6 +51,17 @@ namespace PlayniteAudioSwitcher
             {
                 DeviceButtonsPanel.Children.Clear();
             }
+        }
+
+        public void FocusFirstDevice()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                DeviceButtonsPanel.Children
+                    .OfType<Button>()
+                    .FirstOrDefault()
+                    ?.Focus();
+            }), DispatcherPriority.ApplicationIdle);
         }
 
         private void DeviceButton_Click(object sender, RoutedEventArgs e)

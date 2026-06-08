@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Playnite.SDK.Controls;
 
@@ -25,37 +24,18 @@ namespace PlayniteAudioSwitcher
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            var menu = new ContextMenu
-            {
-                PlacementTarget = OpenButton
-            };
-
-            foreach (var device in plugin.GetThemeSelectorDevices().OrderBy(a => a.EffectiveName))
-            {
-                var item = new MenuItem
-                {
-                    Header = device.SettingsDisplayName,
-                    Tag = device.Id
-                };
-                item.Click += DeviceMenuItem_Click;
-                menu.Items.Add(item);
-            }
-
-            OpenButton.ContextMenu = menu;
-            menu.IsOpen = true;
+            plugin.OpenThemeDeviceSelector(Refresh);
         }
 
-        private void DeviceMenuItem_Click(object sender, RoutedEventArgs e)
+        private void OpenButton_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            var item = sender as MenuItem;
-            var deviceId = item?.Tag as string;
-            if (string.IsNullOrWhiteSpace(deviceId))
+            if (e.Key != Key.Enter && e.Key != Key.Space)
             {
                 return;
             }
 
-            plugin.SetThemeSelectedDevice(deviceId);
-            Refresh();
+            e.Handled = true;
+            plugin.OpenThemeDeviceSelector(Refresh);
         }
 
         private void Refresh()

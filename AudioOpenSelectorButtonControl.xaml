@@ -4,12 +4,34 @@
                             xmlns:playnite="clr-namespace:Playnite.SDK.Controls;assembly=Playnite.SDK">
     <Button x:Name="OpenButton"
             Click="OpenButton_Click"
+            PreviewKeyDown="OpenButton_PreviewKeyDown"
             Width="34"
             Height="34"
             MinWidth="34"
             Padding="7"
+            Background="Transparent"
+            BorderBrush="Transparent"
+            BorderThickness="0"
             HorizontalContentAlignment="Center"
             VerticalContentAlignment="Center">
+        <Button.Template>
+            <ControlTemplate TargetType="Button">
+                <Border x:Name="ButtonChrome"
+                        Background="{TemplateBinding Background}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsFocused" Value="True">
+                        <Setter TargetName="ButtonChrome" Property="Background" Value="#22FFFFFF" />
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="ButtonChrome" Property="Background" Value="#18FFFFFF" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Button.Template>
         <Viewbox Width="20"
                  Height="20"
                  Stretch="Uniform">
