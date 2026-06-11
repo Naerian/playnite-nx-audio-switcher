@@ -9,6 +9,7 @@ namespace PlayniteAudioSwitcher
     {
         private bool isCurrent;
         private bool isPreferred;
+        private bool isHighlighted;
 
         public string Id { get; set; }
 
@@ -32,6 +33,12 @@ namespace PlayniteAudioSwitcher
         {
             get => isPreferred;
             set => SetValue(ref isPreferred, value);
+        }
+
+        public bool IsHighlighted
+        {
+            get => isHighlighted;
+            set => SetValue(ref isHighlighted, value);
         }
 
         public string CurrentMarker => IsCurrent ? "\u2713" : string.Empty;

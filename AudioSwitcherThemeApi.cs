@@ -19,6 +19,7 @@ namespace PlayniteAudioSwitcher
         private Geometry currentDeviceIconGeometry;
         private string preferredDeviceName;
         private bool hasDevices;
+        private int highlightedDeviceIndex = -1;
 
         public AudioSwitcherThemeApi(AudioSwitcherPlugin plugin)
         {
@@ -99,6 +100,12 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref hasDevices, value);
         }
 
+        public int HighlightedDeviceIndex
+        {
+            get => highlightedDeviceIndex;
+            private set => SetValue(ref highlightedDeviceIndex, value);
+        }
+
         public void ToggleSelector()
         {
             IsSelectorOpen = !IsSelectorOpen;
@@ -115,6 +122,37 @@ namespace PlayniteAudioSwitcher
         {
             IsSelectorOpen = false;
             Refresh();
+        }
+
+        public void MoveHighlight(int direction)
+        {
+            if (Devices.Count == 0)
+            {
+                HighlightedDeviceIndex = -1;
+                return;
+            }
+
+            var nextIndex = HighlightedDeviceIndex < 0 ? 0 : HighlightedDeviceIndex + direction;
+            if (nextIndex < 0)
+            {
+                nextIndex = Devices.Count - 1;
+            }
+            else if (nextIndex >= Devices.Count)
+            {
+                nextIndex = 0;
+            }
+
+            SetHighlightedDeviceIndex(nextIndex);
+        }
+
+        public void SelectHighlightedDevice()
+        {
+            if (HighlightedDeviceIndex < 0 || HighlightedDeviceIndex >= Devices.Count)
+            {
+                return;
+            }
+
+            SetDevice(Devices[HighlightedDeviceIndex].Id);
         }
 
         public void Refresh()
@@ -142,6 +180,10 @@ namespace PlayniteAudioSwitcher
                 })
                 .ToList();
 
+            var previousHighlightedId = HighlightedDeviceIndex >= 0 && HighlightedDeviceIndex < Devices.Count
+                ? Devices[HighlightedDeviceIndex].Id
+                : null;
+
             Devices.Clear();
             foreach (var device in devices)
             {
@@ -149,6 +191,36 @@ namespace PlayniteAudioSwitcher
             }
 
             HasDevices = Devices.Count > 0;
+            RestoreHighlightedDevice(previousHighlightedId, currentId);
+        }
+
+        private void RestoreHighlightedDevice(string previousHighlightedId, string currentId)
+        {
+            var preferredId = IsSelectorOpen ? previousHighlightedId : currentId;
+            var index = Devices.ToList().FindIndex(device =>
+                !string.IsNullOrWhiteSpace(preferredId) &&
+                string.Equals(device.Id, preferredId, StringComparison.OrdinalIgnoreCase));
+
+            if (index < 0)
+            {
+                index = Devices.ToList().FindIndex(device => device.IsCurrent);
+            }
+
+            if (index < 0 && Devices.Count > 0)
+            {
+                index = 0;
+            }
+
+            SetHighlightedDeviceIndex(index);
+        }
+
+        private void SetHighlightedDeviceIndex(int index)
+        {
+            HighlightedDeviceIndex = index;
+            for (var i = 0; i < Devices.Count; i++)
+            {
+                Devices[i].IsHighlighted = i == index;
+            }
         }
 
         private void SetDevice(object parameter)

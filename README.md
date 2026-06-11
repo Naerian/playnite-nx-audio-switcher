@@ -104,6 +104,7 @@ Useful properties:
 - `Devices`
 - `HasDevices`
 - `IsSelectorOpen`
+- `HighlightedDeviceIndex`
 
 Useful commands:
 
@@ -138,7 +139,9 @@ Example device list:
 </ItemsControl>
 ```
 
-Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsPreferred`, `CurrentMarker`, and `PreferredMarker`.
+Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsPreferred`, `IsHighlighted`, `CurrentMarker`, and `PreferredMarker`.
+
+When `IsSelectorOpen` is true in Fullscreen, Audio Switcher handles gamepad navigation for the exposed selector state: D-pad or left stick up/down changes the highlighted item, `A` selects it, and `B` closes the selector. Themes should style `IsHighlighted` on each `Devices` item so controller users can see the active row even if focus remains outside the custom panel.
 
 Custom controls are still available for simpler placements, but they should be treated as convenience controls rather than the primary Fullscreen integration path.
 
