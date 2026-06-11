@@ -340,11 +340,6 @@ namespace PlayniteAudioSwitcher
         public override void OnControllerButtonStateChanged(OnControllerButtonStateChangedArgs args)
         {
             TrackControllerInput(args);
-            if (HandleThemeApiSelectorControllerInput(args))
-            {
-                return;
-            }
-
             if (args.State == ControllerInputState.Pressed &&
                 args.Button == ControllerInput.A &&
                 ActivateOpenThemeSelectorDevice())
@@ -355,6 +350,11 @@ namespace PlayniteAudioSwitcher
             if (args.State == ControllerInputState.Pressed &&
                 args.Button == ControllerInput.B &&
                 (CloseOpenThemeSelector() || CloseThemeApiSelector()))
+            {
+                return;
+            }
+
+            if (HandleThemeApiSelectorControllerInput(args))
             {
                 return;
             }
@@ -384,6 +384,11 @@ namespace PlayniteAudioSwitcher
         private bool HandleThemeApiSelectorControllerInput(OnControllerButtonStateChangedArgs args)
         {
             if (args.State != ControllerInputState.Pressed || Theme?.IsSelectorOpen != true)
+            {
+                return false;
+            }
+
+            if (activeThemeSelectorList != null && isThemeSelectorOpen?.Invoke() == true)
             {
                 return false;
             }

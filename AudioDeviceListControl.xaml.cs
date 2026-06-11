@@ -133,6 +133,7 @@ namespace PlayniteAudioSwitcher
             }
 
             plugin.SetThemeSelectedDevice(deviceId);
+            plugin.Theme?.CloseSelector();
             Refresh();
             DeviceSelected?.Invoke(this, EventArgs.Empty);
         }

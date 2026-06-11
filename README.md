@@ -114,7 +114,7 @@ For Fullscreen themes, the safest setup is an icon button plus the bundled `Audi
 </Border>
 ```
 
-The `AudioSwitcher_DeviceList` control creates real focusable buttons for all active playback devices, registers itself with the plugin, and receives focus when `OpenSelectorCommand` or `ToggleSelectorCommand` opens the selector. This is the recommended option for console-like gamepad navigation.
+The `AudioSwitcher_DeviceList` control creates real focusable buttons for all active playback devices, registers itself with the plugin, and receives focus when `OpenSelectorCommand` or `ToggleSelectorCommand` opens the selector. Pressing `A` selects the focused device button and closes the panel. This is the recommended option for console-like gamepad navigation.
 
 Themes that build their own panel should make it a focus scope and contain directional navigation:
 
