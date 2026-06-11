@@ -78,9 +78,9 @@ The `Back + Y` controller shortcut cycles through devices with custom names. Con
 
 Open a game's context menu and go to:
 
-`Audio > Game audio profile`
+`Audio Switcher`
 
-You can set a preferred output device for that game. When the game starts, the plugin switches to that device. When the game stops, the plugin can restore the previous output device if that option is enabled.
+You can set a preferred output device for that game from the list of active playback devices. If the game does not have a saved profile yet, the current system default device is marked in the menu. When the game starts, the plugin switches to the selected device. When the game stops, the plugin can restore the previous output device if that option is enabled.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
 

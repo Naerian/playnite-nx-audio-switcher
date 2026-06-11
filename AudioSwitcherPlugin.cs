@@ -198,29 +198,20 @@ namespace PlayniteAudioSwitcher
 
             var game = games[0];
             var currentProfile = gameProfiles.GetDeviceId(game);
+            var selectedDeviceId = string.IsNullOrWhiteSpace(currentProfile)
+                ? AudioDevices.GetDefaultPlaybackDevice()?.Id
+                : currentProfile;
             var root = VisibleMenuRoot;
-            var items = new List<GameMenuItem>
-            {
-                new GameMenuItem
-                {
-                    MenuSection = root,
-                    Description = GetCheckedMenuText(Loc("LOCAS_DefaultProfile"), string.IsNullOrWhiteSpace(currentProfile)),
-                    Action = _ =>
-                    {
-                        gameProfiles.SetDevice(game, null);
-                        ShowMessage($"{game.Name}: {Loc("LOCAS_DefaultAudio")}");
-                    }
-                }
-            };
+            var items = new List<GameMenuItem>();
 
-            foreach (var device in SafeGetDevicesForMenus())
+            foreach (var device in SafeGetDevices())
             {
                 var deviceId = device.Id;
                 var displayName = GetDeviceDisplayName(device);
                 items.Add(new GameMenuItem
                 {
                     MenuSection = root,
-                    Description = GetCheckedMenuText(displayName, string.Equals(currentProfile, deviceId, StringComparison.OrdinalIgnoreCase)),
+                    Description = GetCheckedMenuText(displayName, string.Equals(selectedDeviceId, deviceId, StringComparison.OrdinalIgnoreCase)),
                     Action = _ =>
                     {
                         gameProfiles.SetDevice(game, deviceId);
