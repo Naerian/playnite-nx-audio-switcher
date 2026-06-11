@@ -475,7 +475,7 @@ namespace PlayniteAudioSwitcher
             var currentDeviceId = GetCurrentDeviceId();
             var preferredDeviceId = settings.FullscreenPreferredDeviceId;
 
-            return SafeGetDevicesForMenus()
+            return SafeGetDevices()
                 .Select(device =>
                 {
                     device.SettingsDisplayName = GetFullscreenDeviceMenuText(device, currentDeviceId, preferredDeviceId);
