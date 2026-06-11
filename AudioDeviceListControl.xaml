@@ -3,7 +3,11 @@
                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                             xmlns:playnite="clr-namespace:Playnite.SDK.Controls;assembly=Playnite.SDK">
     <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  Focusable="False"
                   HorizontalScrollBarVisibility="Disabled">
-        <StackPanel x:Name="DeviceButtonsPanel" />
+        <StackPanel x:Name="DeviceButtonsPanel"
+                    Focusable="True"
+                    KeyboardNavigation.DirectionalNavigation="Contained"
+                    KeyboardNavigation.TabNavigation="Cycle" />
     </ScrollViewer>
 </playnite:PluginUserControl>

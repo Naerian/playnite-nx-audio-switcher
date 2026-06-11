@@ -570,6 +570,95 @@ namespace PlayniteAudioSwitcher
             closeThemeSelector = close;
         }
 
+        public void FocusThemeSelector()
+        {
+            var dispatcher = PlayniteApi?.MainView?.UIDispatcher ?? Application.Current?.Dispatcher;
+            if (dispatcher == null)
+            {
+                return;
+            }
+
+            dispatcher.BeginInvoke(new Action(FocusThemeSelectorOnUiThread), DispatcherPriority.ApplicationIdle);
+            dispatcher.BeginInvoke(new Action(FocusThemeSelectorOnUiThread), DispatcherPriority.ContextIdle);
+        }
+
+        private void FocusThemeSelectorOnUiThread()
+        {
+            if (activeThemeSelectorList != null && isThemeSelectorOpen?.Invoke() == true)
+            {
+                activeThemeSelectorList.FocusFirstDevice();
+                return;
+            }
+
+            var element = FindThemeElementByName("AudioSwitcherThemeDeviceList") ??
+                FindThemeElementByName("NexiumAudioSwitcherDeviceList") ??
+                FindThemeElementByName("AudioSwitcher_DeviceList");
+            if (element == null || !element.IsVisible)
+            {
+                return;
+            }
+
+            SetKeyboardFocus(element);
+        }
+
+        private FrameworkElement FindThemeElementByName(string name)
+        {
+            if (Application.Current?.Windows == null)
+            {
+                return null;
+            }
+
+            foreach (Window window in Application.Current.Windows)
+            {
+                var root = window.Content as DependencyObject;
+                var result = FindDescendantByName<FrameworkElement>(root, name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private T FindDescendantByName<T>(DependencyObject root, string name) where T : FrameworkElement
+        {
+            if (root == null)
+            {
+                return null;
+            }
+
+            if (root is T element && string.Equals(element.Name, name, StringComparison.Ordinal))
+            {
+                return element;
+            }
+
+            var childrenCount = VisualTreeHelper.GetChildrenCount(root);
+            for (var i = 0; i < childrenCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(root, i);
+                var result = FindDescendantByName<T>(child, name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private static void SetKeyboardFocus(FrameworkElement element)
+        {
+            var focusScope = FocusManager.GetFocusScope(element);
+            if (focusScope != null)
+            {
+                FocusManager.SetFocusedElement(focusScope, element);
+            }
+
+            element.Focus();
+            Keyboard.Focus(element);
+        }
+
         public void ClearThemeSelector(AudioDeviceListControl list)
         {
             if (!ReferenceEquals(activeThemeSelectorList, list))

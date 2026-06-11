@@ -86,7 +86,45 @@ Some games keep using the audio device they opened on startup. If a running game
 
 ## Theme Integration
 
-Theme authors can integrate Audio Switcher through `PluginSettings` bindings. This is the recommended path for Fullscreen themes because the theme owns the layout, focus behavior, and overlays.
+Theme authors have two integration paths:
+
+- Use the bundled custom controls for the most reliable controller navigation.
+- Use `PluginSettings` bindings for fully custom layouts, where the theme owns focus behavior and visual states.
+
+For Fullscreen themes, the safest setup is an icon button plus the bundled `AudioSwitcher_DeviceList` inside a theme panel:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
+
+<Border FocusManager.IsFocusScope="True"
+        KeyboardNavigation.DirectionalNavigation="Contained"
+        KeyboardNavigation.TabNavigation="Cycle">
+    <Border.Style>
+        <Style TargetType="Border">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{PluginSettings Plugin=AudioSwitcher, Path=IsSelectorOpen}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Border.Style>
+
+    <ContentControl x:Name="AudioSwitcher_DeviceList" />
+</Border>
+```
+
+The `AudioSwitcher_DeviceList` control creates real focusable buttons, registers itself with the plugin, and receives focus when `OpenSelectorCommand` or `ToggleSelectorCommand` opens the selector. This is the recommended option for console-like gamepad navigation.
+
+Themes that build their own panel should make it a focus scope and contain directional navigation:
+
+```xml
+<Grid FocusManager.IsFocusScope="True"
+      KeyboardNavigation.DirectionalNavigation="Contained"
+      KeyboardNavigation.TabNavigation="Cycle">
+    <!-- Custom selector content -->
+</Grid>
+```
 
 Available binding source:
 

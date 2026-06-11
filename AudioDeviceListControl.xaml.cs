@@ -19,11 +19,18 @@ namespace PlayniteAudioSwitcher
             this.plugin = plugin;
             InitializeComponent();
             Loaded += AudioDeviceListControl_Loaded;
+            Unloaded += AudioDeviceListControl_Unloaded;
         }
 
         private void AudioDeviceListControl_Loaded(object sender, RoutedEventArgs e)
         {
             Refresh();
+            plugin.RegisterThemeSelector(this, () => plugin.Theme?.IsSelectorOpen == true || IsVisible, () => plugin.Theme?.CloseSelector());
+        }
+
+        private void AudioDeviceListControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            plugin.ClearThemeSelector(this);
         }
 
         public void Refresh()
@@ -38,11 +45,15 @@ namespace PlayniteAudioSwitcher
                     {
                         Content = device.SettingsDisplayName,
                         Tag = device.Id,
+                        Focusable = true,
                         HorizontalContentAlignment = HorizontalAlignment.Left,
                         Margin = new Thickness(0, 0, 0, 6),
                         Padding = new Thickness(12, 8, 12, 8),
                         MinWidth = 240
                     };
+
+                    KeyboardNavigation.SetIsTabStop(button, true);
+                    KeyboardNavigation.SetDirectionalNavigation(button, KeyboardNavigationMode.Continue);
 
                     button.Click += DeviceButton_Click;
                     button.PreviewKeyDown += DeviceButton_PreviewKeyDown;
@@ -59,10 +70,22 @@ namespace PlayniteAudioSwitcher
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                DeviceButtonsPanel.Children
+                var firstButton = DeviceButtonsPanel.Children
                     .OfType<Button>()
-                    .FirstOrDefault()
-                    ?.Focus();
+                    .FirstOrDefault();
+                if (firstButton == null)
+                {
+                    return;
+                }
+
+                var focusScope = FocusManager.GetFocusScope(firstButton);
+                if (focusScope != null)
+                {
+                    FocusManager.SetFocusedElement(focusScope, firstButton);
+                }
+
+                firstButton.Focus();
+                Keyboard.Focus(firstButton);
             }), DispatcherPriority.ApplicationIdle);
         }
 

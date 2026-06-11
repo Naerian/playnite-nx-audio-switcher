@@ -116,6 +116,7 @@ namespace PlayniteAudioSwitcher
 
             IsSelectorOpen = !IsSelectorOpen;
             Refresh();
+            FocusSelectorIfOpen();
         }
 
         public void OpenSelector()
@@ -123,6 +124,7 @@ namespace PlayniteAudioSwitcher
             MarkSelectorOpened();
             IsSelectorOpen = true;
             Refresh();
+            FocusSelectorIfOpen();
         }
 
         public void CloseSelector()
@@ -170,6 +172,14 @@ namespace PlayniteAudioSwitcher
         private void MarkSelectorOpened()
         {
             confirmAvailableAt = DateTime.UtcNow.AddMilliseconds(250);
+        }
+
+        private void FocusSelectorIfOpen()
+        {
+            if (IsSelectorOpen)
+            {
+                plugin.FocusThemeSelector();
+            }
         }
 
         public void Refresh()
