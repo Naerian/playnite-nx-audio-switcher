@@ -75,6 +75,8 @@ namespace PlayniteAudioSwitcher
 
         private string MenuRoot => "@Audio Switcher";
 
+        private string VisibleMenuRoot => "Audio Switcher";
+
         public string Loc(string key)
         {
             var value = PlayniteApi.Resources.GetString(key);
@@ -196,7 +198,7 @@ namespace PlayniteAudioSwitcher
 
             var game = games[0];
             var currentProfile = gameProfiles.GetDeviceId(game);
-            var root = MenuRoot;
+            var root = VisibleMenuRoot;
             var items = new List<GameMenuItem>
             {
                 new GameMenuItem
