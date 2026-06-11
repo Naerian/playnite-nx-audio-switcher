@@ -20,6 +20,7 @@ namespace PlayniteAudioSwitcher
         private string preferredDeviceName;
         private bool hasDevices;
         private int highlightedDeviceIndex = -1;
+        private DateTime confirmAvailableAt = DateTime.MinValue;
 
         public AudioSwitcherThemeApi(AudioSwitcherPlugin plugin)
         {
@@ -108,12 +109,18 @@ namespace PlayniteAudioSwitcher
 
         public void ToggleSelector()
         {
+            if (!IsSelectorOpen)
+            {
+                MarkSelectorOpened();
+            }
+
             IsSelectorOpen = !IsSelectorOpen;
             Refresh();
         }
 
         public void OpenSelector()
         {
+            MarkSelectorOpened();
             IsSelectorOpen = true;
             Refresh();
         }
@@ -147,12 +154,22 @@ namespace PlayniteAudioSwitcher
 
         public void SelectHighlightedDevice()
         {
+            if (DateTime.UtcNow < confirmAvailableAt)
+            {
+                return;
+            }
+
             if (HighlightedDeviceIndex < 0 || HighlightedDeviceIndex >= Devices.Count)
             {
                 return;
             }
 
             SetDevice(Devices[HighlightedDeviceIndex].Id);
+        }
+
+        private void MarkSelectorOpened()
+        {
+            confirmAvailableAt = DateTime.UtcNow.AddMilliseconds(250);
         }
 
         public void Refresh()
