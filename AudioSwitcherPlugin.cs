@@ -73,7 +73,7 @@ namespace PlayniteAudioSwitcher
 
         public AudioSwitcherSettings Settings => settings;
 
-        private string MenuRoot => "@" + Loc("LOCAS_PluginName");
+        private string MenuRoot => "@Audio Switcher";
 
         public string Loc(string key)
         {
@@ -196,7 +196,7 @@ namespace PlayniteAudioSwitcher
 
             var game = games[0];
             var currentProfile = gameProfiles.GetDeviceId(game);
-            var root = PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Fullscreen ? $"@{Loc("LOCAS_GameAudioDevice")}" : "@Audio";
+            var root = MenuRoot;
             var items = new List<GameMenuItem>
             {
                 new GameMenuItem
@@ -218,7 +218,7 @@ namespace PlayniteAudioSwitcher
                 items.Add(new GameMenuItem
                 {
                     MenuSection = root,
-                    Description = GetCheckedMenuText(FormatDeviceVisual(device.Icon, displayName), string.Equals(currentProfile, deviceId, StringComparison.OrdinalIgnoreCase)),
+                    Description = GetCheckedMenuText(displayName, string.Equals(currentProfile, deviceId, StringComparison.OrdinalIgnoreCase)),
                     Action = _ =>
                     {
                         gameProfiles.SetDevice(game, deviceId);
@@ -795,12 +795,7 @@ namespace PlayniteAudioSwitcher
 
         private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId, string preferredDeviceId)
         {
-            var name = FormatDeviceVisual(device.Icon, GetDeviceDisplayName(device));
-            if (!string.IsNullOrWhiteSpace(device.CustomName) &&
-                !string.Equals(device.CustomName, device.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                name = $"{name} - {device.Name}";
-            }
+            var name = GetDeviceDisplayName(device);
 
             if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
             {
