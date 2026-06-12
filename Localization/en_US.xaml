@@ -49,6 +49,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">At least two active audio devices are required to switch.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Choose the output device Windows will use as the default audio output.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">No icon</sys:String>
+    <sys:String x:Key="LOCAS_Visible">Visible</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Audio device</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Spatial sound</sys:String>

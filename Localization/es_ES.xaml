@@ -49,6 +49,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Se necesitan al menos dos dispositivos de audio activos para alternar.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Elige el dispositivo de salida que Windows usará como audio predeterminado.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">Sin icono</sys:String>
+    <sys:String x:Key="LOCAS_Visible">Visible</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Dispositivo de audio</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Por defecto</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Sonido espacial</sys:String>

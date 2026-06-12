@@ -33,6 +33,7 @@ namespace PlayniteAudioSwitcher
 
                 var grid = new Grid();
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(240) });
 
@@ -55,6 +56,27 @@ namespace PlayniteAudioSwitcher
                 Grid.SetColumn(namePanel, 0);
                 grid.Children.Add(namePanel);
 
+                var visiblePanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
+                var visibleLabel = new TextBlock
+                {
+                    FontSize = 11,
+                    Opacity = 0.8,
+                    Margin = new Thickness(0, 0, 0, 3)
+                };
+                visibleLabel.SetResourceReference(TextBlock.TextProperty, "LOCAS_Visible");
+                var visibleBox = new CheckBox
+                {
+                    IsChecked = device.IsVisible,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 3, 0, 0)
+                };
+                visibleBox.Checked += (_, __) => device.IsVisible = true;
+                visibleBox.Unchecked += (_, __) => device.IsVisible = false;
+                visiblePanel.Children.Add(visibleLabel);
+                visiblePanel.Children.Add(visibleBox);
+                Grid.SetColumn(visiblePanel, 1);
+                grid.Children.Add(visiblePanel);
+
                 var iconPanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
                 var iconLabel = new TextBlock
                 {
@@ -73,7 +95,7 @@ namespace PlayniteAudioSwitcher
                 iconBox.SelectionChanged += (_, __) => device.Icon = iconBox.SelectedValue?.ToString();
                 iconPanel.Children.Add(iconLabel);
                 iconPanel.Children.Add(iconBox);
-                Grid.SetColumn(iconPanel, 1);
+                Grid.SetColumn(iconPanel, 2);
                 grid.Children.Add(iconPanel);
 
                 var customNamePanel = new StackPanel();
@@ -91,7 +113,7 @@ namespace PlayniteAudioSwitcher
                 customNameBox.TextChanged += (_, __) => device.CustomName = customNameBox.Text;
                 customNamePanel.Children.Add(customNameLabel);
                 customNamePanel.Children.Add(customNameBox);
-                Grid.SetColumn(customNamePanel, 2);
+                Grid.SetColumn(customNamePanel, 3);
                 grid.Children.Add(customNamePanel);
 
                 border.Child = grid;

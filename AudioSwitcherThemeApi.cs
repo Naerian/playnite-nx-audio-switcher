@@ -25,6 +25,7 @@ namespace PlayniteAudioSwitcher
         {
             this.plugin = plugin;
             Devices = new ObservableCollection<AudioSwitcherThemeDevice>();
+            AllDevices = new ObservableCollection<AudioSwitcherThemeDevice>();
             ToggleSelectorCommand = new RelayCommand(ToggleSelector);
             OpenSelectorCommand = new RelayCommand(OpenSelector);
             CloseSelectorCommand = new RelayCommand(CloseSelector);
@@ -42,6 +43,8 @@ namespace PlayniteAudioSwitcher
         }
 
         public ObservableCollection<AudioSwitcherThemeDevice> Devices { get; }
+
+        public ObservableCollection<AudioSwitcherThemeDevice> AllDevices { get; }
 
         public ICommand ToggleSelectorCommand { get; }
 
@@ -180,18 +183,13 @@ namespace PlayniteAudioSwitcher
             CurrentDeviceLabel = plugin.GetCurrentDeviceDisplayLabel();
             CurrentDeviceIconGeometry = plugin.GetCurrentDeviceIconGeometry() ?? plugin.GetIconGeometry("volume-2");
 
-            var devices = plugin.GetThemeSelectorDevices()
+            var devices = plugin.GetThemeSelectorDevices(false)
                 .OrderBy(a => a.EffectiveName)
-                .Select(device => new AudioSwitcherThemeDevice
-                {
-                    Id = device.Id,
-                    Name = device.EffectiveName,
-                    WindowsName = device.Name,
-                    DisplayName = device.SettingsDisplayName,
-                    Icon = device.EffectiveIcon,
-                    IconGeometry = plugin.GetIconGeometry(string.IsNullOrWhiteSpace(device.EffectiveIcon) ? "volume-2" : device.EffectiveIcon),
-                    IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase)
-                })
+                .Select(device => CreateThemeDevice(device, currentId))
+                .ToList();
+            var allDevices = plugin.GetThemeSelectorDevices(true)
+                .OrderBy(a => a.EffectiveName)
+                .Select(device => CreateThemeDevice(device, currentId))
                 .ToList();
 
             var previousHighlightedId = HighlightedDeviceIndex >= 0 && HighlightedDeviceIndex < Devices.Count
@@ -204,8 +202,29 @@ namespace PlayniteAudioSwitcher
                 Devices.Add(device);
             }
 
+            AllDevices.Clear();
+            foreach (var device in allDevices)
+            {
+                AllDevices.Add(device);
+            }
+
             HasDevices = Devices.Count > 0;
             RestoreHighlightedDevice(previousHighlightedId, currentId);
+        }
+
+        private AudioSwitcherThemeDevice CreateThemeDevice(AudioDevice device, string currentId)
+        {
+            return new AudioSwitcherThemeDevice
+            {
+                Id = device.Id,
+                Name = device.EffectiveName,
+                WindowsName = device.Name,
+                DisplayName = device.SettingsDisplayName,
+                Icon = device.EffectiveIcon,
+                IconGeometry = plugin.GetIconGeometry(string.IsNullOrWhiteSpace(device.EffectiveIcon) ? "volume-2" : device.EffectiveIcon),
+                IsVisible = device.IsVisible,
+                IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase)
+            };
         }
 
         private void RestoreHighlightedDevice(string previousHighlightedId, string currentId)

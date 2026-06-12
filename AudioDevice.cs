@@ -14,6 +14,8 @@ namespace PlayniteAudioSwitcher
 
         public string Icon { get; set; }
 
+        public bool IsVisible { get; set; } = true;
+
         public string EffectiveName => string.IsNullOrWhiteSpace(CustomName) ? Name : CustomName;
 
         public string EffectiveIcon => string.IsNullOrWhiteSpace(Icon) ? string.Empty : Icon;

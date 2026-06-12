@@ -11,6 +11,7 @@ It is designed for couch and console-like setups where users often move between 
 - Fullscreen quick switch with `Back + Y`.
 - Custom names for any number of audio devices.
 - Optional icon per renamed audio device.
+- Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
 - Game-specific audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
@@ -44,6 +45,7 @@ From there you can:
 
 - Give friendly names to audio devices.
 - Assign icons to devices.
+- Choose whether each device is visible in Audio Switcher menus and selectors.
 - Enable or disable the Fullscreen quick switch shortcut.
 - Enable or disable automatic game-specific audio profiles.
 - Configure whether the previous audio device is restored after a game-specific profile.
@@ -86,6 +88,8 @@ This feature is disabled by default and Audio Switcher does not bundle third-par
 5. Use a game's `Audio Switcher > Spatial sound` submenu to choose `Do not change`, `Off`, `Windows Sonic for Headphones`, `Dolby Atmos for Headphones`, or `Dolby Atmos for home theater`.
 
 When a game profile starts, Audio Switcher switches the configured output device first and then applies the selected Spatial Sound mode to the current default render device.
+
+Audio Switcher marks the last Spatial Sound mode it successfully applied. Windows does not expose the current Spatial Sound mode through the integration, so changes made outside Audio Switcher may not be reflected in the menu.
 
 Windows does not currently expose a stable public API for selecting the system Spatial Sound format, so this integration depends on the external tool and should be treated as experimental.
 
@@ -146,6 +150,7 @@ Useful properties:
 - `CurrentDeviceIconGeometry`
 - `CurrentDeviceId`
 - `Devices`
+- `AllDevices`
 - `HasDevices`
 - `IsSelectorOpen`
 - `HighlightedDeviceIndex`
@@ -184,9 +189,11 @@ Example device list:
 </ItemsControl>
 ```
 
-Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
+Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
 
 For each device, `Name` is the friendly/custom name when available, `WindowsName` is the original Windows device name, `DisplayName` is ready for a text list and includes the current-device marker, and `IconGeometry` can be used in a `Path`.
+
+`Devices` contains only devices that the user left visible in Audio Switcher settings. `AllDevices` contains active devices including those hidden from normal extension menus, so advanced themes can build their own management UI if needed.
 
 When `IsSelectorOpen` is true in Fullscreen, Audio Switcher handles gamepad navigation for the exposed selector state: D-pad or left stick up/down changes the highlighted item, `A` selects it, and `B` closes the selector. Themes should style `IsHighlighted` on each `Devices` item so controller users can see the active row even if focus remains outside the custom panel.
 

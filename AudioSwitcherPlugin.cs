@@ -176,7 +176,7 @@ namespace PlayniteAudioSwitcher
                 }
             };
 
-            foreach (var device in SafeGetDevices())
+            foreach (var device in SafeGetDevices().Where(a => a.IsVisible))
             {
                 items.Add(new MainMenuItem
                 {
@@ -207,7 +207,7 @@ namespace PlayniteAudioSwitcher
             var root = VisibleMenuRoot;
             var items = new List<GameMenuItem>();
 
-            foreach (var device in SafeGetDevices())
+            foreach (var device in SafeGetDevices().Where(a => a.IsVisible))
             {
                 var deviceId = device.Id;
                 var displayName = GetDeviceDisplayName(device);
@@ -273,33 +273,12 @@ namespace PlayniteAudioSwitcher
 
         public override IEnumerable<TopPanelItem> GetTopPanelItems()
         {
-            yield return new TopPanelItem
-            {
-                Title = Loc("LOCAS_Audio"),
-                Icon = new TextBlock
-                {
-                    Text = "\uE995",
-                    FontFamily = new FontFamily("Segoe MDL2 Assets")
-                },
-                Visible = true,
-                Activated = ToggleCustomDevices
-            };
+            return Enumerable.Empty<TopPanelItem>();
         }
 
         public override IEnumerable<SidebarItem> GetSidebarItems()
         {
-            yield return new SidebarItem
-            {
-                Title = Loc("LOCAS_Audio"),
-                Type = SiderbarItemType.View,
-                Icon = new TextBlock
-                {
-                    Text = "\uE995",
-                    FontFamily = new FontFamily("Segoe MDL2 Assets")
-                },
-                Visible = true,
-                Opened = () => new AudioDeviceSelectorPanelControl(this)
-            };
+            return Enumerable.Empty<SidebarItem>();
         }
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
@@ -434,7 +413,7 @@ namespace PlayniteAudioSwitcher
             var currentDeviceId = GetCurrentDeviceId();
             var items = new List<MainMenuItem>();
 
-            foreach (var device in SafeGetDevices())
+            foreach (var device in SafeGetDevices().Where(a => a.IsVisible))
             {
                 var deviceId = device.Id;
                 var deviceName = GetDeviceDisplayName(device);
@@ -454,6 +433,7 @@ namespace PlayniteAudioSwitcher
         public void ToggleCustomDevices()
         {
             var switchDevices = SafeGetDevices()
+                .Where(a => a.IsVisible)
                 .Where(a => settings.QuickSwitchAllDevices || settings.HasCustomName(a.Id))
                 .OrderBy(a => a.EffectiveName)
                 .ToList();
@@ -481,9 +461,15 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioDevice> GetThemeSelectorDevices()
         {
+            return GetThemeSelectorDevices(false);
+        }
+
+        public IReadOnlyList<AudioDevice> GetThemeSelectorDevices(bool includeHidden)
+        {
             var currentDeviceId = GetCurrentDeviceId();
 
             return SafeGetDevices()
+                .Where(device => includeHidden || device.IsVisible)
                 .Select(device =>
                 {
                     device.SettingsDisplayName = GetFullscreenDeviceMenuText(device, currentDeviceId);
@@ -725,6 +711,7 @@ namespace PlayniteAudioSwitcher
                     {
                         device.CustomName = settings.GetCustomName(device.Id);
                         device.Icon = settings.GetIcon(device.Id);
+                        device.IsVisible = settings.IsDeviceVisible(device.Id);
                         return device;
                     })
                     .ToList();
@@ -785,7 +772,7 @@ namespace PlayniteAudioSwitcher
                 items.Add(new MainMenuItem
                 {
                     MenuSection = $"{MenuRoot}|{Loc("LOCAS_SpatialSoundTitle")}",
-                    Description = mode.Name,
+                    Description = GetCheckedMenuText(mode.Name, string.Equals(settings.CurrentSpatialSoundMode, modeId, StringComparison.OrdinalIgnoreCase)),
                     Action = _ => ApplySpatialSoundMode(modeId, true)
                 });
             }
@@ -843,6 +830,8 @@ namespace PlayniteAudioSwitcher
                     }
                 }
 
+                settings.CurrentSpatialSoundMode = mode.Id;
+                SavePluginSettings(settings);
                 if (notify && settings.ShowNotifications)
                 {
                     ShowMessage($"{Loc("LOCAS_SpatialSoundTitle")}: {mode.Name}");

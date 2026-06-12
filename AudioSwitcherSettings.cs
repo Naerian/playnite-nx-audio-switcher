@@ -26,6 +26,7 @@ namespace PlayniteAudioSwitcher
         private bool restoreDeviceAfterGameProfile = true;
         private bool spatialSoundIntegrationEnabled;
         private string spatialSoundToolPath;
+        private string currentSpatialSoundMode;
 
         public AudioSwitcherSettings()
         {
@@ -53,6 +54,7 @@ namespace PlayniteAudioSwitcher
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
                 SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
                 SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
+                CurrentSpatialSoundMode = savedSettings.CurrentSpatialSoundMode;
             }
 
             MigrateFavoritesToAliases();
@@ -184,6 +186,12 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref spatialSoundToolPath, value);
         }
 
+        public string CurrentSpatialSoundMode
+        {
+            get => currentSpatialSoundMode;
+            set => SetValue(ref currentSpatialSoundMode, value);
+        }
+
         [DontSerialize]
         public List<SpatialSoundModeOption> SpatialSoundModeOptions => new List<SpatialSoundModeOption>
         {
@@ -217,6 +225,7 @@ namespace PlayniteAudioSwitcher
                         {
                             device.CustomName = alias.CustomName;
                             device.Icon = alias.Icon;
+                            device.IsVisible = alias.IsVisible != false;
                         }
 
                         device.SettingsDisplayName = device.TechnicalDisplayName;
@@ -238,6 +247,11 @@ namespace PlayniteAudioSwitcher
         public string GetIcon(string deviceId)
         {
             return DeviceAliases.FirstOrDefault(a => a.DeviceId == deviceId)?.Icon;
+        }
+
+        public bool IsDeviceVisible(string deviceId)
+        {
+            return DeviceAliases.FirstOrDefault(a => a.DeviceId == deviceId)?.IsVisible ?? true;
         }
 
         public bool HasCustomName(string deviceId)
@@ -274,18 +288,22 @@ namespace PlayniteAudioSwitcher
             RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
             SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
+            CurrentSpatialSoundMode = editingClone.CurrentSpatialSoundMode;
             RefreshDevices();
         }
 
         public void EndEdit()
         {
             DeviceAliases = AvailablePlaybackDevices
-                .Where(a => !string.IsNullOrWhiteSpace(a.CustomName))
+                .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
+                    !string.IsNullOrWhiteSpace(a.Icon) ||
+                    !a.IsVisible)
                 .Select(a => new AudioDeviceAlias
                 {
                     DeviceId = a.Id,
-                    CustomName = a.CustomName.Trim(),
-                    Icon = a.Icon
+                    CustomName = a.CustomName?.Trim(),
+                    Icon = a.Icon,
+                    IsVisible = a.IsVisible ? (bool?)null : false
                 })
                 .ToList();
 
@@ -317,7 +335,8 @@ namespace PlayniteAudioSwitcher
             DeviceAliases.Add(new AudioDeviceAlias
             {
                 DeviceId = deviceId,
-                CustomName = customName
+                CustomName = customName,
+                IsVisible = null
             });
         }
 
@@ -333,7 +352,8 @@ namespace PlayniteAudioSwitcher
                 {
                     DeviceId = a.DeviceId,
                     CustomName = a.CustomName,
-                    Icon = a.Icon
+                    Icon = a.Icon,
+                    IsVisible = a.IsVisible
                 }).ToList(),
                 FullscreenPreferredDeviceId = FullscreenPreferredDeviceId,
                 DeviceDisplayMode = DeviceDisplayMode,
@@ -345,7 +365,8 @@ namespace PlayniteAudioSwitcher
                 GameProfilesEnabled = GameProfilesEnabled,
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,
                 SpatialSoundIntegrationEnabled = SpatialSoundIntegrationEnabled,
-                SpatialSoundToolPath = SpatialSoundToolPath
+                SpatialSoundToolPath = SpatialSoundToolPath,
+                CurrentSpatialSoundMode = CurrentSpatialSoundMode
             };
         }
     }

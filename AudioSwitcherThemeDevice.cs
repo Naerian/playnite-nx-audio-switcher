@@ -22,6 +22,8 @@ namespace PlayniteAudioSwitcher
 
         public Geometry IconGeometry { get; set; }
 
+        public bool IsVisible { get; set; } = true;
+
         public bool IsCurrent
         {
             get => isCurrent;

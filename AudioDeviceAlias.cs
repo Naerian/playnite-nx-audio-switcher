@@ -7,5 +7,7 @@ namespace PlayniteAudioSwitcher
         public string CustomName { get; set; }
 
         public string Icon { get; set; }
+
+        public bool? IsVisible { get; set; }
     }
 }
