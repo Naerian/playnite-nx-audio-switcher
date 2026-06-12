@@ -27,13 +27,11 @@ The plugin changes the Windows default playback endpoint using Core Audio / poli
 
 ## Installation
 
-Download the `.pext` package from releases and install it in Playnite.
+1. Download the latest `.pext` file from the [GitHub releases page](https://github.com/Naerian/playnite-nx-audio-switcher/releases).
+2. Open the `.pext` file, or drag it into Playnite.
+3. Restart Playnite if Playnite asks you to do so.
 
-For manual installation during development:
-
-1. Build the project in Release mode.
-2. Copy the build output into a folder under Playnite's `Extensions` directory.
-3. Restart Playnite.
+After installation, the extension appears as **Audio Switcher** in Playnite's extension menus and settings.
 
 ## Configuration
 
@@ -57,11 +55,11 @@ In Fullscreen mode, open:
 
 `Extensions > Audio Switcher`
 
-Available actions include:
-
-- Select from all active output devices.
+This opens a simple list of active Windows output devices. The current output device is marked with a check. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
 
 The optional `Back + RB` controller shortcut cycles through active output devices.
+
+The native Playnite extension menu is text-only, so custom SVG icons are not shown there. Icons are available to Fullscreen themes through the theme integration API and bundled controls.
 
 ## Game-Specific Audio Profiles
 
@@ -79,6 +77,8 @@ Theme authors have two integration paths:
 
 - Use the bundled custom controls for the most reliable controller navigation.
 - Use `PluginSettings` bindings for fully custom layouts, where the theme owns focus behavior and visual states.
+
+The native Playnite extension menu can only display text rows. Theme integrations are the recommended way to build a richer console-like selector with icons, custom layout, and gamepad-friendly focus states.
 
 For Fullscreen themes, the safest setup is an icon button plus the bundled `AudioSwitcher_DeviceList` inside a theme panel:
 
@@ -132,6 +132,8 @@ Useful properties:
 - `IsSelectorOpen`
 - `HighlightedDeviceIndex`
 
+`CurrentDeviceName` is the friendly/custom name for the current output device. `CurrentDeviceIconGeometry` exposes the configured SVG icon geometry, falling back to a speaker icon when needed. `CurrentDeviceLabel` is a convenience label that combines icon text and device name for simple text-based placements.
+
 Useful commands:
 
 - `ToggleSelectorCommand`
@@ -165,6 +167,8 @@ Example device list:
 ```
 
 Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
+
+For each device, `Name` is the friendly/custom name when available, `WindowsName` is the original Windows device name, `DisplayName` is ready for a text list and includes the current-device marker, and `IconGeometry` can be used in a `Path`.
 
 When `IsSelectorOpen` is true in Fullscreen, Audio Switcher handles gamepad navigation for the exposed selector state: D-pad or left stick up/down changes the highlighted item, `A` selects it, and `B` closes the selector. Themes should style `IsHighlighted` on each `Devices` item so controller users can see the active row even if focus remains outside the custom panel.
 
