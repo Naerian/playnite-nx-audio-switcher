@@ -18,7 +18,6 @@ It is designed for couch and console-like setups where users often move between 
 - Full device selector for manual switching.
 - Game-specific audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
-- Optional preferred audio device when Playnite starts in Fullscreen mode.
 - Theme integration controls for theme authors.
 - Localizable UI through Playnite resource dictionaries.
 
@@ -51,12 +50,11 @@ From there you can:
 - Give friendly names to audio devices.
 - Assign icons to devices.
 - Choose how devices are displayed in Fullscreen/theme UI.
-- Choose a preferred Fullscreen device.
 - Enable or disable the Fullscreen quick switch shortcut.
-- Choose whether the quick menu should show only renamed devices.
-- Configure restore behavior after game-specific profiles.
+- Enable or disable automatic game-specific audio profiles.
+- Configure whether the previous audio device is restored after a game-specific profile.
 
-Devices without a custom name still appear in the full output selector, but only renamed devices are used by the quick switch shortcut.
+Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
 
 ## Fullscreen Usage
 
@@ -66,13 +64,9 @@ In Fullscreen mode, open:
 
 Available actions include:
 
-- Switch custom output.
-- Use preferred device.
-- Select a renamed device.
-- Select from all available output devices.
-- Set the preferred Fullscreen device.
+- Select from all active output devices.
 
-The `Back + Y` controller shortcut cycles through devices with custom names. Configure at least two renamed devices for this shortcut to work.
+The optional `Back + RB` controller shortcut cycles through active output devices.
 
 ## Game-Specific Audio Profiles
 
@@ -80,7 +74,7 @@ Open a game's context menu and go to:
 
 `Audio Switcher`
 
-You can set a preferred output device for that game from the list of active playback devices. If the game does not have a saved profile yet, the current system default device is marked in the menu. When the game starts, the plugin switches to the selected device. When the game stops, the plugin can restore the previous output device if that option is enabled.
+You can set an output device for that game from the list of active playback devices. If the game does not have a saved profile yet, the current Windows default device is marked in the menu. When the game starts, the plugin switches to the selected device if game profiles are enabled. When the game stops, the plugin can restore the previous output device if that option is enabled.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
 
@@ -138,7 +132,6 @@ Useful properties:
 - `CurrentDeviceLabel`
 - `CurrentDeviceIconGeometry`
 - `CurrentDeviceId`
-- `PreferredDeviceName`
 - `Devices`
 - `HasDevices`
 - `IsSelectorOpen`
@@ -152,7 +145,6 @@ Useful commands:
 - `NextDeviceCommand`
 - `RefreshDevicesCommand`
 - `SetDeviceCommand`
-- `SetPreferredDeviceCommand`
 
 Example icon button:
 
@@ -177,7 +169,7 @@ Example device list:
 </ItemsControl>
 ```
 
-Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsPreferred`, `IsHighlighted`, `CurrentMarker`, and `PreferredMarker`.
+Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
 
 When `IsSelectorOpen` is true in Fullscreen, Audio Switcher handles gamepad navigation for the exposed selector state: D-pad or left stick up/down changes the highlighted item, `A` selects it, and `B` closes the selector. Themes should style `IsHighlighted` on each `Devices` item so controller users can see the active row even if focus remains outside the custom panel.
 
@@ -189,7 +181,7 @@ Show the current output device without interaction:
 <ContentControl x:Name="AudioSwitcher_CurrentDevice" />
 ```
 
-Place a compact quick-switch button that cycles through configured custom devices:
+Place a compact quick-switch button that cycles through active output devices:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_AudioSwitcherButton" />

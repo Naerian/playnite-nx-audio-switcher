@@ -17,7 +17,6 @@ namespace PlayniteAudioSwitcher
         private string currentDeviceName;
         private string currentDeviceLabel;
         private Geometry currentDeviceIconGeometry;
-        private string preferredDeviceName;
         private bool hasDevices;
         private int highlightedDeviceIndex = -1;
         private DateTime confirmAvailableAt = DateTime.MinValue;
@@ -40,7 +39,6 @@ namespace PlayniteAudioSwitcher
                 Refresh();
             });
             SetDeviceCommand = new RelayCommand<object>(SetDevice);
-            SetPreferredDeviceCommand = new RelayCommand<object>(SetPreferredDevice);
         }
 
         public ObservableCollection<AudioSwitcherThemeDevice> Devices { get; }
@@ -56,8 +54,6 @@ namespace PlayniteAudioSwitcher
         public ICommand RefreshDevicesCommand { get; }
 
         public ICommand SetDeviceCommand { get; }
-
-        public ICommand SetPreferredDeviceCommand { get; }
 
         public bool IsSelectorOpen
         {
@@ -87,12 +83,6 @@ namespace PlayniteAudioSwitcher
         {
             get => currentDeviceIconGeometry;
             private set => SetValue(ref currentDeviceIconGeometry, value);
-        }
-
-        public string PreferredDeviceName
-        {
-            get => preferredDeviceName;
-            private set => SetValue(ref preferredDeviceName, value);
         }
 
         public bool HasDevices
@@ -185,12 +175,10 @@ namespace PlayniteAudioSwitcher
         public void Refresh()
         {
             var currentId = plugin.GetCurrentDeviceId();
-            var preferredId = plugin.Settings.FullscreenPreferredDeviceId;
             CurrentDeviceId = currentId;
             CurrentDeviceName = plugin.GetCurrentDeviceDisplayName();
             CurrentDeviceLabel = plugin.GetCurrentDeviceDisplayLabel();
             CurrentDeviceIconGeometry = plugin.GetCurrentDeviceIconGeometry() ?? plugin.GetIconGeometry("volume-2");
-            PreferredDeviceName = string.IsNullOrWhiteSpace(preferredId) ? string.Empty : plugin.GetDeviceDisplayNameForTheme(preferredId);
 
             var devices = plugin.GetThemeSelectorDevices()
                 .OrderBy(a => a.EffectiveName)
@@ -202,8 +190,7 @@ namespace PlayniteAudioSwitcher
                     DisplayName = device.SettingsDisplayName,
                     Icon = device.EffectiveIcon,
                     IconGeometry = plugin.GetIconGeometry(string.IsNullOrWhiteSpace(device.EffectiveIcon) ? "volume-2" : device.EffectiveIcon),
-                    IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase),
-                    IsPreferred = string.Equals(device.Id, preferredId, StringComparison.OrdinalIgnoreCase)
+                    IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase)
                 })
                 .ToList();
 
@@ -223,10 +210,10 @@ namespace PlayniteAudioSwitcher
 
         private void RestoreHighlightedDevice(string previousHighlightedId, string currentId)
         {
-            var preferredId = IsSelectorOpen ? previousHighlightedId : currentId;
+            var targetId = IsSelectorOpen ? previousHighlightedId : currentId;
             var index = Devices.ToList().FindIndex(device =>
-                !string.IsNullOrWhiteSpace(preferredId) &&
-                string.Equals(device.Id, preferredId, StringComparison.OrdinalIgnoreCase));
+                !string.IsNullOrWhiteSpace(targetId) &&
+                string.Equals(device.Id, targetId, StringComparison.OrdinalIgnoreCase));
 
             if (index < 0)
             {
@@ -263,16 +250,5 @@ namespace PlayniteAudioSwitcher
             Refresh();
         }
 
-        private void SetPreferredDevice(object parameter)
-        {
-            var deviceId = parameter?.ToString();
-            if (string.IsNullOrWhiteSpace(deviceId))
-            {
-                return;
-            }
-
-            plugin.SetThemePreferredDevice(deviceId);
-            Refresh();
-        }
     }
 }

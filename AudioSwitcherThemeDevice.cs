@@ -8,7 +8,6 @@ namespace PlayniteAudioSwitcher
     public sealed class AudioSwitcherThemeDevice : ObservableObject
     {
         private bool isCurrent;
-        private bool isPreferred;
         private bool isHighlighted;
 
         public string Id { get; set; }
@@ -29,12 +28,6 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref isCurrent, value);
         }
 
-        public bool IsPreferred
-        {
-            get => isPreferred;
-            set => SetValue(ref isPreferred, value);
-        }
-
         public bool IsHighlighted
         {
             get => isHighlighted;
@@ -42,7 +35,5 @@ namespace PlayniteAudioSwitcher
         }
 
         public string CurrentMarker => IsCurrent ? "\u2713" : string.Empty;
-
-        public string PreferredMarker => IsPreferred ? "\u2605" : string.Empty;
     }
 }

@@ -22,6 +22,7 @@ namespace PlayniteAudioSwitcher
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
         private bool applyFullscreenPreferredOnStartup = true;
+        private bool gameProfilesEnabled = true;
         private bool restoreDeviceAfterGameProfile = true;
 
         public AudioSwitcherSettings()
@@ -46,6 +47,7 @@ namespace PlayniteAudioSwitcher
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
                 QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
                 ApplyFullscreenPreferredOnStartup = savedSettings.ApplyFullscreenPreferredOnStartup;
+                GameProfilesEnabled = savedSettings.GameProfilesEnabled;
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
             }
 
@@ -162,6 +164,12 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref applyFullscreenPreferredOnStartup, value);
         }
 
+        public bool GameProfilesEnabled
+        {
+            get => gameProfilesEnabled;
+            set => SetValue(ref gameProfilesEnabled, value);
+        }
+
         public bool RestoreDeviceAfterGameProfile
         {
             get => restoreDeviceAfterGameProfile;
@@ -242,7 +250,9 @@ namespace PlayniteAudioSwitcher
             ShowNotifications = editingClone.ShowNotifications;
             FullscreenOnlyFavorites = editingClone.FullscreenOnlyFavorites;
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
+            QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
             ApplyFullscreenPreferredOnStartup = editingClone.ApplyFullscreenPreferredOnStartup;
+            GameProfilesEnabled = editingClone.GameProfilesEnabled;
             RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
             RefreshDevices();
         }
@@ -312,6 +322,7 @@ namespace PlayniteAudioSwitcher
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,
                 ApplyFullscreenPreferredOnStartup = ApplyFullscreenPreferredOnStartup,
+                GameProfilesEnabled = GameProfilesEnabled,
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile
             };
         }

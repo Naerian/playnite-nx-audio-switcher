@@ -17,9 +17,12 @@
     <sys:String x:Key="LOCAS_ShowOnlyCustom">Mostrar solo dispositivos personalizados en el menÃº rÃ¡pido de pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Aplicar el dispositivo preferido cuando Playnite arranque en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Restaurar el dispositivo anterior al cerrar un juego con perfil especÃ­fico</sys:String>
+    <sys:String x:Key="LOCAS_GameProfilesTitle">Perfiles por juego</sys:String>
+    <sys:String x:Key="LOCAS_GameProfilesHelp">Asigna un dispositivo de salida desde el menu contextual de un juego. Al iniciar ese juego, Audio Switcher puede cambiar automaticamente a ese dispositivo.</sys:String>
+    <sys:String x:Key="LOCAS_EnableGameProfiles">Aplicar perfiles de audio por juego al iniciar juegos</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Mostrar notificaciÃ³n despuÃ©s de cambiar</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelp">El acceso rÃ¡pido alterna entre los dispositivos con nombre personalizado. Para que funcione, configura al menos dos.</sys:String>
-    <sys:String x:Key="LOCAS_MenuSwitchCustom">Alternar salida personalizada</sys:String>
+    <sys:String x:Key="LOCAS_MenuSwitchCustom">Alternar salida de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Actualizar dispositivos de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Elegir dispositivo de salida</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDefault">Audio del juego: predeterminado</sys:String>
@@ -38,7 +41,7 @@
     <sys:String x:Key="LOCAS_AudioOutput">Salida de audio</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Dispositivo desconocido</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">El acceso rapido alterna entre todos los dispositivos activos</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchHelpAll">El acceso rapido puede alternar entre todos los dispositivos activos o solo entre los que tengan nombre personalizado.</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchHelpAll">El acceso rapido alterna entre los dispositivos de salida activos.</sys:String>
     <sys:String x:Key="LOCAS_AudioDevices">Dispositivos de audio</sys:String>
     <sys:String x:Key="LOCAS_DefaultDevice">Dispositivo predeterminado</sys:String>
     <sys:String x:Key="LOCAS_DefaultDeviceHelp">Este dispositivo se usara cada vez que se abra la pantalla completa de Playnite.</sys:String>

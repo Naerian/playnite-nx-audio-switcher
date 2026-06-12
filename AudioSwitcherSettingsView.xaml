@@ -44,16 +44,6 @@
                           Margin="0,2,0,10" />
 
                 <Border Style="{StaticResource SectionHeaderBorder}">
-                    <TextBlock Text="{DynamicResource LOCAS_FullscreenPreferredDevice}" Style="{StaticResource SectionHeaderText}" />
-                </Border>
-                <TextBlock Text="{DynamicResource LOCAS_FullscreenPreferredDevice}" Margin="0,4,0,0" />
-                <ComboBox ItemsSource="{Binding AvailablePlaybackDevices}"
-                          DisplayMemberPath="DisplayName"
-                          SelectedValuePath="Id"
-                          SelectedValue="{Binding FullscreenPreferredDeviceId}"
-                          Margin="0,2,0,10" />
-
-                <Border Style="{StaticResource SectionHeaderBorder}">
                     <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
                 </Border>
                 <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
@@ -64,12 +54,15 @@
                           IsChecked="{Binding QuickSwitchAllDevices}"
                           Margin="0,0,0,8" />
 
-                <CheckBox Content="{DynamicResource LOCAS_ShowOnlyCustom}"
-                          IsChecked="{Binding FullscreenOnlyFavorites}"
-                          Margin="0,0,0,8" />
+                <Border Style="{StaticResource SectionHeaderBorder}">
+                    <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
+                </Border>
+                <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,8" />
 
-                <CheckBox Content="{DynamicResource LOCAS_ApplyPreferredOnStartup}"
-                          IsChecked="{Binding ApplyFullscreenPreferredOnStartup}"
+                <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
+                          IsChecked="{Binding GameProfilesEnabled}"
                           Margin="0,0,0,8" />
 
                 <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"

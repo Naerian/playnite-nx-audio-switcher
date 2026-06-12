@@ -286,16 +286,15 @@ namespace PlayniteAudioSwitcher
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
-            if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Fullscreen &&
-                settings.ApplyFullscreenPreferredOnStartup &&
-                !string.IsNullOrWhiteSpace(settings.FullscreenPreferredDeviceId))
-            {
-                SetConfiguredDevice(settings.FullscreenPreferredDeviceId, false);
-            }
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
         {
+            if (!settings.GameProfilesEnabled)
+            {
+                return;
+            }
+
             var deviceId = gameProfiles.GetDeviceId(args.Game);
             if (string.IsNullOrWhiteSpace(deviceId))
             {
@@ -417,7 +416,7 @@ namespace PlayniteAudioSwitcher
                 items.Add(new MainMenuItem
                 {
                     MenuSection = MenuRoot,
-                    Description = GetFullscreenDeviceMenuText(device, currentDeviceId, settings.FullscreenPreferredDeviceId),
+                    Description = GetFullscreenDeviceMenuText(device, currentDeviceId),
                     Action = _ => SetDevice(deviceId, deviceName)
                 });
             }
@@ -453,28 +452,14 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private IReadOnlyList<AudioDevice> SafeGetDevicesForMenus()
-        {
-            var devices = SafeGetDevices().ToList();
-            if (PlayniteApi.ApplicationInfo.Mode != ApplicationMode.Fullscreen || !settings.FullscreenOnlyFavorites)
-            {
-                return devices;
-            }
-
-            return devices
-                .Where(device => settings.HasCustomName(device.Id))
-                .ToList();
-        }
-
         public IReadOnlyList<AudioDevice> GetThemeSelectorDevices()
         {
             var currentDeviceId = GetCurrentDeviceId();
-            var preferredDeviceId = settings.FullscreenPreferredDeviceId;
 
             return SafeGetDevices()
                 .Select(device =>
                 {
-                    device.SettingsDisplayName = GetFullscreenDeviceMenuText(device, currentDeviceId, preferredDeviceId);
+                    device.SettingsDisplayName = GetFullscreenDeviceMenuText(device, currentDeviceId);
                     return device;
                 })
                 .ToList();
@@ -483,18 +468,6 @@ namespace PlayniteAudioSwitcher
         public void SetThemeSelectedDevice(string deviceId)
         {
             SetConfiguredDevice(deviceId, true);
-        }
-
-        public void SetThemePreferredDevice(string deviceId)
-        {
-            if (string.IsNullOrWhiteSpace(deviceId))
-            {
-                return;
-            }
-
-            settings.FullscreenPreferredDeviceId = deviceId;
-            SavePluginSettings(settings);
-            Theme?.Refresh();
         }
 
         public void OpenThemeDeviceSelector(Action onDeviceSelected = null)
@@ -913,18 +886,13 @@ namespace PlayniteAudioSwitcher
             return name;
         }
 
-        private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId, string preferredDeviceId)
+        private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId)
         {
             var name = GetDeviceDisplayName(device);
 
             if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
             {
                 name = "\u2713 " + name;
-            }
-
-            if (string.Equals(device.Id, preferredDeviceId, StringComparison.OrdinalIgnoreCase))
-            {
-                name = $"{name} \u2605";
             }
 
             return name;
@@ -981,7 +949,7 @@ namespace PlayniteAudioSwitcher
 
         private string GetLegacyFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)
         {
-            return GetFullscreenDeviceMenuText(device, useStarForSelected ? null : selectedDeviceId, useStarForSelected ? selectedDeviceId : null);
+            return GetFullscreenDeviceMenuText(device, useStarForSelected ? null : selectedDeviceId);
         }
 
         private string GetUnusedFullscreenDeviceMenuText(AudioDevice device, string selectedDeviceId, bool useStarForSelected)
