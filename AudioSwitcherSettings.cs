@@ -24,6 +24,8 @@ namespace PlayniteAudioSwitcher
         private bool applyFullscreenPreferredOnStartup = true;
         private bool gameProfilesEnabled = true;
         private bool restoreDeviceAfterGameProfile = true;
+        private bool spatialSoundIntegrationEnabled;
+        private string spatialSoundToolPath;
 
         public AudioSwitcherSettings()
         {
@@ -49,6 +51,8 @@ namespace PlayniteAudioSwitcher
                 ApplyFullscreenPreferredOnStartup = savedSettings.ApplyFullscreenPreferredOnStartup;
                 GameProfilesEnabled = savedSettings.GameProfilesEnabled;
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
+                SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
+                SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
             }
 
             MigrateFavoritesToAliases();
@@ -168,6 +172,28 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref restoreDeviceAfterGameProfile, value);
         }
 
+        public bool SpatialSoundIntegrationEnabled
+        {
+            get => spatialSoundIntegrationEnabled;
+            set => SetValue(ref spatialSoundIntegrationEnabled, value);
+        }
+
+        public string SpatialSoundToolPath
+        {
+            get => spatialSoundToolPath;
+            set => SetValue(ref spatialSoundToolPath, value);
+        }
+
+        [DontSerialize]
+        public List<SpatialSoundModeOption> SpatialSoundModeOptions => new List<SpatialSoundModeOption>
+        {
+            new SpatialSoundModeOption { Id = string.Empty, Name = plugin?.Loc("LOCAS_SpatialDoNotChange") ?? "Do not change" },
+            new SpatialSoundModeOption { Id = "Off", Name = plugin?.Loc("LOCAS_SpatialOff") ?? "Off", ToolValue = "Off" },
+            new SpatialSoundModeOption { Id = "WindowsSonicHeadphones", Name = "Windows Sonic for Headphones", ToolValue = "Windows Sonic For Headphones" },
+            new SpatialSoundModeOption { Id = "DolbyAtmosHeadphones", Name = "Dolby Atmos for Headphones", ToolValue = "Dolby Atmos for Headphones" },
+            new SpatialSoundModeOption { Id = "DolbyAtmosHomeTheater", Name = "Dolby Atmos for home theater", ToolValue = "Dolby Atmos for home theater" }
+        };
+
         [DontSerialize]
         public List<AudioDevice> AvailablePlaybackDevices
         {
@@ -246,6 +272,8 @@ namespace PlayniteAudioSwitcher
             ApplyFullscreenPreferredOnStartup = editingClone.ApplyFullscreenPreferredOnStartup;
             GameProfilesEnabled = editingClone.GameProfilesEnabled;
             RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
+            SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
+            SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
             RefreshDevices();
         }
 
@@ -315,7 +343,9 @@ namespace PlayniteAudioSwitcher
                 QuickSwitchAllDevices = QuickSwitchAllDevices,
                 ApplyFullscreenPreferredOnStartup = ApplyFullscreenPreferredOnStartup,
                 GameProfilesEnabled = GameProfilesEnabled,
-                RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile
+                RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,
+                SpatialSoundIntegrationEnabled = SpatialSoundIntegrationEnabled,
+                SpatialSoundToolPath = SpatialSoundToolPath
             };
         }
     }

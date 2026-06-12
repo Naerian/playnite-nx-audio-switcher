@@ -14,6 +14,7 @@ It is designed for couch and console-like setups where users often move between 
 - Full device selector for manual switching.
 - Game-specific audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
+- Experimental Spatial Sound switching through a user-provided external tool.
 - Theme integration controls for theme authors.
 - Localizable UI through Playnite resource dictionaries.
 
@@ -46,6 +47,7 @@ From there you can:
 - Enable or disable the Fullscreen quick switch shortcut.
 - Enable or disable automatic game-specific audio profiles.
 - Configure whether the previous audio device is restored after a game-specific profile.
+- Enable experimental Spatial Sound integration by pointing Audio Switcher to `SoundVolumeView.exe` or `svcl.exe`.
 
 Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
 
@@ -70,6 +72,22 @@ Open a game's context menu and go to:
 You can set an output device for that game from the list of active playback devices. If the game does not have a saved profile yet, the current Windows default device is marked in the menu. When the game starts, the plugin switches to the selected device if game profiles are enabled. When the game stops, the plugin can restore the previous output device if that option is enabled.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
+
+## Experimental Spatial Sound
+
+Audio Switcher can optionally call an external tool to change Windows Spatial Sound for the current default output device. This is intended for advanced users who want to pair game profiles with modes like Windows Sonic or Dolby Atmos.
+
+This feature is disabled by default and Audio Switcher does not bundle third-party executables. To test it:
+
+1. Download either SoundVolumeView or svcl from NirSoft.
+2. Open Audio Switcher settings.
+3. Enable the experimental Spatial Sound integration.
+4. Set the path to `SoundVolumeView.exe` or `svcl.exe`.
+5. Use a game's `Audio Switcher > Spatial sound` submenu to choose `Do not change`, `Off`, `Windows Sonic for Headphones`, `Dolby Atmos for Headphones`, or `Dolby Atmos for home theater`.
+
+When a game profile starts, Audio Switcher switches the configured output device first and then applies the selected Spatial Sound mode to the current default render device.
+
+Windows does not currently expose a stable public API for selecting the system Spatial Sound format, so this integration depends on the external tool and should be treated as experimental.
 
 ## Theme Integration
 

@@ -60,6 +60,22 @@
                           IsChecked="{Binding RestoreDeviceAfterGameProfile}"
                           Margin="0,0,0,8" />
 
+                <Border Style="{StaticResource SectionHeaderBorder}">
+                    <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
+                </Border>
+                <TextBlock Text="{DynamicResource LOCAS_SpatialSoundHelp}"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,8" />
+
+                <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
+                          IsChecked="{Binding SpatialSoundIntegrationEnabled}"
+                          Margin="0,0,0,8" />
+
+                <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}"
+                           Margin="0,0,0,3" />
+                <TextBox Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,12" />
+
                 <CheckBox Content="{DynamicResource LOCAS_ShowNotification}"
                           IsChecked="{Binding ShowNotifications}"
                           Margin="0,0,0,12" />

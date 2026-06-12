@@ -51,6 +51,14 @@
     <sys:String x:Key="LOCAS_NoIcon">No icon</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Audio device</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundTitle">Spatial sound</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: allows Audio Switcher to call an external SoundVolumeView or svcl executable to change Windows Spatial Sound on the current default output device.</sys:String>
+    <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Enable experimental Spatial Sound integration</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolPath">SoundVolumeView.exe or svcl.exe path</sys:String>
+    <sys:String x:Key="LOCAS_SpatialDoNotChange">Do not change</sys:String>
+    <sys:String x:Key="LOCAS_SpatialOff">Off</sys:String>
+    <sys:String x:Key="LOCAS_SpatialToolMissing">Spatial Sound tool path is not configured or does not exist.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSwitchFailed">Spatial Sound switch failed</sys:String>
 </ResourceDictionary>
 
 

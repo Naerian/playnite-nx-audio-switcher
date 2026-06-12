@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -185,6 +186,8 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
+            AddSpatialSoundMenuItems(items);
+
             return items;
         }
 
@@ -197,10 +200,10 @@ namespace PlayniteAudioSwitcher
             }
 
             var game = games[0];
-            var currentProfile = gameProfiles.GetDeviceId(game);
-            var selectedDeviceId = string.IsNullOrWhiteSpace(currentProfile)
+            var currentProfile = gameProfiles.GetProfile(game);
+            var selectedDeviceId = string.IsNullOrWhiteSpace(currentProfile?.DeviceId)
                 ? AudioDevices.GetDefaultPlaybackDevice()?.Id
-                : currentProfile;
+                : currentProfile.DeviceId;
             var root = VisibleMenuRoot;
             var items = new List<GameMenuItem>();
 
@@ -216,6 +219,21 @@ namespace PlayniteAudioSwitcher
                     {
                         gameProfiles.SetDevice(game, deviceId);
                         ShowMessage($"{game.Name}: {displayName}");
+                    }
+                });
+            }
+
+            foreach (var mode in settings.SpatialSoundModeOptions)
+            {
+                var modeId = mode.Id;
+                items.Add(new GameMenuItem
+                {
+                    MenuSection = $"{root}|{Loc("LOCAS_SpatialSoundTitle")}",
+                    Description = GetCheckedMenuText(mode.Name, string.Equals(currentProfile?.SpatialSoundMode ?? string.Empty, modeId ?? string.Empty, StringComparison.OrdinalIgnoreCase)),
+                    Action = _ =>
+                    {
+                        gameProfiles.SetSpatialSoundMode(game, modeId);
+                        ShowMessage($"{game.Name}: {mode.Name}");
                     }
                 });
             }
@@ -295,16 +313,23 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            var deviceId = gameProfiles.GetDeviceId(args.Game);
-            if (string.IsNullOrWhiteSpace(deviceId))
+            var profile = gameProfiles.GetProfile(args.Game);
+            if (profile == null ||
+                string.IsNullOrWhiteSpace(profile.DeviceId) &&
+                string.IsNullOrWhiteSpace(profile.SpatialSoundMode))
             {
                 return;
             }
 
             try
             {
-                previousDevicesByGame[args.Game.Id] = AudioDevices.GetDefaultPlaybackDevice();
-                SetConfiguredDevice(deviceId, true);
+                if (!string.IsNullOrWhiteSpace(profile.DeviceId))
+                {
+                    previousDevicesByGame[args.Game.Id] = AudioDevices.GetDefaultPlaybackDevice();
+                    SetConfiguredDevice(profile.DeviceId, true);
+                }
+
+                ApplySpatialSoundMode(profile.SpatialSoundMode, true);
             }
             catch (Exception ex)
             {
@@ -420,6 +445,8 @@ namespace PlayniteAudioSwitcher
                     Action = _ => SetDevice(deviceId, deviceName)
                 });
             }
+
+            AddSpatialSoundMenuItems(items);
 
             return items;
         }
@@ -743,6 +770,96 @@ namespace PlayniteAudioSwitcher
                 logger.Error(ex, $"Failed to set audio device {deviceName}.");
                 ShowMessage($"{Loc("LOCAS_AudioSwitchFailed")}: {ex.Message}");
             }
+        }
+
+        private void AddSpatialSoundMenuItems(List<MainMenuItem> items)
+        {
+            if (!settings.SpatialSoundIntegrationEnabled)
+            {
+                return;
+            }
+
+            foreach (var mode in settings.SpatialSoundModeOptions.Where(a => !string.IsNullOrWhiteSpace(a.Id)))
+            {
+                var modeId = mode.Id;
+                items.Add(new MainMenuItem
+                {
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_SpatialSoundTitle")}",
+                    Description = mode.Name,
+                    Action = _ => ApplySpatialSoundMode(modeId, true)
+                });
+            }
+        }
+
+        private bool ApplySpatialSoundMode(string modeId, bool notify)
+        {
+            if (string.IsNullOrWhiteSpace(modeId))
+            {
+                return true;
+            }
+
+            if (!settings.SpatialSoundIntegrationEnabled)
+            {
+                return true;
+            }
+
+            var mode = settings.SpatialSoundModeOptions.FirstOrDefault(a => string.Equals(a.Id, modeId, StringComparison.OrdinalIgnoreCase));
+            if (mode == null || string.IsNullOrWhiteSpace(mode.ToolValue))
+            {
+                return true;
+            }
+
+            var toolPath = settings.SpatialSoundToolPath;
+            if (string.IsNullOrWhiteSpace(toolPath) || !File.Exists(toolPath))
+            {
+                ShowMessage(Loc("LOCAS_SpatialToolMissing"));
+                return false;
+            }
+
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = toolPath,
+                    Arguments = $"/SetSpatial \"DefaultRenderDevice\" {EscapeArgument(mode.ToolValue)}",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                using (var process = Process.Start(startInfo))
+                {
+                    process?.WaitForExit(5000);
+                    if (process != null && !process.HasExited)
+                    {
+                        process.Kill();
+                        throw new TimeoutException("Spatial sound tool timed out.");
+                    }
+
+                    if (process != null && process.ExitCode != 0)
+                    {
+                        throw new InvalidOperationException($"Spatial sound tool exited with code {process.ExitCode}.");
+                    }
+                }
+
+                if (notify && settings.ShowNotifications)
+                {
+                    ShowMessage($"{Loc("LOCAS_SpatialSoundTitle")}: {mode.Name}");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to set spatial sound mode {mode.Name}.");
+                ShowMessage($"{Loc("LOCAS_SpatialSwitchFailed")}: {ex.Message}");
+                return false;
+            }
+        }
+
+        private static string EscapeArgument(string value)
+        {
+            return "\"" + (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
         }
 
         private void TrackControllerInput(OnControllerButtonStateChangedArgs args)

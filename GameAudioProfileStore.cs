@@ -10,7 +10,7 @@ namespace PlayniteAudioSwitcher
     {
         private readonly string filePath;
         private readonly object syncRoot = new object();
-        private Dictionary<Guid, string> profiles = new Dictionary<Guid, string>();
+        private Dictionary<Guid, GameAudioProfile> profiles = new Dictionary<Guid, GameAudioProfile>();
 
         public GameAudioProfileStore(string pluginDataPath)
         {
@@ -28,7 +28,20 @@ namespace PlayniteAudioSwitcher
 
             lock (syncRoot)
             {
-                return profiles.TryGetValue(game.Id, out var deviceId) ? deviceId : null;
+                return GetProfile(game)?.DeviceId;
+            }
+        }
+
+        public GameAudioProfile GetProfile(Game game)
+        {
+            if (game == null)
+            {
+                return null;
+            }
+
+            lock (syncRoot)
+            {
+                return profiles.TryGetValue(game.Id, out var profile) ? profile : null;
             }
         }
 
@@ -41,13 +54,49 @@ namespace PlayniteAudioSwitcher
 
             lock (syncRoot)
             {
-                if (string.IsNullOrWhiteSpace(deviceId))
+                if (!profiles.TryGetValue(game.Id, out var profile))
+                {
+                    profile = new GameAudioProfile();
+                }
+
+                profile.DeviceId = deviceId;
+
+                if (IsEmpty(profile))
                 {
                     profiles.Remove(game.Id);
                 }
                 else
                 {
-                    profiles[game.Id] = deviceId;
+                    profiles[game.Id] = profile;
+                }
+
+                Save();
+            }
+        }
+
+        public void SetSpatialSoundMode(Game game, string spatialSoundMode)
+        {
+            if (game == null)
+            {
+                return;
+            }
+
+            lock (syncRoot)
+            {
+                if (!profiles.TryGetValue(game.Id, out var profile))
+                {
+                    profile = new GameAudioProfile();
+                }
+
+                profile.SpatialSoundMode = spatialSoundMode;
+
+                if (IsEmpty(profile))
+                {
+                    profiles.Remove(game.Id);
+                }
+                else
+                {
+                    profiles[game.Id] = profile;
                 }
 
                 Save();
@@ -61,15 +110,35 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            if (Serialization.TryFromJsonFile<Dictionary<Guid, string>>(filePath, out var loadedProfiles))
+            if (Serialization.TryFromJsonFile<Dictionary<Guid, GameAudioProfile>>(filePath, out var loadedProfiles))
             {
-                profiles = loadedProfiles ?? new Dictionary<Guid, string>();
+                profiles = loadedProfiles ?? new Dictionary<Guid, GameAudioProfile>();
+                return;
+            }
+
+            if (Serialization.TryFromJsonFile<Dictionary<Guid, string>>(filePath, out var legacyProfiles))
+            {
+                profiles = new Dictionary<Guid, GameAudioProfile>();
+                foreach (var profile in legacyProfiles ?? new Dictionary<Guid, string>())
+                {
+                    profiles[profile.Key] = new GameAudioProfile
+                    {
+                        DeviceId = profile.Value
+                    };
+                }
             }
         }
 
         private void Save()
         {
             File.WriteAllText(filePath, Serialization.ToJson(profiles, true));
+        }
+
+        private static bool IsEmpty(GameAudioProfile profile)
+        {
+            return profile == null ||
+                string.IsNullOrWhiteSpace(profile.DeviceId) &&
+                string.IsNullOrWhiteSpace(profile.SpatialSoundMode);
         }
     }
 }
