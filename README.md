@@ -89,7 +89,7 @@ This feature is disabled by default and Audio Switcher does not bundle third-par
 
 When a game profile starts, Audio Switcher switches the configured output device first and then applies the selected Spatial Sound mode to the current default render device.
 
-Audio Switcher marks the last Spatial Sound mode it successfully applied. Windows does not expose the current Spatial Sound mode through the integration, so changes made outside Audio Switcher may not be reflected in the menu.
+Audio Switcher marks the Spatial Sound mode it last applied during the current Playnite session. Windows does not expose the current Spatial Sound mode through this integration, so changes made outside Audio Switcher may not be reflected in the menu. When Playnite starts and no mode has been applied yet, the menu assumes Spatial Sound is off.
 
 Windows does not currently expose a stable public API for selecting the system Spatial Sound format, so this integration depends on the external tool and should be treated as experimental.
 

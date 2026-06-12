@@ -772,7 +772,7 @@ namespace PlayniteAudioSwitcher
                 items.Add(new MainMenuItem
                 {
                     MenuSection = $"{MenuRoot}|{Loc("LOCAS_SpatialSoundTitle")}",
-                    Description = GetCheckedMenuText(mode.Name, string.Equals(settings.CurrentSpatialSoundMode, modeId, StringComparison.OrdinalIgnoreCase)),
+                    Description = GetCheckedMenuText(mode.Name, IsCurrentSpatialSoundMenuMode(modeId)),
                     Action = _ => ApplySpatialSoundMode(modeId, true)
                 });
             }
@@ -791,7 +791,7 @@ namespace PlayniteAudioSwitcher
             }
 
             var mode = settings.SpatialSoundModeOptions.FirstOrDefault(a => string.Equals(a.Id, modeId, StringComparison.OrdinalIgnoreCase));
-            if (mode == null || string.IsNullOrWhiteSpace(mode.ToolValue))
+            if (mode == null || mode.ToolValue == null)
             {
                 return true;
             }
@@ -831,7 +831,6 @@ namespace PlayniteAudioSwitcher
                 }
 
                 settings.CurrentSpatialSoundMode = mode.Id;
-                SavePluginSettings(settings);
                 if (notify && settings.ShowNotifications)
                 {
                     ShowMessage($"{Loc("LOCAS_SpatialSoundTitle")}: {mode.Name}");
@@ -845,6 +844,14 @@ namespace PlayniteAudioSwitcher
                 ShowMessage($"{Loc("LOCAS_SpatialSwitchFailed")}: {ex.Message}");
                 return false;
             }
+        }
+
+        private bool IsCurrentSpatialSoundMenuMode(string modeId)
+        {
+            var currentMode = string.IsNullOrWhiteSpace(settings.CurrentSpatialSoundMode)
+                ? "Off"
+                : settings.CurrentSpatialSoundMode;
+            return string.Equals(currentMode, modeId, StringComparison.OrdinalIgnoreCase);
         }
 
         private string ResolveSpatialSoundDeviceArgument(string toolPath)

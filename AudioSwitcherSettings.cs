@@ -54,7 +54,6 @@ namespace PlayniteAudioSwitcher
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
                 SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
                 SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
-                CurrentSpatialSoundMode = savedSettings.CurrentSpatialSoundMode;
             }
 
             MigrateFavoritesToAliases();
@@ -186,6 +185,7 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref spatialSoundToolPath, value);
         }
 
+        [DontSerialize]
         public string CurrentSpatialSoundMode
         {
             get => currentSpatialSoundMode;
@@ -288,7 +288,6 @@ namespace PlayniteAudioSwitcher
             RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
             SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
-            CurrentSpatialSoundMode = editingClone.CurrentSpatialSoundMode;
             RefreshDevices();
         }
 
@@ -365,8 +364,7 @@ namespace PlayniteAudioSwitcher
                 GameProfilesEnabled = GameProfilesEnabled,
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,
                 SpatialSoundIntegrationEnabled = SpatialSoundIntegrationEnabled,
-                SpatialSoundToolPath = SpatialSoundToolPath,
-                CurrentSpatialSoundMode = CurrentSpatialSoundMode
+                SpatialSoundToolPath = SpatialSoundToolPath
             };
         }
     }
