@@ -1,0 +1,12 @@
+AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
+Packages:
+  - Version: 0.6.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-06-12
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v0.6.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_0_6_0.pext
+    Changelog:
+      - Added experimental Spatial Sound integration through SoundVolumeView or svcl.
+      - Added per-device visibility controls.
+      - Added hidden-device access for theme integrations through AllDevices.
+      - Removed Desktop top panel and sidebar shortcuts.
+      - Improved README documentation.
