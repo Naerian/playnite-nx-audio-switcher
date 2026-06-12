@@ -818,10 +818,11 @@ namespace PlayniteAudioSwitcher
 
             try
             {
+                var deviceArgument = ResolveSpatialSoundDeviceArgument(toolPath);
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = toolPath,
-                    Arguments = $"/SetSpatial \"DefaultRenderDevice\" {EscapeArgument(mode.ToolValue)}",
+                    Arguments = $"/SetSpatial {EscapeArgument(deviceArgument)} {EscapeArgument(mode.ToolValue)}",
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden
@@ -857,9 +858,114 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        private string ResolveSpatialSoundDeviceArgument(string toolPath)
+        {
+            var tempFile = Path.Combine(Path.GetTempPath(), $"AudioSwitcher-SoundVolumeView-{Guid.NewGuid():N}.csv");
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = toolPath,
+                    Arguments = $"/scomma {EscapeArgument(tempFile)} /Columns {EscapeArgument("Name,Command-Line Friendly ID,Direction,Device State,Default")}",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                using (var process = Process.Start(startInfo))
+                {
+                    process?.WaitForExit(5000);
+                }
+
+                if (!File.Exists(tempFile))
+                {
+                    return "DefaultRenderDevice";
+                }
+
+                var lines = File.ReadAllLines(tempFile);
+                if (lines.Length < 2)
+                {
+                    return "DefaultRenderDevice";
+                }
+
+                var headers = SplitCsvLine(lines[0]);
+                var friendlyIdIndex = headers.FindIndex(a => string.Equals(a, "Command-Line Friendly ID", StringComparison.OrdinalIgnoreCase));
+                var directionIndex = headers.FindIndex(a => string.Equals(a, "Direction", StringComparison.OrdinalIgnoreCase));
+                var stateIndex = headers.FindIndex(a => string.Equals(a, "Device State", StringComparison.OrdinalIgnoreCase));
+                var defaultIndex = headers.FindIndex(a => string.Equals(a, "Default", StringComparison.OrdinalIgnoreCase));
+
+                foreach (var line in lines.Skip(1))
+                {
+                    var values = SplitCsvLine(line);
+                    var isRender = directionIndex >= 0 && directionIndex < values.Count && string.Equals(values[directionIndex], "Render", StringComparison.OrdinalIgnoreCase);
+                    var isActive = stateIndex >= 0 && stateIndex < values.Count && string.Equals(values[stateIndex], "Active", StringComparison.OrdinalIgnoreCase);
+                    var isDefault = defaultIndex >= 0 && defaultIndex < values.Count && values[defaultIndex].IndexOf("Render", StringComparison.OrdinalIgnoreCase) >= 0;
+                    if (isRender && isActive && isDefault && friendlyIdIndex >= 0 && friendlyIdIndex < values.Count && !string.IsNullOrWhiteSpace(values[friendlyIdIndex]))
+                    {
+                        return values[friendlyIdIndex];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to resolve SoundVolumeView command-line friendly device ID.");
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(tempFile))
+                    {
+                        File.Delete(tempFile);
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return "DefaultRenderDevice";
+        }
+
+        private static List<string> SplitCsvLine(string line)
+        {
+            var values = new List<string>();
+            var current = new System.Text.StringBuilder();
+            var inQuotes = false;
+
+            for (var i = 0; i < (line ?? string.Empty).Length; i++)
+            {
+                var c = line[i];
+                if (c == '"')
+                {
+                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        current.Append('"');
+                        i++;
+                    }
+                    else
+                    {
+                        inQuotes = !inQuotes;
+                    }
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    values.Add(current.ToString());
+                    current.Clear();
+                }
+                else
+                {
+                    current.Append(c);
+                }
+            }
+
+            values.Add(current.ToString());
+            return values;
+        }
+
         private static string EscapeArgument(string value)
         {
-            return "\"" + (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+            return "\"" + (value ?? string.Empty).Replace("\"", "\\\"") + "\"";
         }
 
         private void TrackControllerInput(OnControllerButtonStateChangedArgs args)
