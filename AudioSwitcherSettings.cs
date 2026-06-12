@@ -98,14 +98,6 @@ namespace PlayniteAudioSwitcher
         }
 
         [DontSerialize]
-        public List<DeviceDisplayModeOption> DeviceDisplayModeOptions => new List<DeviceDisplayModeOption>
-        {
-            new DeviceDisplayModeOption { Id = "Text", Name = plugin?.Loc("LOCAS_DisplayModeText") ?? "Texto" },
-            new DeviceDisplayModeOption { Id = "TextAndIcon", Name = plugin?.Loc("LOCAS_DisplayModeTextAndIcon") ?? "Texto e icono" },
-            new DeviceDisplayModeOption { Id = "Icon", Name = plugin?.Loc("LOCAS_DisplayModeIcon") ?? "Solo icono" }
-        };
-
-        [DontSerialize]
         private List<string> LegacyIconOptions => new List<string>
         {
             string.Empty,

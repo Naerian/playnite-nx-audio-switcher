@@ -35,16 +35,6 @@
                 <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
 
                 <Border Style="{StaticResource SectionHeaderBorder}">
-                    <TextBlock Text="{DynamicResource LOCAS_FullscreenDisplayMode}" Style="{StaticResource SectionHeaderText}" />
-                </Border>
-                <TextBlock Text="{DynamicResource LOCAS_FullscreenDisplayMode}" />
-                <ComboBox ItemsSource="{Binding DeviceDisplayModeOptions}"
-                          DisplayMemberPath="Name"
-                          SelectedValuePath="Id"
-                          SelectedValue="{Binding DeviceDisplayMode}"
-                          Margin="0,2,0,10" />
-
-                <Border Style="{StaticResource SectionHeaderBorder}">
                     <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
                 </Border>
                 <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"

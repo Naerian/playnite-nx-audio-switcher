@@ -11,10 +11,6 @@ It is designed for couch and console-like setups where users often move between 
 - Fullscreen quick switch with `Back + Y`.
 - Custom names for any number of audio devices.
 - Optional icon per renamed audio device.
-- Configurable Fullscreen display mode:
-  - Text
-  - Text and icon
-  - Icon only
 - Full device selector for manual switching.
 - Game-specific audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
@@ -49,7 +45,6 @@ From there you can:
 
 - Give friendly names to audio devices.
 - Assign icons to devices.
-- Choose how devices are displayed in Fullscreen/theme UI.
 - Enable or disable the Fullscreen quick switch shortcut.
 - Enable or disable automatic game-specific audio profiles.
 - Configure whether the previous audio device is restored after a game-specific profile.
@@ -207,7 +202,7 @@ Place a controller-friendly device list:
 <ContentControl x:Name="AudioSwitcher_DeviceList" />
 ```
 
-All controls respect the plugin's display mode setting: text, text plus icon, or icon only. The device selector and device list show the active output marker and use the user's custom names and icons when configured.
+The device selector and device list show the active output marker and use the user's custom names and icons when configured. Theme authors can decide whether their layouts show text, icons, or both by choosing the exposed properties that fit their design.
 
 ## Localization
 

@@ -872,18 +872,7 @@ namespace PlayniteAudioSwitcher
         private string FormatDeviceVisual(string icon, string name)
         {
             var iconText = GetIconText(icon);
-            var hasIcon = !string.IsNullOrWhiteSpace(iconText);
-            if (settings.DeviceDisplayMode == "Icon" && hasIcon)
-            {
-                return iconText;
-            }
-
-            if (settings.DeviceDisplayMode == "TextAndIcon" && hasIcon)
-            {
-                return $"{iconText} {name}";
-            }
-
-            return name;
+            return string.IsNullOrWhiteSpace(iconText) ? name : $"{iconText} {name}";
         }
 
         private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId)
