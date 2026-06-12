@@ -8,7 +8,7 @@
              d:DesignWidth="900">
     <UserControl.Resources>
         <Style x:Key="SectionHeaderBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="#666666" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="Padding" Value="0,0,0,6" />
             <Setter Property="Margin" Value="0,18,0,10" />
@@ -22,8 +22,9 @@
         </Style>
     </UserControl.Resources>
     <Grid Margin="12">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="8" MaxWidth="820">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="8" HorizontalAlignment="Stretch">
                 <Border Style="{StaticResource FirstSectionHeaderBorder}">
                     <TextBlock Text="{DynamicResource LOCAS_CustomNamesTitle}" Style="{StaticResource SectionHeaderText}" />
                 </Border>
@@ -73,7 +74,7 @@
                           IsChecked="{Binding ShowNotifications}"
                           Margin="0,0,0,12" />
 
-                <Border BorderBrush="#444444" BorderThickness="1" Padding="10">
+                <Border BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="1" Padding="10" Opacity="0.9">
                     <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}"
                                TextWrapping="Wrap" />
                 </Border>
