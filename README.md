@@ -8,7 +8,7 @@ It is designed for couch and console-like setups where users often move between 
 
 - Switch the default Windows playback device from Playnite.
 - Works from both Desktop and Fullscreen mode extension menus.
-- Fullscreen quick switch with `Back + Y`.
+- Fullscreen quick switch with `Back + RB`.
 - Custom names for any number of audio devices.
 - Optional icon per renamed audio device.
 - Hide audio devices you do not want to see in Audio Switcher menus.
