@@ -75,7 +75,8 @@ namespace PlayniteAudioSwitcher
         public void SetDefaultPlaybackVolume(float volume)
         {
             var endpoint = GetDefaultPlaybackVolumeEndpoint();
-            Marshal.ThrowExceptionForHR(endpoint.SetMasterVolumeLevelScalar(Clamp01(volume), Guid.Empty));
+            var eventContext = Guid.Empty;
+            Marshal.ThrowExceptionForHR(endpoint.SetMasterVolumeLevelScalar(Clamp01(volume), ref eventContext));
         }
 
         public void ChangeDefaultPlaybackVolume(float delta)
@@ -87,7 +88,8 @@ namespace PlayniteAudioSwitcher
         public void SetDefaultPlaybackMute(bool isMuted)
         {
             var endpoint = GetDefaultPlaybackVolumeEndpoint();
-            Marshal.ThrowExceptionForHR(endpoint.SetMute(isMuted, Guid.Empty));
+            var eventContext = Guid.Empty;
+            Marshal.ThrowExceptionForHR(endpoint.SetMute(isMuted, ref eventContext));
         }
 
         public void ToggleDefaultPlaybackMute()
@@ -244,10 +246,10 @@ namespace PlayniteAudioSwitcher
             int GetChannelCount(out uint channelCount);
 
             [PreserveSig]
-            int SetMasterVolumeLevel(float levelDb, Guid eventContext);
+            int SetMasterVolumeLevel(float levelDb, ref Guid eventContext);
 
             [PreserveSig]
-            int SetMasterVolumeLevelScalar(float level, Guid eventContext);
+            int SetMasterVolumeLevelScalar(float level, ref Guid eventContext);
 
             [PreserveSig]
             int GetMasterVolumeLevel(out float levelDb);
@@ -256,10 +258,10 @@ namespace PlayniteAudioSwitcher
             int GetMasterVolumeLevelScalar(out float level);
 
             [PreserveSig]
-            int SetChannelVolumeLevel(uint channelNumber, float levelDb, Guid eventContext);
+            int SetChannelVolumeLevel(uint channelNumber, float levelDb, ref Guid eventContext);
 
             [PreserveSig]
-            int SetChannelVolumeLevelScalar(uint channelNumber, float level, Guid eventContext);
+            int SetChannelVolumeLevelScalar(uint channelNumber, float level, ref Guid eventContext);
 
             [PreserveSig]
             int GetChannelVolumeLevel(uint channelNumber, out float levelDb);
@@ -268,19 +270,19 @@ namespace PlayniteAudioSwitcher
             int GetChannelVolumeLevelScalar(uint channelNumber, out float level);
 
             [PreserveSig]
-            int SetMute(bool isMuted, Guid eventContext);
+            int SetMute([MarshalAs(UnmanagedType.Bool)] bool isMuted, ref Guid eventContext);
 
             [PreserveSig]
-            int GetMute(out bool isMuted);
+            int GetMute([MarshalAs(UnmanagedType.Bool)] out bool isMuted);
 
             [PreserveSig]
             int GetVolumeStepInfo(out uint step, out uint stepCount);
 
             [PreserveSig]
-            int VolumeStepUp(Guid eventContext);
+            int VolumeStepUp(ref Guid eventContext);
 
             [PreserveSig]
-            int VolumeStepDown(Guid eventContext);
+            int VolumeStepDown(ref Guid eventContext);
 
             [PreserveSig]
             int QueryHardwareSupport(out uint hardwareSupportMask);

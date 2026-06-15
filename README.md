@@ -66,11 +66,11 @@ In Fullscreen mode, open:
 
 This opens a simple list of active Windows output devices. The current output device is marked with a check. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
 
-The same Fullscreen extension menu also includes volume actions for the current default output device: volume up, volume down, and mute / unmute. The step size can be changed from the extension settings.
-
 The optional `Back + RB` controller shortcut cycles through active output devices.
 
 The native Playnite extension menu is text-only, so custom SVG icons are not shown there. Icons are available to Fullscreen themes through the theme integration API and bundled controls.
+
+Volume controls are exposed to themes through the theme integration API. They are not shown in the native Fullscreen extension menu because Playnite closes that menu after each action, which makes repeated volume changes awkward from a controller.
 
 ## Game-Specific Audio Profiles
 

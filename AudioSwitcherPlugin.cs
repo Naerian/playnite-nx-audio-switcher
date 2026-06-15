@@ -426,7 +426,6 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
-            AddVolumeMenuItems(items);
             AddSpatialSoundMenuItems(items);
 
             return items;
