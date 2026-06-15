@@ -3,6 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
+    <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Custom names</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Enter a simple name for each output you want to use from Playnite. Devices without a custom name will still appear in the full selector.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows name</sys:String>
@@ -20,7 +21,9 @@
     <sys:String x:Key="LOCAS_GameProfilesTitle">Game profiles</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Assign an output device from a game's context menu. When the game starts, Audio Switcher can switch to that device automatically.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfiles">Apply game-specific audio profiles when games start</sys:String>
-    <sys:String x:Key="LOCAS_ShowNotification">Show notification after switching</sys:String>
+    <sys:String x:Key="LOCAS_ShowNotification">Show audio change notifications</sys:String>
+    <sys:String x:Key="LOCAS_NotificationsTitle">Notifications</sys:String>
+    <sys:String x:Key="LOCAS_NotificationsHelp">Choose when Audio Switcher shows informational notifications. Important errors are always shown.</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelp">Quick switch cycles through devices with custom names. Configure at least two devices to use it.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Quick switch output</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Refresh audio devices</sys:String>
@@ -60,6 +63,15 @@
     <sys:String x:Key="LOCAS_SpatialOff">Off</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">Spatial Sound tool path is not configured or does not exist.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">Spatial Sound switch failed</sys:String>
+    <sys:String x:Key="LOCAS_VolumeTitle">Volume</sys:String>
+    <sys:String x:Key="LOCAS_VolumeHelp">Control the current default output device volume from Audio Switcher and supported themes.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStep">Volume step</sys:String>
+    <sys:String x:Key="LOCAS_VolumeUp">Volume up</sys:String>
+    <sys:String x:Key="LOCAS_VolumeDown">Volume down</sys:String>
+    <sys:String x:Key="LOCAS_ToggleMute">Mute / unmute</sys:String>
+    <sys:String x:Key="LOCAS_Muted">Muted</sys:String>
+    <sys:String x:Key="LOCAS_Unmuted">Sound on</sys:String>
+    <sys:String x:Key="LOCAS_VolumeFailed">Volume change failed</sys:String>
 </ResourceDictionary>
 
 

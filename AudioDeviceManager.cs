@@ -59,6 +59,64 @@ namespace PlayniteAudioSwitcher
             Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications));
         }
 
+        public AudioVolumeState GetDefaultPlaybackVolume()
+        {
+            var volume = GetDefaultPlaybackVolumeEndpoint();
+            Marshal.ThrowExceptionForHR(volume.GetMasterVolumeLevelScalar(out var level));
+            Marshal.ThrowExceptionForHR(volume.GetMute(out var isMuted));
+
+            return new AudioVolumeState
+            {
+                Volume = Clamp01(level),
+                IsMuted = isMuted
+            };
+        }
+
+        public void SetDefaultPlaybackVolume(float volume)
+        {
+            var endpoint = GetDefaultPlaybackVolumeEndpoint();
+            Marshal.ThrowExceptionForHR(endpoint.SetMasterVolumeLevelScalar(Clamp01(volume), Guid.Empty));
+        }
+
+        public void ChangeDefaultPlaybackVolume(float delta)
+        {
+            var state = GetDefaultPlaybackVolume();
+            SetDefaultPlaybackVolume(state.Volume + delta);
+        }
+
+        public void SetDefaultPlaybackMute(bool isMuted)
+        {
+            var endpoint = GetDefaultPlaybackVolumeEndpoint();
+            Marshal.ThrowExceptionForHR(endpoint.SetMute(isMuted, Guid.Empty));
+        }
+
+        public void ToggleDefaultPlaybackMute()
+        {
+            var state = GetDefaultPlaybackVolume();
+            SetDefaultPlaybackMute(!state.IsMuted);
+        }
+
+        private static float Clamp01(float value)
+        {
+            return Math.Max(0f, Math.Min(1f, value));
+        }
+
+        private IAudioEndpointVolume GetDefaultPlaybackVolumeEndpoint()
+        {
+            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia, out var device));
+            var interfaceId = typeof(IAudioEndpointVolume).GUID;
+            Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
+            try
+            {
+                return (IAudioEndpointVolume)Marshal.GetObjectForIUnknown(interfacePointer);
+            }
+            finally
+            {
+                Marshal.Release(interfacePointer);
+            }
+        }
+
         private static string GetDefaultPlaybackDeviceId(IMMDeviceEnumerator enumerator)
         {
             try
@@ -169,6 +227,66 @@ namespace PlayniteAudioSwitcher
 
             [PreserveSig]
             int GetState(out DeviceState state);
+        }
+
+        [ComImport]
+        [Guid("5CDF2C82-841E-4546-9722-0CF74078229A")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioEndpointVolume
+        {
+            [PreserveSig]
+            int RegisterControlChangeNotify(IntPtr client);
+
+            [PreserveSig]
+            int UnregisterControlChangeNotify(IntPtr client);
+
+            [PreserveSig]
+            int GetChannelCount(out uint channelCount);
+
+            [PreserveSig]
+            int SetMasterVolumeLevel(float levelDb, Guid eventContext);
+
+            [PreserveSig]
+            int SetMasterVolumeLevelScalar(float level, Guid eventContext);
+
+            [PreserveSig]
+            int GetMasterVolumeLevel(out float levelDb);
+
+            [PreserveSig]
+            int GetMasterVolumeLevelScalar(out float level);
+
+            [PreserveSig]
+            int SetChannelVolumeLevel(uint channelNumber, float levelDb, Guid eventContext);
+
+            [PreserveSig]
+            int SetChannelVolumeLevelScalar(uint channelNumber, float level, Guid eventContext);
+
+            [PreserveSig]
+            int GetChannelVolumeLevel(uint channelNumber, out float levelDb);
+
+            [PreserveSig]
+            int GetChannelVolumeLevelScalar(uint channelNumber, out float level);
+
+            [PreserveSig]
+            int SetMute(bool isMuted, Guid eventContext);
+
+            [PreserveSig]
+            int GetMute(out bool isMuted);
+
+            [PreserveSig]
+            int GetVolumeStepInfo(out uint step, out uint stepCount);
+
+            [PreserveSig]
+            int VolumeStepUp(Guid eventContext);
+
+            [PreserveSig]
+            int VolumeStepDown(Guid eventContext);
+
+            [PreserveSig]
+            int QueryHardwareSupport(out uint hardwareSupportMask);
+
+            [PreserveSig]
+            int GetVolumeRange(out float volumeMinDb, out float volumeMaxDb, out float volumeIncrementDb);
         }
 
         [ComImport]

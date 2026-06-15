@@ -13,6 +13,7 @@ It is designed for couch and console-like setups where users often move between 
 - Optional icon per renamed audio device.
 - Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
+- Native volume controls for the current default output device.
 - Game-specific audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
@@ -47,11 +48,15 @@ From there you can:
 - Assign icons to devices.
 - Choose whether each device is visible in Audio Switcher menus and selectors.
 - Enable or disable the Fullscreen quick switch shortcut.
+- Configure the volume step used by Audio Switcher volume actions.
 - Enable or disable automatic game-specific audio profiles.
 - Configure whether the previous audio device is restored after a game-specific profile.
 - Enable experimental Spatial Sound integration by pointing Audio Switcher to `SoundVolumeView.exe` or `svcl.exe`.
+- Choose whether Audio Switcher shows informational audio-change notifications.
 
 Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
+
+Notification settings live in their own **Notifications** tab. Disabling notifications hides normal informational messages such as device, volume, mute, and Spatial Sound changes. Important error messages are still shown.
 
 ## Fullscreen Usage
 
@@ -60,6 +65,8 @@ In Fullscreen mode, open:
 `Extensions > Audio Switcher`
 
 This opens a simple list of active Windows output devices. The current output device is marked with a check. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
+
+The same Fullscreen extension menu also includes volume actions for the current default output device: volume up, volume down, and mute / unmute. The step size can be changed from the extension settings.
 
 The optional `Back + RB` controller shortcut cycles through active output devices.
 
@@ -149,6 +156,11 @@ Useful properties:
 - `CurrentDeviceLabel`
 - `CurrentDeviceIconGeometry`
 - `CurrentDeviceId`
+- `CurrentVolume`
+- `CurrentVolumePercent`
+- `CurrentVolumeLabel`
+- `IsMuted`
+- `VolumeStepPercent`
 - `Devices`
 - `AllDevices`
 - `HasDevices`
@@ -156,6 +168,8 @@ Useful properties:
 - `HighlightedDeviceIndex`
 
 `CurrentDeviceName` is the friendly/custom name for the current output device. `CurrentDeviceIconGeometry` exposes the configured SVG icon geometry, falling back to a speaker icon when needed. `CurrentDeviceLabel` is a convenience label that combines icon text and device name for simple text-based placements.
+
+`CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted.
 
 Useful commands:
 
@@ -165,6 +179,11 @@ Useful commands:
 - `NextDeviceCommand`
 - `RefreshDevicesCommand`
 - `SetDeviceCommand`
+- `VolumeUpCommand`
+- `VolumeDownCommand`
+- `SetVolumeCommand`
+- `ToggleMuteCommand`
+- `RefreshVolumeCommand`
 
 Example icon button:
 
@@ -188,6 +207,28 @@ Example device list:
     </ItemsControl.ItemTemplate>
 </ItemsControl>
 ```
+
+Example volume controls:
+
+```xml
+<StackPanel Orientation="Horizontal">
+    <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=VolumeDownCommand}"
+            Content="-" />
+
+    <ProgressBar Minimum="0"
+                 Maximum="100"
+                 Width="120"
+                 Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumePercent}" />
+
+    <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=VolumeUpCommand}"
+            Content="+" />
+
+    <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=ToggleMuteCommand}"
+            Content="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumeLabel}" />
+</StackPanel>
+```
+
+`SetVolumeCommand` accepts either a scalar value such as `0.5` or a percentage value such as `50` / `50%`.
 
 Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
 

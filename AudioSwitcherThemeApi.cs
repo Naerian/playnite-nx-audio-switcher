@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -18,6 +19,11 @@ namespace PlayniteAudioSwitcher
         private string currentDeviceLabel;
         private Geometry currentDeviceIconGeometry;
         private bool hasDevices;
+        private float currentVolume;
+        private int currentVolumePercent;
+        private string currentVolumeLabel;
+        private bool isMuted;
+        private int volumeStepPercent;
         private int highlightedDeviceIndex = -1;
         private DateTime confirmAvailableAt = DateTime.MinValue;
 
@@ -40,6 +46,11 @@ namespace PlayniteAudioSwitcher
                 Refresh();
             });
             SetDeviceCommand = new RelayCommand<object>(SetDevice);
+            VolumeUpCommand = new RelayCommand(() => ChangeVolume(1));
+            VolumeDownCommand = new RelayCommand(() => ChangeVolume(-1));
+            ToggleMuteCommand = new RelayCommand(ToggleMute);
+            RefreshVolumeCommand = new RelayCommand(RefreshVolume);
+            SetVolumeCommand = new RelayCommand<object>(SetVolume);
         }
 
         public ObservableCollection<AudioSwitcherThemeDevice> Devices { get; }
@@ -57,6 +68,16 @@ namespace PlayniteAudioSwitcher
         public ICommand RefreshDevicesCommand { get; }
 
         public ICommand SetDeviceCommand { get; }
+
+        public ICommand VolumeUpCommand { get; }
+
+        public ICommand VolumeDownCommand { get; }
+
+        public ICommand ToggleMuteCommand { get; }
+
+        public ICommand RefreshVolumeCommand { get; }
+
+        public ICommand SetVolumeCommand { get; }
 
         public bool IsSelectorOpen
         {
@@ -92,6 +113,36 @@ namespace PlayniteAudioSwitcher
         {
             get => hasDevices;
             private set => SetValue(ref hasDevices, value);
+        }
+
+        public float CurrentVolume
+        {
+            get => currentVolume;
+            private set => SetValue(ref currentVolume, value);
+        }
+
+        public int CurrentVolumePercent
+        {
+            get => currentVolumePercent;
+            private set => SetValue(ref currentVolumePercent, value);
+        }
+
+        public string CurrentVolumeLabel
+        {
+            get => currentVolumeLabel;
+            private set => SetValue(ref currentVolumeLabel, value);
+        }
+
+        public bool IsMuted
+        {
+            get => isMuted;
+            private set => SetValue(ref isMuted, value);
+        }
+
+        public int VolumeStepPercent
+        {
+            get => volumeStepPercent;
+            private set => SetValue(ref volumeStepPercent, value);
         }
 
         public int HighlightedDeviceIndex
@@ -182,6 +233,7 @@ namespace PlayniteAudioSwitcher
             CurrentDeviceName = plugin.GetCurrentDeviceDisplayName();
             CurrentDeviceLabel = plugin.GetCurrentDeviceDisplayLabel();
             CurrentDeviceIconGeometry = plugin.GetCurrentDeviceIconGeometry() ?? plugin.GetIconGeometry("volume-2");
+            RefreshVolume();
 
             var devices = plugin.GetThemeSelectorDevices(false)
                 .OrderBy(a => a.EffectiveName)
@@ -267,6 +319,95 @@ namespace PlayniteAudioSwitcher
             plugin.SetThemeSelectedDevice(deviceId);
             IsSelectorOpen = false;
             Refresh();
+        }
+
+        private void RefreshVolume()
+        {
+            VolumeStepPercent = plugin.Settings.VolumeStepPercent;
+
+            try
+            {
+                var state = plugin.GetCurrentVolumeState();
+                CurrentVolume = state.Volume;
+                CurrentVolumePercent = state.VolumePercent;
+                IsMuted = state.IsMuted;
+                CurrentVolumeLabel = state.IsMuted ? plugin.Loc("LOCAS_Muted") : $"{state.VolumePercent}%";
+            }
+            catch
+            {
+                CurrentVolume = 0;
+                CurrentVolumePercent = 0;
+                IsMuted = false;
+                CurrentVolumeLabel = string.Empty;
+            }
+        }
+
+        private void ChangeVolume(int direction)
+        {
+            plugin.ChangeVolumeByStep(direction);
+            RefreshVolume();
+        }
+
+        private void ToggleMute()
+        {
+            plugin.ToggleMute();
+            RefreshVolume();
+        }
+
+        private void SetVolume(object parameter)
+        {
+            if (!TryGetVolumeScalar(parameter, out var volume))
+            {
+                return;
+            }
+
+            plugin.SetVolume(volume);
+            RefreshVolume();
+        }
+
+        private static bool TryGetVolumeScalar(object parameter, out float volume)
+        {
+            volume = 0;
+            if (parameter == null)
+            {
+                return false;
+            }
+
+            switch (parameter)
+            {
+                case float floatValue:
+                    volume = NormalizeVolumeValue(floatValue);
+                    return true;
+                case double doubleValue:
+                    volume = NormalizeVolumeValue((float)doubleValue);
+                    return true;
+                case int intValue:
+                    volume = NormalizeVolumeValue(intValue);
+                    return true;
+                case string text:
+                    var value = text.Trim();
+                    if (value.EndsWith("%", StringComparison.Ordinal))
+                    {
+                        value = value.Substring(0, value.Length - 1);
+                    }
+
+                    if (float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var invariantValue) ||
+                        float.TryParse(value, NumberStyles.Float, CultureInfo.CurrentCulture, out invariantValue))
+                    {
+                        volume = NormalizeVolumeValue(invariantValue);
+                        return true;
+                    }
+
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        private static float NormalizeVolumeValue(float value)
+        {
+            var scalar = value > 1 ? value / 100f : value;
+            return Math.Max(0f, Math.Min(1f, scalar));
         }
 
     }

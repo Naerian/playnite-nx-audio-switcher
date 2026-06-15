@@ -22,69 +22,104 @@
         </Style>
     </UserControl.Resources>
     <Grid Margin="12">
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
-            <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                    <TextBlock Text="{DynamicResource LOCAS_CustomNamesTitle}" Style="{StaticResource SectionHeaderText}" />
-                </Border>
-                <TextBlock Text="{DynamicResource LOCAS_CustomNamesHelp}"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,12" />
+        <TabControl>
+            <TabItem Header="{DynamicResource LOCAS_SettingsGeneral}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_CustomNamesTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_CustomNamesHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
 
-                <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
+                        <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
 
-                <Border Style="{StaticResource SectionHeaderBorder}">
-                    <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
-                </Border>
-                <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
-                          IsChecked="{Binding QuickSwitchEnabled}"
-                          Margin="0,2,0,8" />
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
+                                  IsChecked="{Binding QuickSwitchEnabled}"
+                                  Margin="0,2,0,8" />
 
-                <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}"
-                          IsChecked="{Binding QuickSwitchAllDevices}"
-                          Margin="0,0,0,8" />
+                        <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}"
+                                  IsChecked="{Binding QuickSwitchAllDevices}"
+                                  Margin="0,0,0,8" />
 
-                <Border Style="{StaticResource SectionHeaderBorder}">
-                    <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
-                </Border>
-                <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,8" />
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_VolumeTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_VolumeHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
 
-                <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
-                          IsChecked="{Binding GameProfilesEnabled}"
-                          Margin="0,0,0,8" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="{DynamicResource LOCAS_VolumeStep}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0" />
+                            <TextBox Text="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}"
+                                     Width="60" />
+                            <TextBlock Text="%"
+                                       VerticalAlignment="Center"
+                                       Margin="6,0,0,0" />
+                        </StackPanel>
 
-                <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
-                          IsChecked="{Binding RestoreDeviceAfterGameProfile}"
-                          Margin="0,0,0,8" />
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
 
-                <Border Style="{StaticResource SectionHeaderBorder}">
-                    <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
-                </Border>
-                <TextBlock Text="{DynamicResource LOCAS_SpatialSoundHelp}"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,8" />
+                        <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
+                                  IsChecked="{Binding GameProfilesEnabled}"
+                                  Margin="0,0,0,8" />
 
-                <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
-                          IsChecked="{Binding SpatialSoundIntegrationEnabled}"
-                          Margin="0,0,0,8" />
+                        <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
+                                  IsChecked="{Binding RestoreDeviceAfterGameProfile}"
+                                  Margin="0,0,0,8" />
 
-                <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}"
-                           Margin="0,0,0,3" />
-                <TextBox Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
-                         Margin="0,0,0,12" />
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
 
-                <CheckBox Content="{DynamicResource LOCAS_ShowNotification}"
-                          IsChecked="{Binding ShowNotifications}"
-                          Margin="0,0,0,12" />
+                        <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
+                                  IsChecked="{Binding SpatialSoundIntegrationEnabled}"
+                                  Margin="0,0,0,8" />
 
-                <Border BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="1" Padding="10" Opacity="0.9">
-                    <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}"
-                               TextWrapping="Wrap" />
-                </Border>
-            </StackPanel>
-        </ScrollViewer>
+                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}"
+                                   Margin="0,0,0,3" />
+                        <TextBox Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12" />
+
+                        <Border BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="1" Padding="10" Opacity="0.9">
+                            <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}"
+                                       TextWrapping="Wrap" />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="{DynamicResource LOCAS_NotificationsTitle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_NotificationsTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_NotificationsHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+                        <CheckBox Content="{DynamicResource LOCAS_ShowNotification}"
+                                  IsChecked="{Binding ShowNotifications}"
+                                  Margin="0,0,0,12" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

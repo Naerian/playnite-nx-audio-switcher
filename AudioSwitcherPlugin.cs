@@ -186,6 +186,7 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
+            AddVolumeMenuItems(items);
             AddSpatialSoundMenuItems(items);
 
             return items;
@@ -218,7 +219,7 @@ namespace PlayniteAudioSwitcher
                     Action = _ =>
                     {
                         gameProfiles.SetDevice(game, deviceId);
-                        ShowMessage($"{game.Name}: {displayName}");
+                        ShowInfoMessage($"{game.Name}: {displayName}");
                     }
                 });
             }
@@ -233,7 +234,7 @@ namespace PlayniteAudioSwitcher
                     Action = _ =>
                     {
                         gameProfiles.SetSpatialSoundMode(game, modeId);
-                        ShowMessage($"{game.Name}: {mode.Name}");
+                        ShowInfoMessage($"{game.Name}: {mode.Name}");
                     }
                 });
             }
@@ -425,6 +426,7 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
+            AddVolumeMenuItems(items);
             AddSpatialSoundMenuItems(items);
 
             return items;
@@ -702,6 +704,58 @@ namespace PlayniteAudioSwitcher
             return string.IsNullOrWhiteSpace(data) ? null : Geometry.Parse(data);
         }
 
+        public AudioVolumeState GetCurrentVolumeState()
+        {
+            return AudioDevices.GetDefaultPlaybackVolume();
+        }
+
+        public void SetVolume(float volume)
+        {
+            try
+            {
+                AudioDevices.SetDefaultPlaybackVolume(volume);
+                Theme?.Refresh();
+                ShowVolumeInfoMessage();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to set default playback volume.");
+                ShowMessage($"{Loc("LOCAS_VolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ChangeVolumeByStep(int direction)
+        {
+            try
+            {
+                var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
+                AudioDevices.ChangeDefaultPlaybackVolume(step * Math.Sign(direction));
+                Theme?.Refresh();
+                ShowVolumeInfoMessage();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to change default playback volume.");
+                ShowMessage($"{Loc("LOCAS_VolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ToggleMute()
+        {
+            try
+            {
+                AudioDevices.ToggleDefaultPlaybackMute();
+                Theme?.Refresh();
+                var state = AudioDevices.GetDefaultPlaybackVolume();
+                ShowInfoMessage(state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to toggle default playback mute.");
+                ShowMessage($"{Loc("LOCAS_VolumeFailed")}: {ex.Message}");
+            }
+        }
+
         private IEnumerable<AudioDevice> SafeGetDevices()
         {
             try
@@ -776,6 +830,29 @@ namespace PlayniteAudioSwitcher
                     Action = _ => ApplySpatialSoundMode(modeId, true)
                 });
             }
+        }
+
+        private void AddVolumeMenuItems(List<MainMenuItem> items)
+        {
+            var section = $"{MenuRoot}|{Loc("LOCAS_VolumeTitle")}";
+            items.Add(new MainMenuItem
+            {
+                MenuSection = section,
+                Description = Loc("LOCAS_VolumeUp"),
+                Action = _ => ChangeVolumeByStep(1)
+            });
+            items.Add(new MainMenuItem
+            {
+                MenuSection = section,
+                Description = Loc("LOCAS_VolumeDown"),
+                Action = _ => ChangeVolumeByStep(-1)
+            });
+            items.Add(new MainMenuItem
+            {
+                MenuSection = section,
+                Description = Loc("LOCAS_ToggleMute"),
+                Action = _ => ToggleMute()
+            });
         }
 
         private bool ApplySpatialSoundMode(string modeId, bool notify)
@@ -1224,6 +1301,26 @@ namespace PlayniteAudioSwitcher
             }
 
             return prefix + displayName;
+        }
+
+        private void ShowVolumeInfoMessage()
+        {
+            try
+            {
+                var state = AudioDevices.GetDefaultPlaybackVolume();
+                ShowInfoMessage($"{Loc("LOCAS_VolumeTitle")}: {state.VolumePercent}%");
+            }
+            catch
+            {
+            }
+        }
+
+        private void ShowInfoMessage(string message)
+        {
+            if (settings.ShowNotifications)
+            {
+                ShowMessage(message);
+            }
         }
 
         private void ShowMessage(string message)

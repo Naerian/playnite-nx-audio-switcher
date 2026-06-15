@@ -3,6 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
+    <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Nombres personalizados</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Escribe un nombre sencillo para cada salida que quieras usar desde Playnite. Los dispositivos sin nombre personalizado seguirán apareciendo en el selector completo.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Nombre de Windows</sys:String>
@@ -20,7 +21,9 @@
     <sys:String x:Key="LOCAS_GameProfilesTitle">Perfiles por juego</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Asigna un dispositivo de salida desde el menú contextual de un juego. Al iniciar ese juego, Audio Switcher puede cambiar automáticamente a ese dispositivo.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfiles">Aplicar perfiles de audio por juego al iniciar juegos</sys:String>
-    <sys:String x:Key="LOCAS_ShowNotification">Mostrar notificación después de cambiar</sys:String>
+    <sys:String x:Key="LOCAS_ShowNotification">Mostrar notificaciones al cambiar audio</sys:String>
+    <sys:String x:Key="LOCAS_NotificationsTitle">Notificaciones</sys:String>
+    <sys:String x:Key="LOCAS_NotificationsHelp">Elige cuándo Audio Switcher muestra notificaciones informativas. Los errores importantes se muestran siempre.</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelp">El acceso rápido alterna entre los dispositivos con nombre personalizado. Para que funcione, configura al menos dos.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Alternar salida de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Actualizar dispositivos de audio</sys:String>
@@ -60,6 +63,15 @@
     <sys:String x:Key="LOCAS_SpatialOff">Desactivado</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">La ruta de la herramienta de Sonido espacial no está configurada o no existe.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">No se pudo cambiar el Sonido espacial</sys:String>
+    <sys:String x:Key="LOCAS_VolumeTitle">Volumen</sys:String>
+    <sys:String x:Key="LOCAS_VolumeHelp">Controla el volumen del dispositivo de salida predeterminado actual desde Audio Switcher y temas compatibles.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStep">Paso de volumen</sys:String>
+    <sys:String x:Key="LOCAS_VolumeUp">Subir volumen</sys:String>
+    <sys:String x:Key="LOCAS_VolumeDown">Bajar volumen</sys:String>
+    <sys:String x:Key="LOCAS_ToggleMute">Silenciar / activar sonido</sys:String>
+    <sys:String x:Key="LOCAS_Muted">Silenciado</sys:String>
+    <sys:String x:Key="LOCAS_Unmuted">Sonido activado</sys:String>
+    <sys:String x:Key="LOCAS_VolumeFailed">No se pudo cambiar el volumen</sys:String>
 </ResourceDictionary>
 
 

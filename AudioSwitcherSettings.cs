@@ -27,6 +27,7 @@ namespace PlayniteAudioSwitcher
         private bool spatialSoundIntegrationEnabled;
         private string spatialSoundToolPath;
         private string currentSpatialSoundMode;
+        private int volumeStepPercent = 5;
 
         public AudioSwitcherSettings()
         {
@@ -54,6 +55,7 @@ namespace PlayniteAudioSwitcher
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
                 SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
                 SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
+                VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
             }
 
             MigrateFavoritesToAliases();
@@ -179,6 +181,12 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref spatialSoundIntegrationEnabled, value);
         }
 
+        public int VolumeStepPercent
+        {
+            get => volumeStepPercent;
+            set => SetValue(ref volumeStepPercent, System.Math.Max(1, System.Math.Min(50, value)));
+        }
+
         public string SpatialSoundToolPath
         {
             get => spatialSoundToolPath;
@@ -288,6 +296,7 @@ namespace PlayniteAudioSwitcher
             RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
             SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
+            VolumeStepPercent = editingClone.VolumeStepPercent;
             RefreshDevices();
         }
 
@@ -364,7 +373,8 @@ namespace PlayniteAudioSwitcher
                 GameProfilesEnabled = GameProfilesEnabled,
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,
                 SpatialSoundIntegrationEnabled = SpatialSoundIntegrationEnabled,
-                SpatialSoundToolPath = SpatialSoundToolPath
+                SpatialSoundToolPath = SpatialSoundToolPath,
+                VolumeStepPercent = VolumeStepPercent
             };
         }
     }
