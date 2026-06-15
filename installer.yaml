@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 0.7.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-06-15
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v0.7.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_0_7_0.pext
+    Changelog:
+      - Added native volume state and controls for theme integrations.
+      - Added configurable volume step actions.
+      - Added a Notifications settings tab to control informational audio-change notifications.
+      - Fixed mute and unmute control through Windows Core Audio.
+      - Kept native Fullscreen extension menu focused on device switching.
   - Version: 0.6.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-06-12
