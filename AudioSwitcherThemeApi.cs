@@ -165,7 +165,17 @@ namespace PlayniteAudioSwitcher
         public int VolumeStepPercent
         {
             get => volumeStepPercent;
-            private set => SetValue(ref volumeStepPercent, value);
+            set
+            {
+                var normalized = Math.Max(1, Math.Min(50, value));
+                if (volumeStepPercent == normalized)
+                {
+                    return;
+                }
+
+                SetValue(ref volumeStepPercent, normalized);
+                plugin.SetVolumeStepPercent(normalized);
+            }
         }
 
         public int HighlightedDeviceIndex

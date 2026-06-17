@@ -54,16 +54,28 @@
                                    TextWrapping="Wrap"
                                    Margin="0,0,0,8" />
 
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="56" />
+                            </Grid.ColumnDefinitions>
+
                             <TextBlock Text="{DynamicResource LOCAS_VolumeStep}"
                                        VerticalAlignment="Center"
                                        Margin="0,0,8,0" />
-                            <TextBox Text="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}"
-                                     Width="60" />
-                            <TextBlock Text="%"
+                            <Slider Grid.Column="1"
+                                    Minimum="1"
+                                    Maximum="50"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    Value="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding VolumeStepPercent, StringFormat={}{0}%}"
+                                       TextAlignment="Right"
                                        VerticalAlignment="Center"
-                                       Margin="6,0,0,0" />
-                        </StackPanel>
+                                       Margin="8,0,0,0" />
+                        </Grid>
 
                         <Border Style="{StaticResource SectionHeaderBorder}">
                             <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />

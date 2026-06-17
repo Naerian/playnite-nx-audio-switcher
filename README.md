@@ -49,7 +49,7 @@ From there you can:
 - Choose whether each device is visible in Audio Switcher menus and selectors.
 - Set an optional default volume per device.
 - Enable or disable the Fullscreen quick switch shortcut.
-- Configure the volume step used by Audio Switcher volume actions.
+- Configure the Fullscreen volume step used by theme sliders, theme volume buttons, and Desktop volume actions.
 - Enable or disable automatic game-specific audio profiles.
 - Configure whether the previous audio device is restored after a game-specific profile.
 - Enable experimental Spatial Sound integration by pointing Audio Switcher to `SoundVolumeView.exe` or `svcl.exe`.
@@ -172,6 +172,8 @@ Useful properties:
 
 `CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted. `CurrentVolume` and `CurrentVolumePercent` can also be written by custom theme controls; writing either value changes the Windows volume.
 
+`VolumeStepPercent` is writable and controls how many percentage points the volume changes when a Fullscreen theme uses left/right on `AudioSwitcher_VolumeSlider`, `VolumeUpCommand`, or `VolumeDownCommand`. Desktop volume actions use the same step.
+
 Useful commands:
 
 - `ToggleSelectorCommand`
@@ -245,6 +247,16 @@ Theme authors who prefer their own slider can bind to `CurrentVolumePercent` wit
 <Slider Minimum="0"
         Maximum="100"
         Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumePercent, Mode=TwoWay}" />
+```
+
+Themes can also expose the volume step in their own settings UI:
+
+```xml
+<Slider Minimum="1"
+        Maximum="50"
+        IsSnapToTickEnabled="True"
+        TickFrequency="1"
+        Value="{PluginSettings Plugin=AudioSwitcher, Path=VolumeStepPercent, Mode=TwoWay}" />
 ```
 
 Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.

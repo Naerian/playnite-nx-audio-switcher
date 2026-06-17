@@ -64,9 +64,9 @@
     <sys:String x:Key="LOCAS_SpatialOff">Off</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">Spatial Sound tool path is not configured or does not exist.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">Spatial Sound switch failed</sys:String>
-    <sys:String x:Key="LOCAS_VolumeTitle">Volume</sys:String>
-    <sys:String x:Key="LOCAS_VolumeHelp">Control the current default output device volume from Audio Switcher and supported themes.</sys:String>
-    <sys:String x:Key="LOCAS_VolumeStep">Volume step</sys:String>
+    <sys:String x:Key="LOCAS_VolumeTitle">Fullscreen volume controls</sys:String>
+    <sys:String x:Key="LOCAS_VolumeHelp">Defines how much the volume changes when using left/right on the Fullscreen theme slider or theme volume buttons. Desktop volume actions use the same step.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStep">Step per press</sys:String>
     <sys:String x:Key="LOCAS_VolumeUp">Volume up</sys:String>
     <sys:String x:Key="LOCAS_VolumeDown">Volume down</sys:String>
     <sys:String x:Key="LOCAS_ToggleMute">Mute / unmute</sys:String>

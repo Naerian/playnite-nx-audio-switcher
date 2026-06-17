@@ -64,9 +64,9 @@
     <sys:String x:Key="LOCAS_SpatialOff">Desactivado</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">La ruta de la herramienta de Sonido espacial no está configurada o no existe.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">No se pudo cambiar el Sonido espacial</sys:String>
-    <sys:String x:Key="LOCAS_VolumeTitle">Volumen</sys:String>
-    <sys:String x:Key="LOCAS_VolumeHelp">Controla el volumen del dispositivo de salida predeterminado actual desde Audio Switcher y temas compatibles.</sys:String>
-    <sys:String x:Key="LOCAS_VolumeStep">Paso de volumen</sys:String>
+    <sys:String x:Key="LOCAS_VolumeTitle">Controles de volumen en pantalla completa</sys:String>
+    <sys:String x:Key="LOCAS_VolumeHelp">Define cuánto cambia el volumen al usar izquierda/derecha en el slider de un tema de pantalla completa o botones de volumen de un tema. Las acciones de volumen del modo escritorio usan el mismo paso.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStep">Paso por pulsación</sys:String>
     <sys:String x:Key="LOCAS_VolumeUp">Subir volumen</sys:String>
     <sys:String x:Key="LOCAS_VolumeDown">Bajar volumen</sys:String>
     <sys:String x:Key="LOCAS_ToggleMute">Silenciar / activar sonido</sys:String>

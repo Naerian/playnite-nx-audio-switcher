@@ -779,6 +779,13 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void SetVolumeStepPercent(int value)
+        {
+            settings.VolumeStepPercent = Math.Max(1, Math.Min(50, value));
+            SavePluginSettings(settings);
+            Theme?.Refresh();
+        }
+
         private IEnumerable<AudioDevice> SafeGetDevices()
         {
             try
