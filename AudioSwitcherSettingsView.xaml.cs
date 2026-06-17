@@ -36,8 +36,8 @@ namespace PlayniteAudioSwitcher
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(240) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(190) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(220) });
 
                 var namePanel = new StackPanel { Margin = new Thickness(0, 0, 14, 0) };
                 var windowsName = new TextBlock
@@ -108,24 +108,59 @@ namespace PlayniteAudioSwitcher
                     Margin = new Thickness(0, 0, 0, 3)
                 };
                 defaultVolumeLabel.SetResourceReference(TextBlock.TextProperty, "LOCAS_DefaultVolume");
-                var defaultVolumeGrid = new Grid();
+                var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
+                defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                var defaultVolumeBox = new TextBox
+                var defaultVolumeEnabled = new CheckBox
                 {
-                    Text = device.DefaultVolumePercent?.ToString() ?? string.Empty
-                };
-                defaultVolumeBox.TextChanged += (_, __) => SetDefaultVolume(device, defaultVolumeBox.Text);
-                var defaultVolumePercent = new TextBlock
-                {
-                    Text = "%",
-                    Margin = new Thickness(5, 0, 0, 0),
+                    IsChecked = device.DefaultVolumePercent.HasValue,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Opacity = 0.8
+                    Margin = new Thickness(0, 0, 8, 0)
                 };
-                Grid.SetColumn(defaultVolumePercent, 1);
-                defaultVolumeGrid.Children.Add(defaultVolumeBox);
-                defaultVolumeGrid.Children.Add(defaultVolumePercent);
+                var defaultVolumeSlider = new Slider
+                {
+                    Minimum = 0,
+                    Maximum = 100,
+                    Value = device.DefaultVolumePercent ?? 50,
+                    IsSnapToTickEnabled = true,
+                    TickFrequency = 1,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    IsEnabled = device.DefaultVolumePercent.HasValue
+                };
+                var defaultVolumeValue = new TextBlock
+                {
+                    MinWidth = 40,
+                    Margin = new Thickness(8, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    TextAlignment = TextAlignment.Right,
+                    Opacity = 0.85
+                };
+                UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+                defaultVolumeEnabled.Checked += (_, __) =>
+                {
+                    device.DefaultVolumePercent = (int)Math.Round(defaultVolumeSlider.Value);
+                    UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+                };
+                defaultVolumeEnabled.Unchecked += (_, __) =>
+                {
+                    device.DefaultVolumePercent = null;
+                    UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+                };
+                defaultVolumeSlider.ValueChanged += (_, __) =>
+                {
+                    if (defaultVolumeEnabled.IsChecked == true)
+                    {
+                        device.DefaultVolumePercent = (int)Math.Round(defaultVolumeSlider.Value);
+                    }
+
+                    UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+                };
+                Grid.SetColumn(defaultVolumeSlider, 1);
+                Grid.SetColumn(defaultVolumeValue, 2);
+                defaultVolumeGrid.Children.Add(defaultVolumeEnabled);
+                defaultVolumeGrid.Children.Add(defaultVolumeSlider);
+                defaultVolumeGrid.Children.Add(defaultVolumeValue);
                 defaultVolumePanel.Children.Add(defaultVolumeLabel);
                 defaultVolumePanel.Children.Add(defaultVolumeGrid);
                 Grid.SetColumn(defaultVolumePanel, 3);
@@ -172,20 +207,11 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private static void SetDefaultVolume(AudioDevice device, string value)
+        private static void UpdateDefaultVolume(AudioDevice device, CheckBox enabled, Slider slider, TextBlock value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                device.DefaultVolumePercent = null;
-                return;
-            }
-
-            if (!int.TryParse(value.Trim().TrimEnd('%'), out var parsed))
-            {
-                return;
-            }
-
-            device.DefaultVolumePercent = Math.Max(0, Math.Min(100, parsed));
+            var hasValue = enabled.IsChecked == true;
+            slider.IsEnabled = hasValue;
+            value.Text = hasValue ? $"{Math.Max(0, Math.Min(100, device.DefaultVolumePercent ?? (int)Math.Round(slider.Value)))}%" : "-";
         }
 
         private static DataTemplate CreateIconTemplate()

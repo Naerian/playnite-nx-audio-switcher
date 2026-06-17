@@ -325,6 +325,7 @@ namespace PlayniteAudioSwitcher
 
             plugin.SavePluginSettings(this);
             plugin.ReloadSettings();
+            plugin.ApplyDefaultVolumeForCurrentDevice();
         }
 
         public bool VerifySettings(out List<string> errors)

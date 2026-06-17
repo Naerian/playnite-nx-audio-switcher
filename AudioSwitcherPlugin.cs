@@ -769,6 +769,16 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void ApplyDefaultVolumeForCurrentDevice()
+        {
+            var currentDeviceId = GetCurrentDeviceId();
+            if (!string.IsNullOrWhiteSpace(currentDeviceId))
+            {
+                TryApplyDefaultVolume(currentDeviceId);
+                Theme?.Refresh();
+            }
+        }
+
         private IEnumerable<AudioDevice> SafeGetDevices()
         {
             try
