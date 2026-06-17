@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 0.8.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-06-17
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v0.8.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_0_8_0.pext
+    Changelog:
+      - Added a bundled AudioSwitcher_VolumeSlider control for Fullscreen themes.
+      - Made CurrentVolume and CurrentVolumePercent writable for custom two-way theme bindings.
+      - Added optional default volume per audio output device.
+      - Improved the default-volume setting with a checkbox and slider.
+      - Clarified and exposed the Fullscreen volume step setting for theme integrations.
   - Version: 0.7.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-06-15
