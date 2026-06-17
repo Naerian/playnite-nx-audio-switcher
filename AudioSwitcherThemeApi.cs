@@ -24,6 +24,7 @@ namespace PlayniteAudioSwitcher
         private string currentVolumeLabel;
         private bool isMuted;
         private int volumeStepPercent;
+        private bool isRefreshingVolume;
         private int highlightedDeviceIndex = -1;
         private DateTime confirmAvailableAt = DateTime.MinValue;
 
@@ -118,13 +119,35 @@ namespace PlayniteAudioSwitcher
         public float CurrentVolume
         {
             get => currentVolume;
-            private set => SetValue(ref currentVolume, value);
+            set
+            {
+                var normalized = Math.Max(0f, Math.Min(1f, value));
+                if (isRefreshingVolume)
+                {
+                    SetValue(ref currentVolume, normalized);
+                    return;
+                }
+
+                plugin.SetVolume(normalized, false);
+                RefreshVolume();
+            }
         }
 
         public int CurrentVolumePercent
         {
             get => currentVolumePercent;
-            private set => SetValue(ref currentVolumePercent, value);
+            set
+            {
+                var normalized = Math.Max(0, Math.Min(100, value));
+                if (isRefreshingVolume)
+                {
+                    SetValue(ref currentVolumePercent, normalized);
+                    return;
+                }
+
+                plugin.SetVolume(normalized / 100f, false);
+                RefreshVolume();
+            }
         }
 
         public string CurrentVolumeLabel
@@ -328,17 +351,27 @@ namespace PlayniteAudioSwitcher
             try
             {
                 var state = plugin.GetCurrentVolumeState();
-                CurrentVolume = state.Volume;
-                CurrentVolumePercent = state.VolumePercent;
-                IsMuted = state.IsMuted;
-                CurrentVolumeLabel = state.IsMuted ? plugin.Loc("LOCAS_Muted") : $"{state.VolumePercent}%";
+                SetVolumeState(state.Volume, state.VolumePercent, state.IsMuted);
             }
             catch
             {
-                CurrentVolume = 0;
-                CurrentVolumePercent = 0;
-                IsMuted = false;
-                CurrentVolumeLabel = string.Empty;
+                SetVolumeState(0, 0, false, string.Empty);
+            }
+        }
+
+        private void SetVolumeState(float volume, int volumePercent, bool muted, string label = null)
+        {
+            isRefreshingVolume = true;
+            try
+            {
+                CurrentVolume = volume;
+                CurrentVolumePercent = volumePercent;
+                IsMuted = muted;
+                CurrentVolumeLabel = label ?? (muted ? plugin.Loc("LOCAS_Muted") : $"{volumePercent}%");
+            }
+            finally
+            {
+                isRefreshingVolume = false;
             }
         }
 
@@ -361,7 +394,7 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            plugin.SetVolume(volume);
+            plugin.SetVolume(volume, false);
             RefreshVolume();
         }
 

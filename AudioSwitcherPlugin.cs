@@ -58,7 +58,8 @@ namespace PlayniteAudioSwitcher
                     "AudioDeviceSelector",
                     "CurrentDevice",
                     "OpenSelectorButton",
-                    "DeviceList"
+                    "DeviceList",
+                    "VolumeSlider"
                 }
             });
 
@@ -267,6 +268,11 @@ namespace PlayniteAudioSwitcher
             if (args.Name == "DeviceList")
             {
                 return new AudioDeviceListControl(this);
+            }
+
+            if (args.Name == "VolumeSlider")
+            {
+                return new AudioVolumeSliderControl(this);
             }
 
             return null;
@@ -710,11 +716,19 @@ namespace PlayniteAudioSwitcher
 
         public void SetVolume(float volume)
         {
+            SetVolume(volume, true);
+        }
+
+        public void SetVolume(float volume, bool notify)
+        {
             try
             {
                 AudioDevices.SetDefaultPlaybackVolume(volume);
                 Theme?.Refresh();
-                ShowVolumeInfoMessage();
+                if (notify)
+                {
+                    ShowVolumeInfoMessage();
+                }
             }
             catch (Exception ex)
             {
@@ -765,6 +779,7 @@ namespace PlayniteAudioSwitcher
                         device.CustomName = settings.GetCustomName(device.Id);
                         device.Icon = settings.GetIcon(device.Id);
                         device.IsVisible = settings.IsDeviceVisible(device.Id);
+                        device.DefaultVolumePercent = settings.GetDefaultVolumePercent(device.Id);
                         return device;
                     })
                     .ToList();
@@ -798,6 +813,7 @@ namespace PlayniteAudioSwitcher
             try
             {
                 AudioDevices.SetDefaultPlaybackDevice(deviceId);
+                TryApplyDefaultVolume(deviceId);
                 settings.RefreshDevices();
                 Theme?.Refresh();
                 if (notify && settings.ShowNotifications)
@@ -809,6 +825,25 @@ namespace PlayniteAudioSwitcher
             {
                 logger.Error(ex, $"Failed to set audio device {deviceName}.");
                 ShowMessage($"{Loc("LOCAS_AudioSwitchFailed")}: {ex.Message}");
+            }
+        }
+
+        private void TryApplyDefaultVolume(string deviceId)
+        {
+            var defaultVolume = settings.GetDefaultVolumePercent(deviceId);
+            if (!defaultVolume.HasValue)
+            {
+                return;
+            }
+
+            try
+            {
+                AudioDevices.SetDefaultPlaybackVolume(defaultVolume.Value / 100f);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to apply default volume for audio device {deviceId}.");
+                ShowMessage($"{Loc("LOCAS_VolumeFailed")}: {ex.Message}");
             }
         }
 

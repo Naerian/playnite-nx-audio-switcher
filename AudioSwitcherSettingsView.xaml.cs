@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -35,6 +36,7 @@ namespace PlayniteAudioSwitcher
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(240) });
 
                 var namePanel = new StackPanel { Margin = new Thickness(0, 0, 14, 0) };
@@ -98,6 +100,37 @@ namespace PlayniteAudioSwitcher
                 Grid.SetColumn(iconPanel, 2);
                 grid.Children.Add(iconPanel);
 
+                var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
+                var defaultVolumeLabel = new TextBlock
+                {
+                    FontSize = 11,
+                    Opacity = 0.8,
+                    Margin = new Thickness(0, 0, 0, 3)
+                };
+                defaultVolumeLabel.SetResourceReference(TextBlock.TextProperty, "LOCAS_DefaultVolume");
+                var defaultVolumeGrid = new Grid();
+                defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                var defaultVolumeBox = new TextBox
+                {
+                    Text = device.DefaultVolumePercent?.ToString() ?? string.Empty
+                };
+                defaultVolumeBox.TextChanged += (_, __) => SetDefaultVolume(device, defaultVolumeBox.Text);
+                var defaultVolumePercent = new TextBlock
+                {
+                    Text = "%",
+                    Margin = new Thickness(5, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Opacity = 0.8
+                };
+                Grid.SetColumn(defaultVolumePercent, 1);
+                defaultVolumeGrid.Children.Add(defaultVolumeBox);
+                defaultVolumeGrid.Children.Add(defaultVolumePercent);
+                defaultVolumePanel.Children.Add(defaultVolumeLabel);
+                defaultVolumePanel.Children.Add(defaultVolumeGrid);
+                Grid.SetColumn(defaultVolumePanel, 3);
+                grid.Children.Add(defaultVolumePanel);
+
                 var customNamePanel = new StackPanel();
                 var customNameLabel = new TextBlock
                 {
@@ -113,7 +146,7 @@ namespace PlayniteAudioSwitcher
                 customNameBox.TextChanged += (_, __) => device.CustomName = customNameBox.Text;
                 customNamePanel.Children.Add(customNameLabel);
                 customNamePanel.Children.Add(customNameBox);
-                Grid.SetColumn(customNamePanel, 3);
+                Grid.SetColumn(customNamePanel, 4);
                 grid.Children.Add(customNamePanel);
 
                 border.Child = grid;
@@ -137,6 +170,22 @@ namespace PlayniteAudioSwitcher
 
                 DeviceRowsPanel.Children.Add(row);
             }
+        }
+
+        private static void SetDefaultVolume(AudioDevice device, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                device.DefaultVolumePercent = null;
+                return;
+            }
+
+            if (!int.TryParse(value.Trim().TrimEnd('%'), out var parsed))
+            {
+                return;
+            }
+
+            device.DefaultVolumePercent = Math.Max(0, Math.Min(100, parsed));
         }
 
         private static DataTemplate CreateIconTemplate()

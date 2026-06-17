@@ -9,5 +9,7 @@ namespace PlayniteAudioSwitcher
         public string Icon { get; set; }
 
         public bool? IsVisible { get; set; }
+
+        public int? DefaultVolumePercent { get; set; }
     }
 }

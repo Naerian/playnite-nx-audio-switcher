@@ -234,6 +234,7 @@ namespace PlayniteAudioSwitcher
                             device.CustomName = alias.CustomName;
                             device.Icon = alias.Icon;
                             device.IsVisible = alias.IsVisible != false;
+                            device.DefaultVolumePercent = alias.DefaultVolumePercent;
                         }
 
                         device.SettingsDisplayName = device.TechnicalDisplayName;
@@ -260,6 +261,11 @@ namespace PlayniteAudioSwitcher
         public bool IsDeviceVisible(string deviceId)
         {
             return DeviceAliases.FirstOrDefault(a => a.DeviceId == deviceId)?.IsVisible ?? true;
+        }
+
+        public int? GetDefaultVolumePercent(string deviceId)
+        {
+            return DeviceAliases.FirstOrDefault(a => a.DeviceId == deviceId)?.DefaultVolumePercent;
         }
 
         public bool HasCustomName(string deviceId)
@@ -305,13 +311,15 @@ namespace PlayniteAudioSwitcher
             DeviceAliases = AvailablePlaybackDevices
                 .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
                     !string.IsNullOrWhiteSpace(a.Icon) ||
-                    !a.IsVisible)
+                    !a.IsVisible ||
+                    a.DefaultVolumePercent.HasValue)
                 .Select(a => new AudioDeviceAlias
                 {
                     DeviceId = a.Id,
                     CustomName = a.CustomName?.Trim(),
                     Icon = a.Icon,
-                    IsVisible = a.IsVisible ? (bool?)null : false
+                    IsVisible = a.IsVisible ? (bool?)null : false,
+                    DefaultVolumePercent = a.DefaultVolumePercent
                 })
                 .ToList();
 
@@ -361,7 +369,8 @@ namespace PlayniteAudioSwitcher
                     DeviceId = a.DeviceId,
                     CustomName = a.CustomName,
                     Icon = a.Icon,
-                    IsVisible = a.IsVisible
+                    IsVisible = a.IsVisible,
+                    DefaultVolumePercent = a.DefaultVolumePercent
                 }).ToList(),
                 FullscreenPreferredDeviceId = FullscreenPreferredDeviceId,
                 DeviceDisplayMode = DeviceDisplayMode,

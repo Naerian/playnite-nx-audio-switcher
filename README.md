@@ -47,6 +47,7 @@ From there you can:
 - Give friendly names to audio devices.
 - Assign icons to devices.
 - Choose whether each device is visible in Audio Switcher menus and selectors.
+- Set an optional default volume per device.
 - Enable or disable the Fullscreen quick switch shortcut.
 - Configure the volume step used by Audio Switcher volume actions.
 - Enable or disable automatic game-specific audio profiles.
@@ -169,7 +170,7 @@ Useful properties:
 
 `CurrentDeviceName` is the friendly/custom name for the current output device. `CurrentDeviceIconGeometry` exposes the configured SVG icon geometry, falling back to a speaker icon when needed. `CurrentDeviceLabel` is a convenience label that combines icon text and device name for simple text-based placements.
 
-`CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted.
+`CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted. `CurrentVolume` and `CurrentVolumePercent` can also be written by custom theme controls; writing either value changes the Windows volume.
 
 Useful commands:
 
@@ -208,7 +209,15 @@ Example device list:
 </ItemsControl>
 ```
 
-Example volume controls:
+Recommended bundled volume slider:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_VolumeSlider" />
+```
+
+`AudioSwitcher_VolumeSlider` creates a real focusable slider, updates the current Windows default output volume directly, supports left/right keyboard or gamepad navigation, and uses the volume step configured in Audio Switcher settings.
+
+Example custom volume controls:
 
 ```xml
 <StackPanel Orientation="Horizontal">
@@ -229,6 +238,14 @@ Example volume controls:
 ```
 
 `SetVolumeCommand` accepts either a scalar value such as `0.5` or a percentage value such as `50` / `50%`.
+
+Theme authors who prefer their own slider can bind to `CurrentVolumePercent` with a two-way binding:
+
+```xml
+<Slider Minimum="0"
+        Maximum="100"
+        Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumePercent, Mode=TwoWay}" />
+```
 
 Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
 
@@ -270,6 +287,12 @@ Place a controller-friendly device list:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_DeviceList" />
+```
+
+Place a controller-friendly volume slider:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_VolumeSlider" />
 ```
 
 The device selector and device list show the active output marker and use the user's custom names and icons when configured. Theme authors can decide whether their layouts show text, icons, or both by choosing the exposed properties that fit their design.

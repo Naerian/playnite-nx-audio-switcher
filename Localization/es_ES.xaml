@@ -8,6 +8,7 @@
     <sys:String x:Key="LOCAS_CustomNamesHelp">Escribe un nombre sencillo para cada salida que quieras usar desde Playnite. Los dispositivos sin nombre personalizado seguirán apareciendo en el selector completo.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Nombre de Windows</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icono</sys:String>
+    <sys:String x:Key="LOCAS_DefaultVolume">Volumen predeterminado</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Nombre en Playnite</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Visualización en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Texto</sys:String>
