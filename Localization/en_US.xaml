@@ -4,11 +4,20 @@
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
     <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
+    <sys:String x:Key="LOCAS_DevicesTab">Devices</sys:String>
+    <sys:String x:Key="LOCAS_OutputTab">Output</sys:String>
+    <sys:String x:Key="LOCAS_InputTab">Input</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenTab">Fullscreen</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Custom names</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Enter a simple name for each output you want to use from Playnite. Devices without a custom name will still appear in the full selector.</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesTitle">Output devices</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesHelp">Configure output device names, icons, visibility and optional default volume.</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesTitle">Input devices</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesHelp">Configure microphone/input device names, icons, visibility and optional default input volume.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows name</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icon</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Default volume</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Default input volume</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Playnite name</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Fullscreen display</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Text</sys:String>
@@ -20,15 +29,23 @@
     <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Apply preferred device when Playnite starts in Fullscreen</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Restore previous device after a game-specific profile stops</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Game profiles</sys:String>
-    <sys:String x:Key="LOCAS_GameProfilesHelp">Assign an output device from a game's context menu. When the game starts, Audio Switcher can switch to that device automatically.</sys:String>
+    <sys:String x:Key="LOCAS_GameProfilesHelp">Assign output and input devices from a game's context menu. When the game starts, Audio Switcher can switch to those devices automatically.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfiles">Apply game-specific audio profiles when games start</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Show audio change notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Choose when Audio Switcher shows informational notifications. Important errors are always shown.</sys:String>
+    <sys:String x:Key="LOCAS_NotificationCategories">Notifications by change type</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDevice">Output device changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDevice">Input device changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolume">Volume changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMute">Mute / unmute changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfile">Game profile changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSound">Spatial Sound changes</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelp">Quick switch cycles through devices with custom names. Configure at least two devices to use it.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Quick switch output</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Refresh audio devices</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Choose output device</sys:String>
+    <sys:String x:Key="LOCAS_MenuChooseInput">Choose input device</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDefault">Game audio: default</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Game audio</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Game audio profile</sys:String>
@@ -43,6 +60,9 @@
     <sys:String x:Key="LOCAS_AudioSwitchFailed">Audio switch failed</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">The configured audio device is not currently active.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Audio output</sys:String>
+    <sys:String x:Key="LOCAS_AudioInput">Audio input</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">The configured audio input device is not currently active.</sys:String>
+    <sys:String x:Key="LOCAS_InputSwitchFailed">Audio input switch failed</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Unknown device</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Quick switch cycles through all active devices</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Quick switch cycles through active output devices.</sys:String>
@@ -56,6 +76,9 @@
     <sys:String x:Key="LOCAS_Visible">Visible</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Audio device</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
+    <sys:String x:Key="LOCAS_ResetGameProfile">Reset game profile</sys:String>
+    <sys:String x:Key="LOCAS_GameProfileReset">Game profile reset</sys:String>
+    <sys:String x:Key="LOCAS_GameProfileApplied">Game profile applied</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Spatial sound</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: allows Audio Switcher to call an external SoundVolumeView or svcl executable to change Windows Spatial Sound on the current default output device.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Enable experimental Spatial Sound integration</sys:String>
@@ -73,6 +96,9 @@
     <sys:String x:Key="LOCAS_Muted">Muted</sys:String>
     <sys:String x:Key="LOCAS_Unmuted">Sound on</sys:String>
     <sys:String x:Key="LOCAS_VolumeFailed">Volume change failed</sys:String>
+    <sys:String x:Key="LOCAS_InputMuted">Microphone muted</sys:String>
+    <sys:String x:Key="LOCAS_InputUnmuted">Microphone on</sys:String>
+    <sys:String x:Key="LOCAS_InputVolumeFailed">Input volume change failed</sys:String>
 </ResourceDictionary>
 
 

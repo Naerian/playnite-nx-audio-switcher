@@ -1,20 +1,23 @@
 # Playnite NX Audio Switcher
 
-Playnite NX Audio Switcher is a Playnite extension for quickly switching the default Windows audio output device from Desktop mode, Fullscreen mode, game context menus, controller shortcuts, and custom Playnite themes.
+Playnite NX Audio Switcher is a Playnite extension for quickly switching Windows audio devices from Desktop mode, Fullscreen mode, game context menus, controller shortcuts, and custom Playnite themes.
 
 It is designed for couch and console-like setups where users often move between TV speakers, headphones, soundbars, wireless headsets, capture devices, or controller audio outputs.
 
 ## Features
 
 - Switch the default Windows playback device from Playnite.
+- Switch the default Windows recording/input device from Playnite.
 - Works from both Desktop and Fullscreen mode extension menus.
 - Fullscreen quick switch with `Back + RB`.
-- Custom names for any number of audio devices.
+- Custom names for any number of output and input audio devices.
 - Optional icon per renamed audio device.
+- Expanded bundled Lucide icon set for speakers, headsets, microphones, webcams, capture devices, Bluetooth, HDMI, USB and generic audio states.
+- Automatic icon suggestions based on Windows device names when no custom icon has been selected.
 - Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
-- Native volume controls for the current default output device.
-- Game-specific audio profiles from the game context menu.
+- Native volume controls for the current default output and input devices.
+- Game-specific output and input audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
 - Theme integration controls for theme authors.
@@ -26,7 +29,7 @@ It is designed for couch and console-like setups where users often move between 
 - Playnite 10.x.
 - Playnite SDK 6.16.0 compatible runtime.
 
-The plugin changes the Windows default playback endpoint using Core Audio / policy configuration APIs.
+The plugin changes Windows default playback and recording endpoints using Core Audio / policy configuration APIs.
 
 ## Installation
 
@@ -42,22 +45,18 @@ Open:
 
 `Add-ons > Extension settings > Generic > Audio Switcher`
 
-From there you can:
+The settings window is organized by task:
 
-- Give friendly names to audio devices.
-- Assign icons to devices.
-- Choose whether each device is visible in Audio Switcher menus and selectors.
-- Set an optional default volume per device.
-- Enable or disable the Fullscreen quick switch shortcut.
-- Configure the Fullscreen volume step used by theme sliders, theme volume buttons, and Desktop volume actions.
-- Enable or disable automatic game-specific audio profiles.
-- Configure whether the previous audio device is restored after a game-specific profile.
-- Enable experimental Spatial Sound integration by pointing Audio Switcher to `SoundVolumeView.exe` or `svcl.exe`.
-- Choose whether Audio Switcher shows informational audio-change notifications.
+- **Output**: friendly names, icons, visibility, and default volume for playback devices.
+- **Input**: friendly names, icons, visibility, and default input volume for recording devices.
+- **Fullscreen**: controller quick switch and the volume step used by Fullscreen theme sliders or theme volume buttons.
+- **Game profiles**: automatic output/input switching per game and restore behavior after closing a game.
+- **Spatial sound**: experimental integration through a user-provided `SoundVolumeView.exe` or `svcl.exe`.
+- **Notifications**: informational notifications by category, including output changes, input changes, volume, mute, game profiles, and Spatial Sound.
 
 Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
 
-Notification settings live in their own **Notifications** tab. Disabling notifications hides normal informational messages such as device, volume, mute, and Spatial Sound changes. Important error messages are still shown.
+Notification settings live in their own **Notifications** tab. Disabling the master notification option hides normal informational messages, and each category can also be controlled separately. Important error messages are still shown. When a game profile changes multiple things at launch, Audio Switcher groups the result into one profile notification instead of showing one message per device or mode.
 
 ## Fullscreen Usage
 
@@ -67,11 +66,13 @@ In Fullscreen mode, open:
 
 This opens a simple list of active Windows output devices. The current output device is marked with a check. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
 
+Input devices are available from the `Choose input device` submenu. This can be used for microphones, headset mics, capture cards, or other active Windows recording devices.
+
 The optional `Back + RB` controller shortcut cycles through active output devices.
 
 The native Playnite extension menu is text-only, so custom SVG icons are not shown there. Icons are available to Fullscreen themes through the theme integration API and bundled controls.
 
-Volume controls are exposed to themes through the theme integration API. They are not shown in the native Fullscreen extension menu because Playnite closes that menu after each action, which makes repeated volume changes awkward from a controller.
+Output and input volume controls are exposed to themes through the theme integration API. They are not shown in the native Fullscreen extension menu because Playnite closes that menu after each action, which makes repeated volume changes awkward from a controller.
 
 ## Game-Specific Audio Profiles
 
@@ -79,9 +80,15 @@ Open a game's context menu and go to:
 
 `Audio Switcher`
 
-You can set an output device for that game from the list of active playback devices. If the game does not have a saved profile yet, the current Windows default device is marked in the menu. When the game starts, the plugin switches to the selected device if game profiles are enabled. When the game stops, the plugin can restore the previous output device if that option is enabled.
+You can set an output device from `Audio Switcher > Choose output device`. The `Choose input device` submenu lets you set a microphone, headset mic, webcam mic, capture card input, or any other active Windows recording device for that game.
+
+If the game does not have a saved profile yet, the current Windows default output and input devices are marked in their respective menus. When the game starts, the plugin switches to the selected devices if game profiles are enabled. When the game stops, the plugin can restore the previous output and input devices if that option is enabled.
+
+Use `Audio Switcher > Reset game profile` to remove all saved Audio Switcher settings for that game.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
+
+The same caveat may apply to input devices: some games only read the microphone device during startup or voice chat initialization.
 
 ## Experimental Spatial Sound
 
@@ -249,6 +256,62 @@ Theme authors who prefer their own slider can bind to `CurrentVolumePercent` wit
         Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumePercent, Mode=TwoWay}" />
 ```
 
+Input devices use the same pattern with input-specific properties and commands:
+
+- `CurrentInputDeviceName`
+- `CurrentInputDeviceLabel`
+- `CurrentInputDeviceIconGeometry`
+- `CurrentInputDeviceId`
+- `CurrentInputVolume`
+- `CurrentInputVolumePercent`
+- `CurrentInputVolumeLabel`
+- `IsInputMuted`
+- `InputDevices`
+- `AllInputDevices`
+- `HasInputDevices`
+
+Useful input commands:
+
+- `RefreshInputDevicesCommand`
+- `SetInputDeviceCommand`
+- `InputVolumeUpCommand`
+- `InputVolumeDownCommand`
+- `SetInputVolumeCommand`
+- `ToggleInputMuteCommand`
+- `RefreshInputVolumeCommand`
+
+Recommended bundled input controls:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_InputDeviceList" />
+<ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
+```
+
+`AudioSwitcher_InputDeviceList` creates focusable buttons for visible active recording devices. `AudioSwitcher_InputVolumeSlider` creates a real focusable microphone/input volume slider, changes the current Windows default recording device volume directly, supports left/right keyboard or gamepad navigation, and uses the same `VolumeStepPercent` setting as the output volume slider.
+
+Custom input device list:
+
+```xml
+<ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=InputDevices}">
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=SetInputDeviceCommand}"
+                    CommandParameter="{Binding Id}">
+                <TextBlock Text="{Binding DisplayName}" />
+            </Button>
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+</ItemsControl>
+```
+
+Custom input volume slider:
+
+```xml
+<Slider Minimum="0"
+        Maximum="100"
+        Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentInputVolumePercent, Mode=TwoWay}" />
+```
+
 Themes can also expose the volume step in their own settings UI:
 
 ```xml
@@ -259,11 +322,11 @@ Themes can also expose the volume step in their own settings UI:
         Value="{PluginSettings Plugin=AudioSwitcher, Path=VolumeStepPercent, Mode=TwoWay}" />
 ```
 
-Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
+Each item in `Devices`, `AllDevices`, `InputDevices`, and `AllInputDevices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
 
 For each device, `Name` is the friendly/custom name when available, `WindowsName` is the original Windows device name, `DisplayName` is ready for a text list and includes the current-device marker, and `IconGeometry` can be used in a `Path`.
 
-`Devices` contains only devices that the user left visible in Audio Switcher settings. `AllDevices` contains active devices including those hidden from normal extension menus, so advanced themes can build their own management UI if needed.
+`Devices` and `InputDevices` contain only devices that the user left visible in Audio Switcher settings. `AllDevices` and `AllInputDevices` contain active devices including those hidden from normal extension menus, so advanced themes can build their own management UI if needed.
 
 When `IsSelectorOpen` is true in Fullscreen, Audio Switcher handles gamepad navigation for the exposed selector state: D-pad or left stick up/down changes the highlighted item, `A` selects it, and `B` closes the selector. Themes should style `IsHighlighted` on each `Devices` item so controller users can see the active row even if focus remains outside the custom panel.
 
@@ -307,7 +370,14 @@ Place a controller-friendly volume slider:
 <ContentControl x:Name="AudioSwitcher_VolumeSlider" />
 ```
 
-The device selector and device list show the active output marker and use the user's custom names and icons when configured. Theme authors can decide whether their layouts show text, icons, or both by choosing the exposed properties that fit their design.
+Place a controller-friendly input device list and input volume slider:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_InputDeviceList" />
+<ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
+```
+
+The device selector and device lists show the active marker and use the user's custom names and icons when configured. Theme authors can decide whether their layouts show text, icons, or both by choosing the exposed properties that fit their design.
 
 ## Localization
 

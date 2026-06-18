@@ -4,6 +4,8 @@ namespace PlayniteAudioSwitcher
     {
         public string DeviceId { get; set; }
 
+        public string InputDeviceId { get; set; }
+
         public string SpatialSoundMode { get; set; }
     }
 }

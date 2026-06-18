@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,19 +19,32 @@ namespace PlayniteAudioSwitcher
 
         private void RebuildDeviceRows()
         {
-            if (DeviceRowsPanel == null || !(DataContext is AudioSwitcherSettings settings))
+            if (DeviceRowsPanel == null || InputDeviceRowsPanel == null || !(DataContext is AudioSwitcherSettings settings))
             {
                 return;
             }
 
-            DeviceRowsPanel.Children.Clear();
-            foreach (var device in settings.AvailablePlaybackDevices)
+            BuildDeviceRows(DeviceRowsPanel, settings.AvailablePlaybackDevices, settings, "LOCAS_DefaultVolume");
+            BuildDeviceRows(InputDeviceRowsPanel, settings.AvailableRecordingDevices, settings, "LOCAS_DefaultInputVolume");
+        }
+
+        private void BuildDeviceRows(StackPanel panel, IEnumerable<AudioDevice> devices, AudioSwitcherSettings settings, string defaultVolumeLabelResource)
+        {
+            panel.Children.Clear();
+
+            foreach (var device in devices)
             {
-                var border = new Border
-                {
-                    BorderThickness = new Thickness(0),
-                    Padding = new Thickness(0, 0, 0, 12)
-                };
+                panel.Children.Add(CreateDeviceRow(device, settings, defaultVolumeLabelResource));
+            }
+        }
+
+        private static UIElement CreateDeviceRow(AudioDevice device, AudioSwitcherSettings settings, string defaultVolumeLabelResource)
+        {
+            var border = new Border
+            {
+                BorderThickness = new Thickness(0),
+                Padding = new Thickness(0, 0, 0, 12)
+            };
 
                 var grid = new Grid();
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -94,7 +108,11 @@ namespace PlayniteAudioSwitcher
                     SelectedValue = device.Icon ?? string.Empty,
                     ItemTemplate = CreateIconTemplate()
                 };
-                iconBox.SelectionChanged += (_, __) => device.Icon = iconBox.SelectedValue?.ToString();
+                iconBox.SelectionChanged += (_, __) =>
+                {
+                    device.Icon = iconBox.SelectedValue?.ToString();
+                    device.IsIconSuggested = false;
+                };
                 iconPanel.Children.Add(iconLabel);
                 iconPanel.Children.Add(iconBox);
                 Grid.SetColumn(iconPanel, 2);
@@ -107,7 +125,7 @@ namespace PlayniteAudioSwitcher
                     Opacity = 0.8,
                     Margin = new Thickness(0, 0, 0, 3)
                 };
-                defaultVolumeLabel.SetResourceReference(TextBlock.TextProperty, "LOCAS_DefaultVolume");
+                defaultVolumeLabel.SetResourceReference(TextBlock.TextProperty, defaultVolumeLabelResource);
                 var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
                 defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -203,8 +221,7 @@ namespace PlayniteAudioSwitcher
                 Grid.SetRow(separator, 1);
                 row.Children.Add(separator);
 
-                DeviceRowsPanel.Children.Add(row);
-            }
+                return row;
         }
 
         private static void UpdateDefaultVolume(AudioDevice device, CheckBox enabled, Slider slider, TextBlock value)

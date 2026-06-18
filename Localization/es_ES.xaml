@@ -4,11 +4,20 @@
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
     <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
+    <sys:String x:Key="LOCAS_DevicesTab">Dispositivos</sys:String>
+    <sys:String x:Key="LOCAS_OutputTab">Salida</sys:String>
+    <sys:String x:Key="LOCAS_InputTab">Entrada</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenTab">Pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Nombres personalizados</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Escribe un nombre sencillo para cada salida que quieras usar desde Playnite. Los dispositivos sin nombre personalizado seguirán apareciendo en el selector completo.</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesTitle">Dispositivos de salida</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesHelp">Configura nombres, iconos, visibilidad y volumen predeterminado opcional para los dispositivos de salida.</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesTitle">Dispositivos de entrada</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesHelp">Configura nombres, iconos, visibilidad y volumen de entrada predeterminado opcional para micrófonos y dispositivos de entrada.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Nombre de Windows</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icono</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Volumen predeterminado</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Volumen de entrada predeterminado</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Nombre en Playnite</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Visualización en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Texto</sys:String>
@@ -20,15 +29,23 @@
     <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Aplicar el dispositivo preferido cuando Playnite arranque en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Restaurar el dispositivo anterior al cerrar un juego con perfil específico</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Perfiles por juego</sys:String>
-    <sys:String x:Key="LOCAS_GameProfilesHelp">Asigna un dispositivo de salida desde el menú contextual de un juego. Al iniciar ese juego, Audio Switcher puede cambiar automáticamente a ese dispositivo.</sys:String>
+    <sys:String x:Key="LOCAS_GameProfilesHelp">Asigna dispositivos de salida y entrada desde el menú contextual de un juego. Al iniciar ese juego, Audio Switcher puede cambiar automáticamente a esos dispositivos.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfiles">Aplicar perfiles de audio por juego al iniciar juegos</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Mostrar notificaciones al cambiar audio</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notificaciones</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Elige cuándo Audio Switcher muestra notificaciones informativas. Los errores importantes se muestran siempre.</sys:String>
+    <sys:String x:Key="LOCAS_NotificationCategories">Notificaciones por cambios</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDevice">Cambios de dispositivo de salida</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDevice">Cambios de dispositivo de entrada</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolume">Cambios de volumen</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMute">Silenciar / activar sonido</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfile">Cambios de perfil de juego</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSound">Cambios de Sonido espacial</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelp">El acceso rápido alterna entre los dispositivos con nombre personalizado. Para que funcione, configura al menos dos.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Alternar salida de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Actualizar dispositivos de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Elegir dispositivo de salida</sys:String>
+    <sys:String x:Key="LOCAS_MenuChooseInput">Elegir dispositivo de entrada</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDefault">Audio del juego: predeterminado</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Audio del juego</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Perfil de audio del juego</sys:String>
@@ -43,6 +60,9 @@
     <sys:String x:Key="LOCAS_AudioSwitchFailed">No se pudo cambiar el audio</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">El dispositivo de audio configurado no está activo ahora mismo.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Salida de audio</sys:String>
+    <sys:String x:Key="LOCAS_AudioInput">Entrada de audio</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">El dispositivo de entrada configurado no está activo ahora mismo.</sys:String>
+    <sys:String x:Key="LOCAS_InputSwitchFailed">No se pudo cambiar la entrada de audio</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Dispositivo desconocido</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">El acceso rápido alterna entre todos los dispositivos activos</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">El acceso rápido alterna entre los dispositivos de salida activos.</sys:String>
@@ -56,6 +76,9 @@
     <sys:String x:Key="LOCAS_Visible">Visible</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Dispositivo de audio</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Por defecto</sys:String>
+    <sys:String x:Key="LOCAS_ResetGameProfile">Restablecer perfil del juego</sys:String>
+    <sys:String x:Key="LOCAS_GameProfileReset">Perfil del juego restablecido</sys:String>
+    <sys:String x:Key="LOCAS_GameProfileApplied">Perfil de juego aplicado</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Sonido espacial</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: permite que Audio Switcher llame a un ejecutable externo de SoundVolumeView o svcl para cambiar el Sonido espacial de Windows en la salida predeterminada actual.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Activar integración experimental de Sonido espacial</sys:String>
@@ -73,6 +96,9 @@
     <sys:String x:Key="LOCAS_Muted">Silenciado</sys:String>
     <sys:String x:Key="LOCAS_Unmuted">Sonido activado</sys:String>
     <sys:String x:Key="LOCAS_VolumeFailed">No se pudo cambiar el volumen</sys:String>
+    <sys:String x:Key="LOCAS_InputMuted">Micrófono silenciado</sys:String>
+    <sys:String x:Key="LOCAS_InputUnmuted">Micrófono activado</sys:String>
+    <sys:String x:Key="LOCAS_InputVolumeFailed">No se pudo cambiar el volumen de entrada</sys:String>
 </ResourceDictionary>
 
 

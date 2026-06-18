@@ -8,11 +8,95 @@ namespace PlayniteAudioSwitcher
     {
         public IReadOnlyList<AudioDevice> GetPlaybackDevices()
         {
+            return GetDevices(EDataFlow.eRender);
+        }
+
+        public IReadOnlyList<AudioDevice> GetRecordingDevices()
+        {
+            return GetDevices(EDataFlow.eCapture);
+        }
+
+        public AudioDevice GetDefaultPlaybackDevice()
+        {
+            return GetDefaultDevice(EDataFlow.eRender);
+        }
+
+        public AudioDevice GetDefaultRecordingDevice()
+        {
+            return GetDefaultDevice(EDataFlow.eCapture);
+        }
+
+        public void SetDefaultPlaybackDevice(string deviceId)
+        {
+            SetDefaultDevice(deviceId);
+        }
+
+        public void SetDefaultRecordingDevice(string deviceId)
+        {
+            SetDefaultDevice(deviceId);
+        }
+
+        public AudioVolumeState GetDefaultPlaybackVolume()
+        {
+            return GetDefaultVolume(EDataFlow.eRender);
+        }
+
+        public AudioVolumeState GetDefaultRecordingVolume()
+        {
+            return GetDefaultVolume(EDataFlow.eCapture);
+        }
+
+        public void SetDefaultPlaybackVolume(float volume)
+        {
+            SetDefaultVolume(EDataFlow.eRender, volume);
+        }
+
+        public void SetDefaultRecordingVolume(float volume)
+        {
+            SetDefaultVolume(EDataFlow.eCapture, volume);
+        }
+
+        public void ChangeDefaultPlaybackVolume(float delta)
+        {
+            var state = GetDefaultPlaybackVolume();
+            SetDefaultPlaybackVolume(state.Volume + delta);
+        }
+
+        public void ChangeDefaultRecordingVolume(float delta)
+        {
+            var state = GetDefaultRecordingVolume();
+            SetDefaultRecordingVolume(state.Volume + delta);
+        }
+
+        public void SetDefaultPlaybackMute(bool isMuted)
+        {
+            SetDefaultMute(EDataFlow.eRender, isMuted);
+        }
+
+        public void SetDefaultRecordingMute(bool isMuted)
+        {
+            SetDefaultMute(EDataFlow.eCapture, isMuted);
+        }
+
+        public void ToggleDefaultPlaybackMute()
+        {
+            var state = GetDefaultPlaybackVolume();
+            SetDefaultPlaybackMute(!state.IsMuted);
+        }
+
+        public void ToggleDefaultRecordingMute()
+        {
+            var state = GetDefaultRecordingVolume();
+            SetDefaultRecordingMute(!state.IsMuted);
+        }
+
+        private IReadOnlyList<AudioDevice> GetDevices(EDataFlow dataFlow)
+        {
             var devices = new List<AudioDevice>();
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            var defaultId = GetDefaultPlaybackDeviceId(enumerator);
+            var defaultId = GetDefaultDeviceId(enumerator, dataFlow);
 
-            Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(EDataFlow.eRender, DeviceState.Active, out var collection));
+            Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active, out var collection));
             Marshal.ThrowExceptionForHR(collection.GetCount(out var count));
 
             for (uint i = 0; i < count; i++)
@@ -32,10 +116,10 @@ namespace PlayniteAudioSwitcher
             return devices;
         }
 
-        public AudioDevice GetDefaultPlaybackDevice()
+        private AudioDevice GetDefaultDevice(EDataFlow dataFlow)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia, out var device));
+            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device));
             Marshal.ThrowExceptionForHR(device.GetId(out var id));
 
             return new AudioDevice
@@ -46,7 +130,7 @@ namespace PlayniteAudioSwitcher
             };
         }
 
-        public void SetDefaultPlaybackDevice(string deviceId)
+        private void SetDefaultDevice(string deviceId)
         {
             if (string.IsNullOrWhiteSpace(deviceId))
             {
@@ -59,9 +143,9 @@ namespace PlayniteAudioSwitcher
             Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications));
         }
 
-        public AudioVolumeState GetDefaultPlaybackVolume()
+        private AudioVolumeState GetDefaultVolume(EDataFlow dataFlow)
         {
-            var volume = GetDefaultPlaybackVolumeEndpoint();
+            var volume = GetDefaultVolumeEndpoint(dataFlow);
             Marshal.ThrowExceptionForHR(volume.GetMasterVolumeLevelScalar(out var level));
             Marshal.ThrowExceptionForHR(volume.GetMute(out var isMuted));
 
@@ -72,30 +156,18 @@ namespace PlayniteAudioSwitcher
             };
         }
 
-        public void SetDefaultPlaybackVolume(float volume)
+        private void SetDefaultVolume(EDataFlow dataFlow, float volume)
         {
-            var endpoint = GetDefaultPlaybackVolumeEndpoint();
+            var endpoint = GetDefaultVolumeEndpoint(dataFlow);
             var eventContext = Guid.Empty;
             Marshal.ThrowExceptionForHR(endpoint.SetMasterVolumeLevelScalar(Clamp01(volume), ref eventContext));
         }
 
-        public void ChangeDefaultPlaybackVolume(float delta)
+        private void SetDefaultMute(EDataFlow dataFlow, bool isMuted)
         {
-            var state = GetDefaultPlaybackVolume();
-            SetDefaultPlaybackVolume(state.Volume + delta);
-        }
-
-        public void SetDefaultPlaybackMute(bool isMuted)
-        {
-            var endpoint = GetDefaultPlaybackVolumeEndpoint();
+            var endpoint = GetDefaultVolumeEndpoint(dataFlow);
             var eventContext = Guid.Empty;
             Marshal.ThrowExceptionForHR(endpoint.SetMute(isMuted, ref eventContext));
-        }
-
-        public void ToggleDefaultPlaybackMute()
-        {
-            var state = GetDefaultPlaybackVolume();
-            SetDefaultPlaybackMute(!state.IsMuted);
         }
 
         private static float Clamp01(float value)
@@ -103,10 +175,10 @@ namespace PlayniteAudioSwitcher
             return Math.Max(0f, Math.Min(1f, value));
         }
 
-        private IAudioEndpointVolume GetDefaultPlaybackVolumeEndpoint()
+        private IAudioEndpointVolume GetDefaultVolumeEndpoint(EDataFlow dataFlow)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia, out var device));
+            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device));
             var interfaceId = typeof(IAudioEndpointVolume).GUID;
             Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
             try
@@ -119,11 +191,11 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private static string GetDefaultPlaybackDeviceId(IMMDeviceEnumerator enumerator)
+        private static string GetDefaultDeviceId(IMMDeviceEnumerator enumerator, EDataFlow dataFlow)
         {
             try
             {
-                Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia, out var device));
+                Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device));
                 Marshal.ThrowExceptionForHR(device.GetId(out var id));
                 return id;
             }
