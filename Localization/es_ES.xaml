@@ -6,9 +6,14 @@
     <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Nombres personalizados</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Escribe un nombre sencillo para cada salida que quieras usar desde Playnite. Los dispositivos sin nombre personalizado seguirán apareciendo en el selector completo.</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesTitle">Dispositivos de salida</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesHelp">Configura nombres, iconos, visibilidad y volumen predeterminado opcional para los dispositivos de salida.</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesTitle">Dispositivos de entrada</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesHelp">Configura nombres, iconos, visibilidad y volumen de entrada predeterminado opcional para micrófonos y dispositivos de entrada.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Nombre de Windows</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icono</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Volumen predeterminado</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Volumen de entrada predeterminado</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Nombre en Playnite</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Visualización en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Texto</sys:String>
@@ -29,6 +34,7 @@
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Alternar salida de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Actualizar dispositivos de audio</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Elegir dispositivo de salida</sys:String>
+    <sys:String x:Key="LOCAS_MenuChooseInput">Elegir dispositivo de entrada</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDefault">Audio del juego: predeterminado</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Audio del juego</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Perfil de audio del juego</sys:String>
@@ -43,6 +49,9 @@
     <sys:String x:Key="LOCAS_AudioSwitchFailed">No se pudo cambiar el audio</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">El dispositivo de audio configurado no está activo ahora mismo.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Salida de audio</sys:String>
+    <sys:String x:Key="LOCAS_AudioInput">Entrada de audio</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">El dispositivo de entrada configurado no está activo ahora mismo.</sys:String>
+    <sys:String x:Key="LOCAS_InputSwitchFailed">No se pudo cambiar la entrada de audio</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Dispositivo desconocido</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">El acceso rápido alterna entre todos los dispositivos activos</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">El acceso rápido alterna entre los dispositivos de salida activos.</sys:String>
@@ -73,6 +82,9 @@
     <sys:String x:Key="LOCAS_Muted">Silenciado</sys:String>
     <sys:String x:Key="LOCAS_Unmuted">Sonido activado</sys:String>
     <sys:String x:Key="LOCAS_VolumeFailed">No se pudo cambiar el volumen</sys:String>
+    <sys:String x:Key="LOCAS_InputMuted">Micrófono silenciado</sys:String>
+    <sys:String x:Key="LOCAS_InputUnmuted">Micrófono activado</sys:String>
+    <sys:String x:Key="LOCAS_InputVolumeFailed">No se pudo cambiar el volumen de entrada</sys:String>
 </ResourceDictionary>
 
 

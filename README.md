@@ -1,19 +1,20 @@
 # Playnite NX Audio Switcher
 
-Playnite NX Audio Switcher is a Playnite extension for quickly switching the default Windows audio output device from Desktop mode, Fullscreen mode, game context menus, controller shortcuts, and custom Playnite themes.
+Playnite NX Audio Switcher is a Playnite extension for quickly switching Windows audio devices from Desktop mode, Fullscreen mode, game context menus, controller shortcuts, and custom Playnite themes.
 
 It is designed for couch and console-like setups where users often move between TV speakers, headphones, soundbars, wireless headsets, capture devices, or controller audio outputs.
 
 ## Features
 
 - Switch the default Windows playback device from Playnite.
+- Switch the default Windows recording/input device from Playnite.
 - Works from both Desktop and Fullscreen mode extension menus.
 - Fullscreen quick switch with `Back + RB`.
-- Custom names for any number of audio devices.
+- Custom names for any number of output and input audio devices.
 - Optional icon per renamed audio device.
 - Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
-- Native volume controls for the current default output device.
+- Native volume controls for the current default output and input devices.
 - Game-specific audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
@@ -26,7 +27,7 @@ It is designed for couch and console-like setups where users often move between 
 - Playnite 10.x.
 - Playnite SDK 6.16.0 compatible runtime.
 
-The plugin changes the Windows default playback endpoint using Core Audio / policy configuration APIs.
+The plugin changes Windows default playback and recording endpoints using Core Audio / policy configuration APIs.
 
 ## Installation
 
@@ -47,7 +48,8 @@ From there you can:
 - Give friendly names to audio devices.
 - Assign icons to devices.
 - Choose whether each device is visible in Audio Switcher menus and selectors.
-- Set an optional default volume per device.
+- Set an optional default volume per output device.
+- Set an optional default input volume per recording device.
 - Enable or disable the Fullscreen quick switch shortcut.
 - Configure the Fullscreen volume step used by theme sliders, theme volume buttons, and Desktop volume actions.
 - Enable or disable automatic game-specific audio profiles.
@@ -67,11 +69,13 @@ In Fullscreen mode, open:
 
 This opens a simple list of active Windows output devices. The current output device is marked with a check. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
 
+Input devices are available from the `Choose input device` submenu. This can be used for microphones, headset mics, capture cards, or other active Windows recording devices.
+
 The optional `Back + RB` controller shortcut cycles through active output devices.
 
 The native Playnite extension menu is text-only, so custom SVG icons are not shown there. Icons are available to Fullscreen themes through the theme integration API and bundled controls.
 
-Volume controls are exposed to themes through the theme integration API. They are not shown in the native Fullscreen extension menu because Playnite closes that menu after each action, which makes repeated volume changes awkward from a controller.
+Output and input volume controls are exposed to themes through the theme integration API. They are not shown in the native Fullscreen extension menu because Playnite closes that menu after each action, which makes repeated volume changes awkward from a controller.
 
 ## Game-Specific Audio Profiles
 
@@ -249,6 +253,62 @@ Theme authors who prefer their own slider can bind to `CurrentVolumePercent` wit
         Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumePercent, Mode=TwoWay}" />
 ```
 
+Input devices use the same pattern with input-specific properties and commands:
+
+- `CurrentInputDeviceName`
+- `CurrentInputDeviceLabel`
+- `CurrentInputDeviceIconGeometry`
+- `CurrentInputDeviceId`
+- `CurrentInputVolume`
+- `CurrentInputVolumePercent`
+- `CurrentInputVolumeLabel`
+- `IsInputMuted`
+- `InputDevices`
+- `AllInputDevices`
+- `HasInputDevices`
+
+Useful input commands:
+
+- `RefreshInputDevicesCommand`
+- `SetInputDeviceCommand`
+- `InputVolumeUpCommand`
+- `InputVolumeDownCommand`
+- `SetInputVolumeCommand`
+- `ToggleInputMuteCommand`
+- `RefreshInputVolumeCommand`
+
+Recommended bundled input controls:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_InputDeviceList" />
+<ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
+```
+
+`AudioSwitcher_InputDeviceList` creates focusable buttons for visible active recording devices. `AudioSwitcher_InputVolumeSlider` changes the current Windows default recording device volume directly and uses the same `VolumeStepPercent` setting for left/right navigation.
+
+Custom input device list:
+
+```xml
+<ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=InputDevices}">
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=SetInputDeviceCommand}"
+                    CommandParameter="{Binding Id}">
+                <TextBlock Text="{Binding DisplayName}" />
+            </Button>
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+</ItemsControl>
+```
+
+Custom input volume slider:
+
+```xml
+<Slider Minimum="0"
+        Maximum="100"
+        Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentInputVolumePercent, Mode=TwoWay}" />
+```
+
 Themes can also expose the volume step in their own settings UI:
 
 ```xml
@@ -259,11 +319,11 @@ Themes can also expose the volume step in their own settings UI:
         Value="{PluginSettings Plugin=AudioSwitcher, Path=VolumeStepPercent, Mode=TwoWay}" />
 ```
 
-Each item in `Devices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
+Each item in `Devices`, `AllDevices`, `InputDevices`, and `AllInputDevices` exposes `Id`, `Name`, `WindowsName`, `DisplayName`, `Icon`, `IconGeometry`, `IsVisible`, `IsCurrent`, `IsHighlighted`, and `CurrentMarker`.
 
 For each device, `Name` is the friendly/custom name when available, `WindowsName` is the original Windows device name, `DisplayName` is ready for a text list and includes the current-device marker, and `IconGeometry` can be used in a `Path`.
 
-`Devices` contains only devices that the user left visible in Audio Switcher settings. `AllDevices` contains active devices including those hidden from normal extension menus, so advanced themes can build their own management UI if needed.
+`Devices` and `InputDevices` contain only devices that the user left visible in Audio Switcher settings. `AllDevices` and `AllInputDevices` contain active devices including those hidden from normal extension menus, so advanced themes can build their own management UI if needed.
 
 When `IsSelectorOpen` is true in Fullscreen, Audio Switcher handles gamepad navigation for the exposed selector state: D-pad or left stick up/down changes the highlighted item, `A` selects it, and `B` closes the selector. Themes should style `IsHighlighted` on each `Devices` item so controller users can see the active row even if focus remains outside the custom panel.
 
@@ -307,7 +367,14 @@ Place a controller-friendly volume slider:
 <ContentControl x:Name="AudioSwitcher_VolumeSlider" />
 ```
 
-The device selector and device list show the active output marker and use the user's custom names and icons when configured. Theme authors can decide whether their layouts show text, icons, or both by choosing the exposed properties that fit their design.
+Place a controller-friendly input device list and input volume slider:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_InputDeviceList" />
+<ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
+```
+
+The device selector and device lists show the active marker and use the user's custom names and icons when configured. Theme authors can decide whether their layouts show text, icons, or both by choosing the exposed properties that fit their design.
 
 ## Localization
 

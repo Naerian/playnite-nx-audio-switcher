@@ -6,9 +6,14 @@
     <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Custom names</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Enter a simple name for each output you want to use from Playnite. Devices without a custom name will still appear in the full selector.</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesTitle">Output devices</sys:String>
+    <sys:String x:Key="LOCAS_OutputDevicesHelp">Configure output device names, icons, visibility and optional default volume.</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesTitle">Input devices</sys:String>
+    <sys:String x:Key="LOCAS_InputDevicesHelp">Configure microphone/input device names, icons, visibility and optional default input volume.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows name</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icon</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Default volume</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Default input volume</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Playnite name</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Fullscreen display</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Text</sys:String>
@@ -29,6 +34,7 @@
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Quick switch output</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Refresh audio devices</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Choose output device</sys:String>
+    <sys:String x:Key="LOCAS_MenuChooseInput">Choose input device</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDefault">Game audio: default</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Game audio</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Game audio profile</sys:String>
@@ -43,6 +49,9 @@
     <sys:String x:Key="LOCAS_AudioSwitchFailed">Audio switch failed</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredDeviceInactive">The configured audio device is not currently active.</sys:String>
     <sys:String x:Key="LOCAS_AudioOutput">Audio output</sys:String>
+    <sys:String x:Key="LOCAS_AudioInput">Audio input</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">The configured audio input device is not currently active.</sys:String>
+    <sys:String x:Key="LOCAS_InputSwitchFailed">Audio input switch failed</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Unknown device</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Quick switch cycles through all active devices</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Quick switch cycles through active output devices.</sys:String>
@@ -73,6 +82,9 @@
     <sys:String x:Key="LOCAS_Muted">Muted</sys:String>
     <sys:String x:Key="LOCAS_Unmuted">Sound on</sys:String>
     <sys:String x:Key="LOCAS_VolumeFailed">Volume change failed</sys:String>
+    <sys:String x:Key="LOCAS_InputMuted">Microphone muted</sys:String>
+    <sys:String x:Key="LOCAS_InputUnmuted">Microphone on</sys:String>
+    <sys:String x:Key="LOCAS_InputVolumeFailed">Input volume change failed</sys:String>
 </ResourceDictionary>
 
 

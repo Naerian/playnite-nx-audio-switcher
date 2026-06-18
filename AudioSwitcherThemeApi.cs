@@ -19,12 +19,22 @@ namespace PlayniteAudioSwitcher
         private string currentDeviceLabel;
         private Geometry currentDeviceIconGeometry;
         private bool hasDevices;
+        private string currentInputDeviceId;
+        private string currentInputDeviceName;
+        private string currentInputDeviceLabel;
+        private Geometry currentInputDeviceIconGeometry;
+        private bool hasInputDevices;
         private float currentVolume;
         private int currentVolumePercent;
         private string currentVolumeLabel;
         private bool isMuted;
+        private float currentInputVolume;
+        private int currentInputVolumePercent;
+        private string currentInputVolumeLabel;
+        private bool isInputMuted;
         private int volumeStepPercent;
         private bool isRefreshingVolume;
+        private bool isRefreshingInputVolume;
         private int highlightedDeviceIndex = -1;
         private DateTime confirmAvailableAt = DateTime.MinValue;
 
@@ -33,6 +43,8 @@ namespace PlayniteAudioSwitcher
             this.plugin = plugin;
             Devices = new ObservableCollection<AudioSwitcherThemeDevice>();
             AllDevices = new ObservableCollection<AudioSwitcherThemeDevice>();
+            InputDevices = new ObservableCollection<AudioSwitcherThemeDevice>();
+            AllInputDevices = new ObservableCollection<AudioSwitcherThemeDevice>();
             ToggleSelectorCommand = new RelayCommand(ToggleSelector);
             OpenSelectorCommand = new RelayCommand(OpenSelector);
             CloseSelectorCommand = new RelayCommand(CloseSelector);
@@ -52,11 +64,26 @@ namespace PlayniteAudioSwitcher
             ToggleMuteCommand = new RelayCommand(ToggleMute);
             RefreshVolumeCommand = new RelayCommand(RefreshVolume);
             SetVolumeCommand = new RelayCommand<object>(SetVolume);
+            RefreshInputDevicesCommand = new RelayCommand(() =>
+            {
+                plugin.Settings.RefreshDevices();
+                Refresh();
+            });
+            SetInputDeviceCommand = new RelayCommand<object>(SetInputDevice);
+            InputVolumeUpCommand = new RelayCommand(() => ChangeInputVolume(1));
+            InputVolumeDownCommand = new RelayCommand(() => ChangeInputVolume(-1));
+            ToggleInputMuteCommand = new RelayCommand(ToggleInputMute);
+            RefreshInputVolumeCommand = new RelayCommand(RefreshInputVolume);
+            SetInputVolumeCommand = new RelayCommand<object>(SetInputVolume);
         }
 
         public ObservableCollection<AudioSwitcherThemeDevice> Devices { get; }
 
         public ObservableCollection<AudioSwitcherThemeDevice> AllDevices { get; }
+
+        public ObservableCollection<AudioSwitcherThemeDevice> InputDevices { get; }
+
+        public ObservableCollection<AudioSwitcherThemeDevice> AllInputDevices { get; }
 
         public ICommand ToggleSelectorCommand { get; }
 
@@ -79,6 +106,20 @@ namespace PlayniteAudioSwitcher
         public ICommand RefreshVolumeCommand { get; }
 
         public ICommand SetVolumeCommand { get; }
+
+        public ICommand RefreshInputDevicesCommand { get; }
+
+        public ICommand SetInputDeviceCommand { get; }
+
+        public ICommand InputVolumeUpCommand { get; }
+
+        public ICommand InputVolumeDownCommand { get; }
+
+        public ICommand ToggleInputMuteCommand { get; }
+
+        public ICommand RefreshInputVolumeCommand { get; }
+
+        public ICommand SetInputVolumeCommand { get; }
 
         public bool IsSelectorOpen
         {
@@ -114,6 +155,36 @@ namespace PlayniteAudioSwitcher
         {
             get => hasDevices;
             private set => SetValue(ref hasDevices, value);
+        }
+
+        public string CurrentInputDeviceId
+        {
+            get => currentInputDeviceId;
+            private set => SetValue(ref currentInputDeviceId, value);
+        }
+
+        public string CurrentInputDeviceName
+        {
+            get => currentInputDeviceName;
+            private set => SetValue(ref currentInputDeviceName, value);
+        }
+
+        public string CurrentInputDeviceLabel
+        {
+            get => currentInputDeviceLabel;
+            private set => SetValue(ref currentInputDeviceLabel, value);
+        }
+
+        public Geometry CurrentInputDeviceIconGeometry
+        {
+            get => currentInputDeviceIconGeometry;
+            private set => SetValue(ref currentInputDeviceIconGeometry, value);
+        }
+
+        public bool HasInputDevices
+        {
+            get => hasInputDevices;
+            private set => SetValue(ref hasInputDevices, value);
         }
 
         public float CurrentVolume
@@ -160,6 +231,52 @@ namespace PlayniteAudioSwitcher
         {
             get => isMuted;
             private set => SetValue(ref isMuted, value);
+        }
+
+        public float CurrentInputVolume
+        {
+            get => currentInputVolume;
+            set
+            {
+                var normalized = Math.Max(0f, Math.Min(1f, value));
+                if (isRefreshingInputVolume)
+                {
+                    SetValue(ref currentInputVolume, normalized);
+                    return;
+                }
+
+                plugin.SetInputVolume(normalized, false);
+                RefreshInputVolume();
+            }
+        }
+
+        public int CurrentInputVolumePercent
+        {
+            get => currentInputVolumePercent;
+            set
+            {
+                var normalized = Math.Max(0, Math.Min(100, value));
+                if (isRefreshingInputVolume)
+                {
+                    SetValue(ref currentInputVolumePercent, normalized);
+                    return;
+                }
+
+                plugin.SetInputVolume(normalized / 100f, false);
+                RefreshInputVolume();
+            }
+        }
+
+        public string CurrentInputVolumeLabel
+        {
+            get => currentInputVolumeLabel;
+            private set => SetValue(ref currentInputVolumeLabel, value);
+        }
+
+        public bool IsInputMuted
+        {
+            get => isInputMuted;
+            private set => SetValue(ref isInputMuted, value);
         }
 
         public int VolumeStepPercent
@@ -267,6 +384,11 @@ namespace PlayniteAudioSwitcher
             CurrentDeviceLabel = plugin.GetCurrentDeviceDisplayLabel();
             CurrentDeviceIconGeometry = plugin.GetCurrentDeviceIconGeometry() ?? plugin.GetIconGeometry("volume-2");
             RefreshVolume();
+            CurrentInputDeviceId = plugin.GetCurrentInputDeviceId();
+            CurrentInputDeviceName = plugin.GetCurrentInputDeviceDisplayName();
+            CurrentInputDeviceLabel = plugin.GetCurrentInputDeviceDisplayLabel();
+            CurrentInputDeviceIconGeometry = plugin.GetCurrentInputDeviceIconGeometry() ?? plugin.GetIconGeometry("mic");
+            RefreshInputVolume();
 
             var devices = plugin.GetThemeSelectorDevices(false)
                 .OrderBy(a => a.EffectiveName)
@@ -295,6 +417,7 @@ namespace PlayniteAudioSwitcher
 
             HasDevices = Devices.Count > 0;
             RestoreHighlightedDevice(previousHighlightedId, currentId);
+            RefreshInputDevices(currentInputId: CurrentInputDeviceId);
         }
 
         private AudioSwitcherThemeDevice CreateThemeDevice(AudioDevice device, string currentId)
@@ -310,6 +433,47 @@ namespace PlayniteAudioSwitcher
                 IsVisible = device.IsVisible,
                 IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase)
             };
+        }
+
+        private AudioSwitcherThemeDevice CreateThemeInputDevice(AudioDevice device, string currentId)
+        {
+            return new AudioSwitcherThemeDevice
+            {
+                Id = device.Id,
+                Name = device.EffectiveName,
+                WindowsName = device.Name,
+                DisplayName = device.SettingsDisplayName,
+                Icon = device.EffectiveIcon,
+                IconGeometry = plugin.GetIconGeometry(string.IsNullOrWhiteSpace(device.EffectiveIcon) ? "mic" : device.EffectiveIcon),
+                IsVisible = device.IsVisible,
+                IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase)
+            };
+        }
+
+        private void RefreshInputDevices(string currentInputId)
+        {
+            var inputDevices = plugin.GetThemeSelectorInputDevices(false)
+                .OrderBy(a => a.EffectiveName)
+                .Select(device => CreateThemeInputDevice(device, currentInputId))
+                .ToList();
+            var allInputDevices = plugin.GetThemeSelectorInputDevices(true)
+                .OrderBy(a => a.EffectiveName)
+                .Select(device => CreateThemeInputDevice(device, currentInputId))
+                .ToList();
+
+            InputDevices.Clear();
+            foreach (var device in inputDevices)
+            {
+                InputDevices.Add(device);
+            }
+
+            AllInputDevices.Clear();
+            foreach (var device in allInputDevices)
+            {
+                AllInputDevices.Add(device);
+            }
+
+            HasInputDevices = InputDevices.Count > 0;
         }
 
         private void RestoreHighlightedDevice(string previousHighlightedId, string currentId)
@@ -354,6 +518,18 @@ namespace PlayniteAudioSwitcher
             Refresh();
         }
 
+        private void SetInputDevice(object parameter)
+        {
+            var deviceId = parameter?.ToString();
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                return;
+            }
+
+            plugin.SetThemeSelectedInputDevice(deviceId);
+            Refresh();
+        }
+
         private void RefreshVolume()
         {
             VolumeStepPercent = plugin.Settings.VolumeStepPercent;
@@ -385,16 +561,57 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        private void RefreshInputVolume()
+        {
+            try
+            {
+                var state = plugin.GetCurrentInputVolumeState();
+                SetInputVolumeState(state.Volume, state.VolumePercent, state.IsMuted);
+            }
+            catch
+            {
+                SetInputVolumeState(0, 0, false, string.Empty);
+            }
+        }
+
+        private void SetInputVolumeState(float volume, int volumePercent, bool muted, string label = null)
+        {
+            isRefreshingInputVolume = true;
+            try
+            {
+                CurrentInputVolume = volume;
+                CurrentInputVolumePercent = volumePercent;
+                IsInputMuted = muted;
+                CurrentInputVolumeLabel = label ?? (muted ? plugin.Loc("LOCAS_InputMuted") : $"{volumePercent}%");
+            }
+            finally
+            {
+                isRefreshingInputVolume = false;
+            }
+        }
+
         private void ChangeVolume(int direction)
         {
             plugin.ChangeVolumeByStep(direction);
             RefreshVolume();
         }
 
+        private void ChangeInputVolume(int direction)
+        {
+            plugin.ChangeInputVolumeByStep(direction);
+            RefreshInputVolume();
+        }
+
         private void ToggleMute()
         {
             plugin.ToggleMute();
             RefreshVolume();
+        }
+
+        private void ToggleInputMute()
+        {
+            plugin.ToggleInputMute();
+            RefreshInputVolume();
         }
 
         private void SetVolume(object parameter)
@@ -406,6 +623,17 @@ namespace PlayniteAudioSwitcher
 
             plugin.SetVolume(volume, false);
             RefreshVolume();
+        }
+
+        private void SetInputVolume(object parameter)
+        {
+            if (!TryGetVolumeScalar(parameter, out var volume))
+            {
+                return;
+            }
+
+            plugin.SetInputVolume(volume, false);
+            RefreshInputVolume();
         }
 
         private static bool TryGetVolumeScalar(object parameter, out float volume)

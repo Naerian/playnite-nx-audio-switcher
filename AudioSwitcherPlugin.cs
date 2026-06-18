@@ -59,7 +59,9 @@ namespace PlayniteAudioSwitcher
                     "CurrentDevice",
                     "OpenSelectorButton",
                     "DeviceList",
-                    "VolumeSlider"
+                    "VolumeSlider",
+                    "InputDeviceList",
+                    "InputVolumeSlider"
                 }
             });
 
@@ -187,6 +189,16 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
+            foreach (var device in SafeGetInputDevices().Where(a => a.IsVisible))
+            {
+                items.Add(new MainMenuItem
+                {
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuChooseInput")}",
+                    Description = device.DisplayName,
+                    Action = _ => SetInputDevice(device.Id, GetInputDeviceDisplayName(device))
+                });
+            }
+
             AddVolumeMenuItems(items);
             AddSpatialSoundMenuItems(items);
 
@@ -273,6 +285,16 @@ namespace PlayniteAudioSwitcher
             if (args.Name == "VolumeSlider")
             {
                 return new AudioVolumeSliderControl(this);
+            }
+
+            if (args.Name == "InputDeviceList")
+            {
+                return new AudioInputDeviceListControl(this);
+            }
+
+            if (args.Name == "InputVolumeSlider")
+            {
+                return new AudioInputVolumeSliderControl(this);
             }
 
             return null;
@@ -432,6 +454,19 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
+            var currentInputDeviceId = GetCurrentInputDeviceId();
+            foreach (var device in SafeGetInputDevices().Where(a => a.IsVisible))
+            {
+                var deviceId = device.Id;
+                var deviceName = GetInputDeviceDisplayName(device);
+                items.Add(new MainMenuItem
+                {
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuChooseInput")}",
+                    Description = GetFullscreenInputDeviceMenuText(device, currentInputDeviceId),
+                    Action = _ => SetInputDevice(deviceId, deviceName)
+                });
+            }
+
             AddSpatialSoundMenuItems(items);
 
             return items;
@@ -488,6 +523,30 @@ namespace PlayniteAudioSwitcher
         public void SetThemeSelectedDevice(string deviceId)
         {
             SetConfiguredDevice(deviceId, true);
+        }
+
+        public IReadOnlyList<AudioDevice> GetThemeSelectorInputDevices()
+        {
+            return GetThemeSelectorInputDevices(false);
+        }
+
+        public IReadOnlyList<AudioDevice> GetThemeSelectorInputDevices(bool includeHidden)
+        {
+            var currentDeviceId = GetCurrentInputDeviceId();
+
+            return SafeGetInputDevices()
+                .Where(device => includeHidden || device.IsVisible)
+                .Select(device =>
+                {
+                    device.SettingsDisplayName = GetFullscreenInputDeviceMenuText(device, currentDeviceId);
+                    return device;
+                })
+                .ToList();
+        }
+
+        public void SetThemeSelectedInputDevice(string deviceId)
+        {
+            SetConfiguredInputDevice(deviceId, true);
         }
 
         public void OpenThemeDeviceSelector(Action onDeviceSelected = null)
@@ -684,9 +743,38 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public string GetCurrentInputDeviceDisplayName()
+        {
+            try
+            {
+                return GetInputDeviceDisplayName(AudioDevices.GetDefaultRecordingDevice());
+            }
+            catch
+            {
+                return Loc("LOCAS_AudioInput");
+            }
+        }
+
+        public string GetCurrentInputDeviceDisplayLabel()
+        {
+            try
+            {
+                return GetInputDeviceLabel(AudioDevices.GetDefaultRecordingDevice()?.Id, false);
+            }
+            catch
+            {
+                return Loc("LOCAS_AudioInput");
+            }
+        }
+
         public string GetDeviceDisplayNameForTheme(string deviceId)
         {
             return GetDeviceDisplayName(deviceId);
+        }
+
+        public string GetInputDeviceDisplayNameForTheme(string deviceId)
+        {
+            return GetInputDeviceDisplayName(deviceId);
         }
 
         public Geometry GetCurrentDeviceIconGeometry()
@@ -695,6 +783,20 @@ namespace PlayniteAudioSwitcher
             {
                 var current = AudioDevices.GetDefaultPlaybackDevice();
                 var icon = settings.GetIcon(current?.Id);
+                return string.IsNullOrWhiteSpace(icon) ? null : GetIconGeometry(icon);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public Geometry GetCurrentInputDeviceIconGeometry()
+        {
+            try
+            {
+                var current = AudioDevices.GetDefaultRecordingDevice();
+                var icon = settings.GetInputIcon(current?.Id);
                 return string.IsNullOrWhiteSpace(icon) ? null : GetIconGeometry(icon);
             }
             catch
@@ -712,6 +814,11 @@ namespace PlayniteAudioSwitcher
         public AudioVolumeState GetCurrentVolumeState()
         {
             return AudioDevices.GetDefaultPlaybackVolume();
+        }
+
+        public AudioVolumeState GetCurrentInputVolumeState()
+        {
+            return AudioDevices.GetDefaultRecordingVolume();
         }
 
         public void SetVolume(float volume)
@@ -737,6 +844,29 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void SetInputVolume(float volume)
+        {
+            SetInputVolume(volume, true);
+        }
+
+        public void SetInputVolume(float volume, bool notify)
+        {
+            try
+            {
+                AudioDevices.SetDefaultRecordingVolume(volume);
+                Theme?.Refresh();
+                if (notify)
+                {
+                    ShowInputVolumeInfoMessage();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to set default recording volume.");
+                ShowMessage($"{Loc("LOCAS_InputVolumeFailed")}: {ex.Message}");
+            }
+        }
+
         public void ChangeVolumeByStep(int direction)
         {
             try
@@ -750,6 +880,22 @@ namespace PlayniteAudioSwitcher
             {
                 logger.Error(ex, "Failed to change default playback volume.");
                 ShowMessage($"{Loc("LOCAS_VolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ChangeInputVolumeByStep(int direction)
+        {
+            try
+            {
+                var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
+                AudioDevices.ChangeDefaultRecordingVolume(step * Math.Sign(direction));
+                Theme?.Refresh();
+                ShowInputVolumeInfoMessage();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to change default recording volume.");
+                ShowMessage($"{Loc("LOCAS_InputVolumeFailed")}: {ex.Message}");
             }
         }
 
@@ -769,12 +915,38 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void ToggleInputMute()
+        {
+            try
+            {
+                AudioDevices.ToggleDefaultRecordingMute();
+                Theme?.Refresh();
+                var state = AudioDevices.GetDefaultRecordingVolume();
+                ShowInfoMessage(state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to toggle default recording mute.");
+                ShowMessage($"{Loc("LOCAS_InputVolumeFailed")}: {ex.Message}");
+            }
+        }
+
         public void ApplyDefaultVolumeForCurrentDevice()
         {
             var currentDeviceId = GetCurrentDeviceId();
             if (!string.IsNullOrWhiteSpace(currentDeviceId))
             {
                 TryApplyDefaultVolume(currentDeviceId);
+                Theme?.Refresh();
+            }
+        }
+
+        public void ApplyDefaultInputVolumeForCurrentDevice()
+        {
+            var currentDeviceId = GetCurrentInputDeviceId();
+            if (!string.IsNullOrWhiteSpace(currentDeviceId))
+            {
+                TryApplyDefaultInputVolume(currentDeviceId);
                 Theme?.Refresh();
             }
         }
@@ -808,6 +980,28 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        private IEnumerable<AudioDevice> SafeGetInputDevices()
+        {
+            try
+            {
+                return AudioDevices.GetRecordingDevices()
+                    .Select(device =>
+                    {
+                        device.CustomName = settings.GetInputCustomName(device.Id);
+                        device.Icon = settings.GetInputIcon(device.Id);
+                        device.IsVisible = settings.IsInputDeviceVisible(device.Id);
+                        device.DefaultVolumePercent = settings.GetDefaultInputVolumePercent(device.Id);
+                        return device;
+                    })
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to enumerate audio input devices.");
+                return Enumerable.Empty<AudioDevice>();
+            }
+        }
+
         private void SetConfiguredDevice(string deviceId, bool notify)
         {
             var device = AudioDevices.GetPlaybackDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase));
@@ -818,6 +1012,18 @@ namespace PlayniteAudioSwitcher
             }
 
             SetDevice(device.Id, GetDeviceDisplayName(device), notify);
+        }
+
+        private void SetConfiguredInputDevice(string deviceId, bool notify)
+        {
+            var device = AudioDevices.GetRecordingDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase));
+            if (device == null)
+            {
+                ShowMessage(Loc("LOCAS_ConfiguredInputDeviceInactive"));
+                return;
+            }
+
+            SetInputDevice(device.Id, GetInputDeviceDisplayName(device), notify);
         }
 
         private void SetDevice(string deviceId, string deviceName)
@@ -845,6 +1051,31 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        private void SetInputDevice(string deviceId, string deviceName)
+        {
+            SetInputDevice(deviceId, deviceName, true);
+        }
+
+        private void SetInputDevice(string deviceId, string deviceName, bool notify)
+        {
+            try
+            {
+                AudioDevices.SetDefaultRecordingDevice(deviceId);
+                TryApplyDefaultInputVolume(deviceId);
+                settings.RefreshDevices();
+                Theme?.Refresh();
+                if (notify && settings.ShowNotifications)
+                {
+                    ShowMessage($"{Loc("LOCAS_AudioInput")}: {deviceName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to set audio input device {deviceName}.");
+                ShowMessage($"{Loc("LOCAS_InputSwitchFailed")}: {ex.Message}");
+            }
+        }
+
         private void TryApplyDefaultVolume(string deviceId)
         {
             var defaultVolume = settings.GetDefaultVolumePercent(deviceId);
@@ -861,6 +1092,25 @@ namespace PlayniteAudioSwitcher
             {
                 logger.Error(ex, $"Failed to apply default volume for audio device {deviceId}.");
                 ShowMessage($"{Loc("LOCAS_VolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        private void TryApplyDefaultInputVolume(string deviceId)
+        {
+            var defaultVolume = settings.GetDefaultInputVolumePercent(deviceId);
+            if (!defaultVolume.HasValue)
+            {
+                return;
+            }
+
+            try
+            {
+                AudioDevices.SetDefaultRecordingVolume(defaultVolume.Value / 100f);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to apply default input volume for audio device {deviceId}.");
+                ShowMessage($"{Loc("LOCAS_InputVolumeFailed")}: {ex.Message}");
             }
         }
 
@@ -1186,11 +1436,35 @@ namespace PlayniteAudioSwitcher
                 Loc("LOCAS_UnknownDevice");
         }
 
+        private string GetInputDeviceDisplayName(AudioDevice device)
+        {
+            return GetInputDeviceDisplayName(device?.Id) ?? device?.Name;
+        }
+
+        private string GetInputDeviceDisplayName(string deviceId)
+        {
+            return settings.GetInputCustomName(deviceId) ??
+                SafeGetInputDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase))?.Name ??
+                Loc("LOCAS_UnknownDevice");
+        }
+
         public string GetCurrentDeviceId()
         {
             try
             {
                 return AudioDevices.GetDefaultPlaybackDevice()?.Id;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public string GetCurrentInputDeviceId()
+        {
+            try
+            {
+                return AudioDevices.GetDefaultRecordingDevice()?.Id;
             }
             catch
             {
@@ -1216,6 +1490,20 @@ namespace PlayniteAudioSwitcher
             return text;
         }
 
+        private string GetInputDeviceLabel(string deviceId, bool includeActiveMarker, bool includeDefaultStar = false)
+        {
+            var device = SafeGetInputDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase));
+            var name = GetInputDeviceDisplayName(deviceId);
+            var text = FormatDeviceVisual(settings.GetInputIcon(deviceId), name);
+
+            if (includeDefaultStar && device?.IsDefault == true)
+            {
+                text = "â˜… " + text;
+            }
+
+            return text;
+        }
+
         private string FormatDeviceVisual(string icon, string name)
         {
             var iconText = GetIconText(icon);
@@ -1225,6 +1513,18 @@ namespace PlayniteAudioSwitcher
         private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId)
         {
             var name = GetDeviceDisplayName(device);
+
+            if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
+            {
+                name = "\u2713 " + name;
+            }
+
+            return name;
+        }
+
+        private string GetFullscreenInputDeviceMenuText(AudioDevice device, string currentDeviceId)
+        {
+            var name = GetInputDeviceDisplayName(device);
 
             if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
             {
@@ -1321,6 +1621,8 @@ namespace PlayniteAudioSwitcher
                     return "V";
                 case "headphones":
                     return "HP";
+                case "mic":
+                    return "MIC";
                 case "speaker":
                     return "SP";
                 case "tv":
@@ -1360,6 +1662,18 @@ namespace PlayniteAudioSwitcher
             {
                 var state = AudioDevices.GetDefaultPlaybackVolume();
                 ShowInfoMessage($"{Loc("LOCAS_VolumeTitle")}: {state.VolumePercent}%");
+            }
+            catch
+            {
+            }
+        }
+
+        private void ShowInputVolumeInfoMessage()
+        {
+            try
+            {
+                var state = AudioDevices.GetDefaultRecordingVolume();
+                ShowInfoMessage($"{Loc("LOCAS_AudioInput")}: {state.VolumePercent}%");
             }
             catch
             {

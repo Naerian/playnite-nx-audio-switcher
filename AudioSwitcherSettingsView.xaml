@@ -28,13 +28,22 @@
                               HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="8" HorizontalAlignment="Stretch">
                         <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_CustomNamesTitle}" Style="{StaticResource SectionHeaderText}" />
+                            <TextBlock Text="{DynamicResource LOCAS_OutputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
                         </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_CustomNamesHelp}"
+                        <TextBlock Text="{DynamicResource LOCAS_OutputDevicesHelp}"
                                    TextWrapping="Wrap"
                                    Margin="0,0,0,12" />
 
                         <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
+
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_InputDevicesHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+
+                        <StackPanel x:Name="InputDeviceRowsPanel" Margin="0,0,0,12" />
 
                         <Border Style="{StaticResource SectionHeaderBorder}">
                             <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
