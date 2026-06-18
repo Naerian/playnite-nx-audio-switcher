@@ -52,11 +52,11 @@ The settings window is organized by task:
 - **Fullscreen**: controller quick switch and the volume step used by Fullscreen theme sliders or theme volume buttons.
 - **Game profiles**: automatic output/input switching per game and restore behavior after closing a game.
 - **Spatial sound**: experimental integration through a user-provided `SoundVolumeView.exe` or `svcl.exe`.
-- **Notifications**: informational audio-change notifications.
+- **Notifications**: informational notifications by category, including output changes, input changes, volume, mute, game profiles, and Spatial Sound.
 
 Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
 
-Notification settings live in their own **Notifications** tab. Disabling notifications hides normal informational messages such as device, volume, mute, and Spatial Sound changes. Important error messages are still shown.
+Notification settings live in their own **Notifications** tab. Disabling the master notification option hides normal informational messages, and each category can also be controlled separately. Important error messages are still shown. When a game profile changes multiple things at launch, Audio Switcher groups the result into one profile notification instead of showing one message per device or mode.
 
 ## Fullscreen Usage
 

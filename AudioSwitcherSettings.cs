@@ -20,6 +20,12 @@ namespace PlayniteAudioSwitcher
         private string fullscreenPreferredDeviceId;
         private string deviceDisplayMode = "TextAndIcon";
         private bool showNotifications = true;
+        private bool showOutputDeviceNotifications = true;
+        private bool showInputDeviceNotifications = true;
+        private bool showVolumeNotifications;
+        private bool showMuteNotifications;
+        private bool showGameProfileNotifications = true;
+        private bool showSpatialSoundNotifications = true;
         private bool fullscreenOnlyFavorites = true;
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
@@ -58,6 +64,12 @@ namespace PlayniteAudioSwitcher
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
                 SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
                 SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
+                ShowOutputDeviceNotifications = savedSettings.ShowOutputDeviceNotifications;
+                ShowInputDeviceNotifications = savedSettings.ShowInputDeviceNotifications;
+                ShowVolumeNotifications = savedSettings.ShowVolumeNotifications;
+                ShowMuteNotifications = savedSettings.ShowMuteNotifications;
+                ShowGameProfileNotifications = savedSettings.ShowGameProfileNotifications;
+                ShowSpatialSoundNotifications = savedSettings.ShowSpatialSoundNotifications;
                 VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
             }
 
@@ -169,6 +181,42 @@ namespace PlayniteAudioSwitcher
         {
             get => showNotifications;
             set => SetValue(ref showNotifications, value);
+        }
+
+        public bool ShowOutputDeviceNotifications
+        {
+            get => showOutputDeviceNotifications;
+            set => SetValue(ref showOutputDeviceNotifications, value);
+        }
+
+        public bool ShowInputDeviceNotifications
+        {
+            get => showInputDeviceNotifications;
+            set => SetValue(ref showInputDeviceNotifications, value);
+        }
+
+        public bool ShowVolumeNotifications
+        {
+            get => showVolumeNotifications;
+            set => SetValue(ref showVolumeNotifications, value);
+        }
+
+        public bool ShowMuteNotifications
+        {
+            get => showMuteNotifications;
+            set => SetValue(ref showMuteNotifications, value);
+        }
+
+        public bool ShowGameProfileNotifications
+        {
+            get => showGameProfileNotifications;
+            set => SetValue(ref showGameProfileNotifications, value);
+        }
+
+        public bool ShowSpatialSoundNotifications
+        {
+            get => showSpatialSoundNotifications;
+            set => SetValue(ref showSpatialSoundNotifications, value);
         }
 
         public bool FullscreenOnlyFavorites
@@ -410,6 +458,12 @@ namespace PlayniteAudioSwitcher
             FullscreenPreferredDeviceId = editingClone.FullscreenPreferredDeviceId;
             DeviceDisplayMode = editingClone.DeviceDisplayMode;
             ShowNotifications = editingClone.ShowNotifications;
+            ShowOutputDeviceNotifications = editingClone.ShowOutputDeviceNotifications;
+            ShowInputDeviceNotifications = editingClone.ShowInputDeviceNotifications;
+            ShowVolumeNotifications = editingClone.ShowVolumeNotifications;
+            ShowMuteNotifications = editingClone.ShowMuteNotifications;
+            ShowGameProfileNotifications = editingClone.ShowGameProfileNotifications;
+            ShowSpatialSoundNotifications = editingClone.ShowSpatialSoundNotifications;
             FullscreenOnlyFavorites = editingClone.FullscreenOnlyFavorites;
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
             QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
@@ -516,6 +570,12 @@ namespace PlayniteAudioSwitcher
                 FullscreenPreferredDeviceId = FullscreenPreferredDeviceId,
                 DeviceDisplayMode = DeviceDisplayMode,
                 ShowNotifications = ShowNotifications,
+                ShowOutputDeviceNotifications = ShowOutputDeviceNotifications,
+                ShowInputDeviceNotifications = ShowInputDeviceNotifications,
+                ShowVolumeNotifications = ShowVolumeNotifications,
+                ShowMuteNotifications = ShowMuteNotifications,
+                ShowGameProfileNotifications = ShowGameProfileNotifications,
+                ShowSpatialSoundNotifications = ShowSpatialSoundNotifications,
                 FullscreenOnlyFavorites = FullscreenOnlyFavorites,
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,

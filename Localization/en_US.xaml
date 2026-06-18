@@ -34,6 +34,12 @@
     <sys:String x:Key="LOCAS_ShowNotification">Show audio change notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Choose when Audio Switcher shows informational notifications. Important errors are always shown.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDevice">Output device changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDevice">Input device changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolume">Volume changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMute">Mute / unmute changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfile">Game profile changes</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSound">Spatial Sound changes</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelp">Quick switch cycles through devices with custom names. Configure at least two devices to use it.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Quick switch output</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Refresh audio devices</sys:String>
@@ -71,6 +77,7 @@
     <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
     <sys:String x:Key="LOCAS_ResetGameProfile">Reset game profile</sys:String>
     <sys:String x:Key="LOCAS_GameProfileReset">Game profile reset</sys:String>
+    <sys:String x:Key="LOCAS_GameProfileApplied">Game profile applied</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Spatial sound</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: allows Audio Switcher to call an external SoundVolumeView or svcl executable to change Windows Spatial Sound on the current default output device.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Enable experimental Spatial Sound integration</sys:String>
