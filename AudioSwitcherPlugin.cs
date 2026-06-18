@@ -505,7 +505,7 @@ namespace PlayniteAudioSwitcher
                 var deviceName = GetDeviceDisplayName(device);
                 items.Add(new MainMenuItem
                 {
-                    MenuSection = MenuRoot,
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuChooseOutput")}",
                     Description = GetFullscreenDeviceMenuText(device, currentDeviceId),
                     Action = _ => SetDevice(deviceId, deviceName)
                 });

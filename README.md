@@ -64,9 +64,9 @@ In Fullscreen mode, open:
 
 `Extensions > Audio Switcher`
 
-This opens a simple list of active Windows output devices. The current output device is marked with a check. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
+Use `Choose output device` to open the list of active Windows output devices. Use `Choose input device` for microphones, headset mics, capture cards, or other active Windows recording devices.
 
-Input devices are available from the `Choose input device` submenu. This can be used for microphones, headset mics, capture cards, or other active Windows recording devices.
+The current device is marked with a check in each list. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
 
 The optional `Back + RB` controller shortcut cycles through active output devices.
 

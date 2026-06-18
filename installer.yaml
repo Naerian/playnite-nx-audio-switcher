@@ -1,5 +1,11 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.0.1
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-06-18
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.0.1/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_0_1.pext
+    Changelog:
+      - Made the native Fullscreen extension menu show output and input devices consistently under separate submenus.
   - Version: 1.0.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-06-18
