@@ -166,29 +166,33 @@
                                   IsChecked="{Binding ShowNotifications}"
                                   Margin="0,0,0,12" />
 
+                        <TextBlock Text="{DynamicResource LOCAS_NotificationCategories}"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8" />
+
                         <CheckBox Content="{DynamicResource LOCAS_NotifyOutputDevice}"
                                   IsChecked="{Binding ShowOutputDeviceNotifications}"
-                                  Margin="16,0,0,8" />
+                                  Margin="0,0,0,8" />
 
                         <CheckBox Content="{DynamicResource LOCAS_NotifyInputDevice}"
                                   IsChecked="{Binding ShowInputDeviceNotifications}"
-                                  Margin="16,0,0,8" />
+                                  Margin="0,0,0,8" />
 
                         <CheckBox Content="{DynamicResource LOCAS_NotifyVolume}"
                                   IsChecked="{Binding ShowVolumeNotifications}"
-                                  Margin="16,0,0,8" />
+                                  Margin="0,0,0,8" />
 
                         <CheckBox Content="{DynamicResource LOCAS_NotifyMute}"
                                   IsChecked="{Binding ShowMuteNotifications}"
-                                  Margin="16,0,0,8" />
+                                  Margin="0,0,0,8" />
 
                         <CheckBox Content="{DynamicResource LOCAS_NotifyGameProfile}"
                                   IsChecked="{Binding ShowGameProfileNotifications}"
-                                  Margin="16,0,0,8" />
+                                  Margin="0,0,0,8" />
 
                         <CheckBox Content="{DynamicResource LOCAS_NotifySpatialSound}"
                                   IsChecked="{Binding ShowSpatialSoundNotifications}"
-                                  Margin="16,0,0,12" />
+                                  Margin="0,0,0,12" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

@@ -34,6 +34,7 @@
     <sys:String x:Key="LOCAS_ShowNotification">Show audio change notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Choose when Audio Switcher shows informational notifications. Important errors are always shown.</sys:String>
+    <sys:String x:Key="LOCAS_NotificationCategories">Notify on</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDevice">Output device changes</sys:String>
     <sys:String x:Key="LOCAS_NotifyInputDevice">Input device changes</sys:String>
     <sys:String x:Key="LOCAS_NotifyVolume">Volume changes</sys:String>
