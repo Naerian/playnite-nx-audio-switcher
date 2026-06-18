@@ -272,6 +272,17 @@ namespace PlayniteAudioSwitcher
                 });
             }
 
+            items.Add(new GameMenuItem
+            {
+                MenuSection = root,
+                Description = Loc("LOCAS_ResetGameProfile"),
+                Action = _ =>
+                {
+                    gameProfiles.ClearProfile(game);
+                    ShowInfoMessage($"{game.Name}: {Loc("LOCAS_GameProfileReset")}");
+                }
+            });
+
             return items;
         }
 
@@ -1000,6 +1011,11 @@ namespace PlayniteAudioSwitcher
                     {
                         device.CustomName = settings.GetCustomName(device.Id);
                         device.Icon = settings.GetIcon(device.Id);
+                        if (string.IsNullOrWhiteSpace(device.Icon))
+                        {
+                            device.Icon = settings.SuggestIconForDevice(device.Name, false);
+                        }
+
                         device.IsVisible = settings.IsDeviceVisible(device.Id);
                         device.DefaultVolumePercent = settings.GetDefaultVolumePercent(device.Id);
                         return device;
@@ -1022,6 +1038,11 @@ namespace PlayniteAudioSwitcher
                     {
                         device.CustomName = settings.GetInputCustomName(device.Id);
                         device.Icon = settings.GetInputIcon(device.Id);
+                        if (string.IsNullOrWhiteSpace(device.Icon))
+                        {
+                            device.Icon = settings.SuggestIconForDevice(device.Name, true);
+                        }
+
                         device.IsVisible = settings.IsInputDeviceVisible(device.Id);
                         device.DefaultVolumePercent = settings.GetDefaultInputVolumePercent(device.Id);
                         return device;

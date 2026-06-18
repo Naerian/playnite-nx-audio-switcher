@@ -145,6 +145,20 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void ClearProfile(Game game)
+        {
+            if (game == null)
+            {
+                return;
+            }
+
+            lock (syncRoot)
+            {
+                profiles.Remove(game.Id);
+                Save();
+            }
+        }
+
         private void Load()
         {
             if (!File.Exists(filePath))

@@ -258,8 +258,8 @@ namespace PlayniteAudioSwitcher
 
         public void RefreshDevices()
         {
-            AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetPlaybackDevices());
-            AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetRecordingDevices());
+            AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetPlaybackDevices(), false);
+            AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetRecordingDevices(), true);
         }
 
         public string GetCustomName(string deviceId)
@@ -307,6 +307,87 @@ namespace PlayniteAudioSwitcher
             return !string.IsNullOrWhiteSpace(GetCustomName(deviceId));
         }
 
+        public string SuggestIconForDevice(string deviceName, bool isInput)
+        {
+            var text = (deviceName ?? string.Empty).ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return isInput ? "mic" : "volume-2";
+            }
+
+            if (text.Contains("webcam") || text.Contains("camera") || text.Contains("camara") || text.Contains("cámara"))
+            {
+                return "webcam";
+            }
+
+            if (text.Contains("headset") || text.Contains("auricular") || text.Contains("headphone") || text.Contains("headphones"))
+            {
+                return isInput ? "headset" : "headphones";
+            }
+
+            if (text.Contains("microphone") || text.Contains("microfono") || text.Contains("micrófono") || text.Contains("mic "))
+            {
+                return "mic";
+            }
+
+            if (text.Contains("bluetooth") || text.Contains("wireless"))
+            {
+                return "bluetooth";
+            }
+
+            if (text.Contains("hdmi"))
+            {
+                return "hdmi-port";
+            }
+
+            if (text.Contains("usb"))
+            {
+                return "usb";
+            }
+
+            if (text.Contains("monitor") || text.Contains("display"))
+            {
+                return "monitor-speaker";
+            }
+
+            if (text.Contains("tv") || text.Contains("television") || text.Contains("televisión"))
+            {
+                return "tv";
+            }
+
+            if (text.Contains("speaker") || text.Contains("altavoz") || text.Contains("speakers"))
+            {
+                return "speaker";
+            }
+
+            if (text.Contains("capture") || text.Contains("captura"))
+            {
+                return isInput ? "radio-receiver" : "hdmi-port";
+            }
+
+            if (text.Contains("phone") || text.Contains("smartphone"))
+            {
+                return "smartphone";
+            }
+
+            if (text.Contains("tablet"))
+            {
+                return "tablet";
+            }
+
+            if (text.Contains("laptop"))
+            {
+                return "laptop";
+            }
+
+            if (text.Contains("pc") || text.Contains("realtek"))
+            {
+                return isInput ? "mic" : "pc-case";
+            }
+
+            return isInput ? "mic" : "volume-2";
+        }
+
         public void BeginEdit()
         {
             RefreshDevices();
@@ -345,14 +426,14 @@ namespace PlayniteAudioSwitcher
         {
             DeviceAliases = AvailablePlaybackDevices
                 .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
-                    !string.IsNullOrWhiteSpace(a.Icon) ||
+                    !a.IsIconSuggested && !string.IsNullOrWhiteSpace(a.Icon) ||
                     !a.IsVisible ||
                     a.DefaultVolumePercent.HasValue)
                 .Select(a => new AudioDeviceAlias
                 {
                     DeviceId = a.Id,
                     CustomName = a.CustomName?.Trim(),
-                    Icon = a.Icon,
+                    Icon = a.IsIconSuggested ? null : a.Icon,
                     IsVisible = a.IsVisible ? (bool?)null : false,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 })
@@ -360,14 +441,14 @@ namespace PlayniteAudioSwitcher
 
             InputDeviceAliases = AvailableRecordingDevices
                 .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
-                    !string.IsNullOrWhiteSpace(a.Icon) ||
+                    !a.IsIconSuggested && !string.IsNullOrWhiteSpace(a.Icon) ||
                     !a.IsVisible ||
                     a.DefaultVolumePercent.HasValue)
                 .Select(a => new AudioDeviceAlias
                 {
                     DeviceId = a.Id,
                     CustomName = a.CustomName?.Trim(),
-                    Icon = a.Icon,
+                    Icon = a.IsIconSuggested ? null : a.Icon,
                     IsVisible = a.IsVisible ? (bool?)null : false,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 })
@@ -447,7 +528,7 @@ namespace PlayniteAudioSwitcher
             };
         }
 
-        private List<AudioDevice> RefreshDeviceList(List<AudioDeviceAlias> aliasesSource, System.Func<IReadOnlyList<AudioDevice>> getDevices)
+        private List<AudioDevice> RefreshDeviceList(List<AudioDeviceAlias> aliasesSource, System.Func<IReadOnlyList<AudioDevice>> getDevices, bool isInput)
         {
             try
             {
@@ -466,6 +547,12 @@ namespace PlayniteAudioSwitcher
                             device.Icon = alias.Icon;
                             device.IsVisible = alias.IsVisible != false;
                             device.DefaultVolumePercent = alias.DefaultVolumePercent;
+                        }
+
+                        if (string.IsNullOrWhiteSpace(device.Icon))
+                        {
+                            device.Icon = SuggestIconForDevice(device.Name, isInput);
+                            device.IsIconSuggested = true;
                         }
 
                         device.SettingsDisplayName = device.TechnicalDisplayName;

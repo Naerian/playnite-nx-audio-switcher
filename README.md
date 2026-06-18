@@ -13,6 +13,7 @@ It is designed for couch and console-like setups where users often move between 
 - Custom names for any number of output and input audio devices.
 - Optional icon per renamed audio device.
 - Expanded bundled Lucide icon set for speakers, headsets, microphones, webcams, capture devices, Bluetooth, HDMI, USB and generic audio states.
+- Automatic icon suggestions based on Windows device names when no custom icon has been selected.
 - Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
 - Native volume controls for the current default output and input devices.
@@ -82,6 +83,8 @@ Open a game's context menu and go to:
 You can set an output device from `Audio Switcher > Choose output device`. The `Choose input device` submenu lets you set a microphone, headset mic, webcam mic, capture card input, or any other active Windows recording device for that game.
 
 If the game does not have a saved profile yet, the current Windows default output and input devices are marked in their respective menus. When the game starts, the plugin switches to the selected devices if game profiles are enabled. When the game stops, the plugin can restore the previous output and input devices if that option is enabled.
+
+Use `Audio Switcher > Reset game profile` to remove all saved Audio Switcher settings for that game.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
 
@@ -284,7 +287,7 @@ Recommended bundled input controls:
 <ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
 ```
 
-`AudioSwitcher_InputDeviceList` creates focusable buttons for visible active recording devices. `AudioSwitcher_InputVolumeSlider` changes the current Windows default recording device volume directly and uses the same `VolumeStepPercent` setting for left/right navigation.
+`AudioSwitcher_InputDeviceList` creates focusable buttons for visible active recording devices. `AudioSwitcher_InputVolumeSlider` creates a real focusable microphone/input volume slider, changes the current Windows default recording device volume directly, supports left/right keyboard or gamepad navigation, and uses the same `VolumeStepPercent` setting as the output volume slider.
 
 Custom input device list:
 

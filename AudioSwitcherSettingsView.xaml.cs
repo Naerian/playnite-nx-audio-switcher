@@ -108,7 +108,11 @@ namespace PlayniteAudioSwitcher
                     SelectedValue = device.Icon ?? string.Empty,
                     ItemTemplate = CreateIconTemplate()
                 };
-                iconBox.SelectionChanged += (_, __) => device.Icon = iconBox.SelectedValue?.ToString();
+                iconBox.SelectionChanged += (_, __) =>
+                {
+                    device.Icon = iconBox.SelectedValue?.ToString();
+                    device.IsIconSuggested = false;
+                };
                 iconPanel.Children.Add(iconLabel);
                 iconPanel.Children.Add(iconBox);
                 Grid.SetColumn(iconPanel, 2);
