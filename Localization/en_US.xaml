@@ -25,7 +25,7 @@
     <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Apply preferred device when Playnite starts in Fullscreen</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Restore previous device after a game-specific profile stops</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Game profiles</sys:String>
-    <sys:String x:Key="LOCAS_GameProfilesHelp">Assign an output device from a game's context menu. When the game starts, Audio Switcher can switch to that device automatically.</sys:String>
+    <sys:String x:Key="LOCAS_GameProfilesHelp">Assign output and input devices from a game's context menu. When the game starts, Audio Switcher can switch to those devices automatically.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfiles">Apply game-specific audio profiles when games start</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Show audio change notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notifications</sys:String>

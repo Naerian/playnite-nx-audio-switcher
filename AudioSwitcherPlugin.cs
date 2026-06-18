@@ -23,6 +23,7 @@ namespace PlayniteAudioSwitcher
         private readonly ILogger logger;
         private readonly HashSet<ControllerInput> pressedInputs = new HashSet<ControllerInput>();
         private readonly Dictionary<Guid, AudioDevice> previousDevicesByGame = new Dictionary<Guid, AudioDevice>();
+        private readonly Dictionary<Guid, AudioDevice> previousInputDevicesByGame = new Dictionary<Guid, AudioDevice>();
         private AudioSwitcherSettings settings;
         private GameAudioProfileStore gameProfiles;
         private DateTime lastQuickSwitch = DateTime.MinValue;
@@ -218,6 +219,9 @@ namespace PlayniteAudioSwitcher
             var selectedDeviceId = string.IsNullOrWhiteSpace(currentProfile?.DeviceId)
                 ? AudioDevices.GetDefaultPlaybackDevice()?.Id
                 : currentProfile.DeviceId;
+            var selectedInputDeviceId = string.IsNullOrWhiteSpace(currentProfile?.InputDeviceId)
+                ? AudioDevices.GetDefaultRecordingDevice()?.Id
+                : currentProfile.InputDeviceId;
             var root = VisibleMenuRoot;
             var items = new List<GameMenuItem>();
 
@@ -232,6 +236,22 @@ namespace PlayniteAudioSwitcher
                     Action = _ =>
                     {
                         gameProfiles.SetDevice(game, deviceId);
+                        ShowInfoMessage($"{game.Name}: {displayName}");
+                    }
+                });
+            }
+
+            foreach (var device in SafeGetInputDevices().Where(a => a.IsVisible))
+            {
+                var deviceId = device.Id;
+                var displayName = GetInputDeviceDisplayName(device);
+                items.Add(new GameMenuItem
+                {
+                    MenuSection = $"{root}|{Loc("LOCAS_MenuChooseInput")}",
+                    Description = GetCheckedMenuText(displayName, string.Equals(selectedInputDeviceId, deviceId, StringComparison.OrdinalIgnoreCase)),
+                    Action = _ =>
+                    {
+                        gameProfiles.SetInputDevice(game, deviceId);
                         ShowInfoMessage($"{game.Name}: {displayName}");
                     }
                 });
@@ -324,6 +344,7 @@ namespace PlayniteAudioSwitcher
             var profile = gameProfiles.GetProfile(args.Game);
             if (profile == null ||
                 string.IsNullOrWhiteSpace(profile.DeviceId) &&
+                string.IsNullOrWhiteSpace(profile.InputDeviceId) &&
                 string.IsNullOrWhiteSpace(profile.SpatialSoundMode))
             {
                 return;
@@ -335,6 +356,12 @@ namespace PlayniteAudioSwitcher
                 {
                     previousDevicesByGame[args.Game.Id] = AudioDevices.GetDefaultPlaybackDevice();
                     SetConfiguredDevice(profile.DeviceId, true);
+                }
+
+                if (!string.IsNullOrWhiteSpace(profile.InputDeviceId))
+                {
+                    previousInputDevicesByGame[args.Game.Id] = AudioDevices.GetDefaultRecordingDevice();
+                    SetConfiguredInputDevice(profile.InputDeviceId, true);
                 }
 
                 ApplySpatialSoundMode(profile.SpatialSoundMode, true);
@@ -357,6 +384,12 @@ namespace PlayniteAudioSwitcher
             {
                 previousDevicesByGame.Remove(args.Game.Id);
                 SetDevice(previousDevice.Id, GetDeviceDisplayName(previousDevice));
+            }
+
+            if (previousInputDevicesByGame.TryGetValue(args.Game.Id, out var previousInputDevice))
+            {
+                previousInputDevicesByGame.Remove(args.Game.Id);
+                SetInputDevice(previousInputDevice.Id, GetInputDeviceDisplayName(previousInputDevice));
             }
         }
 
@@ -1619,22 +1652,66 @@ namespace PlayniteAudioSwitcher
                     return "V+";
                 case "volume-1":
                     return "V";
+                case "volume":
+                    return "VOL";
+                case "volume-off":
+                    return "MUTE";
+                case "volume-x":
+                    return "VX";
                 case "headphones":
                     return "HP";
+                case "headset":
+                    return "HS";
                 case "mic":
                     return "MIC";
+                case "mic-off":
+                    return "MIC-";
+                case "mic-vocal":
+                    return "VOC";
+                case "webcam":
+                    return "CAM";
+                case "audio-lines":
+                    return "EQ";
+                case "audio-waveform":
+                    return "WAV";
+                case "podcast":
+                    return "POD";
+                case "radio":
+                    return "RAD";
+                case "radio-receiver":
+                    return "REC";
                 case "speaker":
                     return "SP";
+                case "monitor-speaker":
+                    return "MS";
+                case "boom-box":
+                    return "BOX";
                 case "tv":
                     return "TV";
                 case "monitor":
                     return "PC";
+                case "laptop":
+                    return "LAP";
+                case "pc-case":
+                    return "CASE";
+                case "smartphone":
+                    return "PH";
+                case "tablet":
+                    return "TAB";
                 case "gamepad-2":
                     return "GP";
                 case "bluetooth":
                     return "BT";
+                case "bluetooth-connected":
+                    return "BT+";
+                case "bluetooth-searching":
+                    return "BT?";
                 case "usb":
                     return "USB";
+                case "hdmi-port":
+                    return "HDMI";
+                case "cable":
+                    return "CAB";
                 default:
                     return icon;
             }

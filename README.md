@@ -12,10 +12,11 @@ It is designed for couch and console-like setups where users often move between 
 - Fullscreen quick switch with `Back + RB`.
 - Custom names for any number of output and input audio devices.
 - Optional icon per renamed audio device.
+- Expanded bundled Lucide icon set for speakers, headsets, microphones, webcams, capture devices, Bluetooth, HDMI, USB and generic audio states.
 - Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
 - Native volume controls for the current default output and input devices.
-- Game-specific audio profiles from the game context menu.
+- Game-specific output and input audio profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
 - Theme integration controls for theme authors.
@@ -52,7 +53,7 @@ From there you can:
 - Set an optional default input volume per recording device.
 - Enable or disable the Fullscreen quick switch shortcut.
 - Configure the Fullscreen volume step used by theme sliders, theme volume buttons, and Desktop volume actions.
-- Enable or disable automatic game-specific audio profiles.
+- Enable or disable automatic game-specific audio profiles for output and input devices.
 - Configure whether the previous audio device is restored after a game-specific profile.
 - Enable experimental Spatial Sound integration by pointing Audio Switcher to `SoundVolumeView.exe` or `svcl.exe`.
 - Choose whether Audio Switcher shows informational audio-change notifications.
@@ -83,9 +84,13 @@ Open a game's context menu and go to:
 
 `Audio Switcher`
 
-You can set an output device for that game from the list of active playback devices. If the game does not have a saved profile yet, the current Windows default device is marked in the menu. When the game starts, the plugin switches to the selected device if game profiles are enabled. When the game stops, the plugin can restore the previous output device if that option is enabled.
+You can set an output device for that game from the list of active playback devices. The `Choose input device` submenu lets you set a microphone, headset mic, webcam mic, capture card input, or any other active Windows recording device for that game.
+
+If the game does not have a saved profile yet, the current Windows default output and input devices are marked in their respective menus. When the game starts, the plugin switches to the selected devices if game profiles are enabled. When the game stops, the plugin can restore the previous output and input devices if that option is enabled.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
+
+The same caveat may apply to input devices: some games only read the microphone device during startup or voice chat initialization.
 
 ## Experimental Spatial Sound
 
