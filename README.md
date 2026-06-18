@@ -44,19 +44,13 @@ Open:
 
 `Add-ons > Extension settings > Generic > Audio Switcher`
 
-From there you can:
+The settings window is organized by task:
 
-- Give friendly names to audio devices.
-- Assign icons to devices.
-- Choose whether each device is visible in Audio Switcher menus and selectors.
-- Set an optional default volume per output device.
-- Set an optional default input volume per recording device.
-- Enable or disable the Fullscreen quick switch shortcut.
-- Configure the Fullscreen volume step used by theme sliders, theme volume buttons, and Desktop volume actions.
-- Enable or disable automatic game-specific audio profiles for output and input devices.
-- Configure whether the previous audio device is restored after a game-specific profile.
-- Enable experimental Spatial Sound integration by pointing Audio Switcher to `SoundVolumeView.exe` or `svcl.exe`.
-- Choose whether Audio Switcher shows informational audio-change notifications.
+- **Devices**: friendly names, icons, visibility, default output volume, and default input volume.
+- **Fullscreen**: controller quick switch and the volume step used by Fullscreen theme sliders or theme volume buttons.
+- **Game profiles**: automatic output/input switching per game and restore behavior after closing a game.
+- **Spatial sound**: experimental integration through a user-provided `SoundVolumeView.exe` or `svcl.exe`.
+- **Notifications**: informational audio-change notifications.
 
 Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
 
@@ -84,7 +78,7 @@ Open a game's context menu and go to:
 
 `Audio Switcher`
 
-You can set an output device for that game from the list of active playback devices. The `Choose input device` submenu lets you set a microphone, headset mic, webcam mic, capture card input, or any other active Windows recording device for that game.
+You can set an output device from `Audio Switcher > Choose output device`. The `Choose input device` submenu lets you set a microphone, headset mic, webcam mic, capture card input, or any other active Windows recording device for that game.
 
 If the game does not have a saved profile yet, the current Windows default output and input devices are marked in their respective menus. When the game starts, the plugin switches to the selected devices if game profiles are enabled. When the game stops, the plugin can restore the previous output and input devices if that option is enabled.
 

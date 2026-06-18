@@ -231,7 +231,7 @@ namespace PlayniteAudioSwitcher
                 var displayName = GetDeviceDisplayName(device);
                 items.Add(new GameMenuItem
                 {
-                    MenuSection = root,
+                    MenuSection = $"{root}|{Loc("LOCAS_MenuChooseOutput")}",
                     Description = GetCheckedMenuText(displayName, string.Equals(selectedDeviceId, deviceId, StringComparison.OrdinalIgnoreCase)),
                     Action = _ =>
                     {

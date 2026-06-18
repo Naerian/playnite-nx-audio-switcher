@@ -23,7 +23,7 @@
     </UserControl.Resources>
     <Grid Margin="12">
         <TabControl>
-            <TabItem Header="{DynamicResource LOCAS_SettingsGeneral}">
+            <TabItem Header="{DynamicResource LOCAS_DevicesTab}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="8" HorizontalAlignment="Stretch">
@@ -44,10 +44,21 @@
                                    Margin="0,0,0,12" />
 
                         <StackPanel x:Name="InputDeviceRowsPanel" Margin="0,0,0,12" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                        <Border Style="{StaticResource SectionHeaderBorder}">
+            <TabItem Header="{DynamicResource LOCAS_FullscreenTab}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
                             <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
                         </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+
                         <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
                                   IsChecked="{Binding QuickSwitchEnabled}"
                                   Margin="0,2,0,8" />
@@ -85,8 +96,15 @@
                                        VerticalAlignment="Center"
                                        Margin="8,0,0,0" />
                         </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                        <Border Style="{StaticResource SectionHeaderBorder}">
+            <TabItem Header="{DynamicResource LOCAS_GameProfilesTitle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
                             <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
                         </Border>
                         <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}"
@@ -100,8 +118,15 @@
                         <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
                                   IsChecked="{Binding RestoreDeviceAfterGameProfile}"
                                   Margin="0,0,0,8" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                        <Border Style="{StaticResource SectionHeaderBorder}">
+            <TabItem Header="{DynamicResource LOCAS_SpatialSoundTitle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
                             <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
                         </Border>
                         <TextBlock Text="{DynamicResource LOCAS_SpatialSoundHelp}"
@@ -116,11 +141,6 @@
                                    Margin="0,0,0,3" />
                         <TextBox Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="0,0,0,12" />
-
-                        <Border BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="1" Padding="10" Opacity="0.9">
-                            <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}"
-                                       TextWrapping="Wrap" />
-                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
