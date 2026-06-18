@@ -5,6 +5,8 @@
     <sys:String x:Key="LOCAS_Audio">Audio</sys:String>
     <sys:String x:Key="LOCAS_SettingsGeneral">General</sys:String>
     <sys:String x:Key="LOCAS_DevicesTab">Devices</sys:String>
+    <sys:String x:Key="LOCAS_OutputTab">Output</sys:String>
+    <sys:String x:Key="LOCAS_InputTab">Input</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Fullscreen</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Custom names</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Enter a simple name for each output you want to use from Playnite. Devices without a custom name will still appear in the full selector.</sys:String>

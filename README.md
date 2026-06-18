@@ -46,7 +46,8 @@ Open:
 
 The settings window is organized by task:
 
-- **Devices**: friendly names, icons, visibility, default output volume, and default input volume.
+- **Output**: friendly names, icons, visibility, and default volume for playback devices.
+- **Input**: friendly names, icons, visibility, and default input volume for recording devices.
 - **Fullscreen**: controller quick switch and the volume step used by Fullscreen theme sliders or theme volume buttons.
 - **Game profiles**: automatic output/input switching per game and restore behavior after closing a game.
 - **Spatial sound**: experimental integration through a user-provided `SoundVolumeView.exe` or `svcl.exe`.

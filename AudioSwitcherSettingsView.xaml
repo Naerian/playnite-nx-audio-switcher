@@ -23,7 +23,7 @@
     </UserControl.Resources>
     <Grid Margin="12">
         <TabControl>
-            <TabItem Header="{DynamicResource LOCAS_DevicesTab}">
+            <TabItem Header="{DynamicResource LOCAS_OutputTab}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="8" HorizontalAlignment="Stretch">
@@ -35,8 +35,15 @@
                                    Margin="0,0,0,12" />
 
                         <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                        <Border Style="{StaticResource SectionHeaderBorder}">
+            <TabItem Header="{DynamicResource LOCAS_InputTab}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
                             <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
                         </Border>
                         <TextBlock Text="{DynamicResource LOCAS_InputDevicesHelp}"
