@@ -1,5 +1,17 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.0.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-06-18
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.0.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_0_0.pext
+    Changelog:
+      - Added Windows recording/input device switching for microphones, headset mics, webcams, capture cards, and virtual inputs.
+      - Added input device settings with custom names, icons, visibility, and default input volume.
+      - Added game profiles for both output and input devices, plus profile reset.
+      - Added Fullscreen theme integrations for input devices and microphone volume sliders.
+      - Expanded bundled Lucide icons and added automatic icon suggestions based on device names.
+      - Reorganized settings into Output, Input, Fullscreen, Game profiles, Spatial sound, and Notifications tabs.
+      - Added notification categories and grouped game-profile notifications.
   - Version: 0.8.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-06-17

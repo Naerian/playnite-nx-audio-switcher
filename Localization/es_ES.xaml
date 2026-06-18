@@ -34,7 +34,7 @@
     <sys:String x:Key="LOCAS_ShowNotification">Mostrar notificaciones al cambiar audio</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notificaciones</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Elige cuándo Audio Switcher muestra notificaciones informativas. Los errores importantes se muestran siempre.</sys:String>
-    <sys:String x:Key="LOCAS_NotificationCategories">Notificar al</sys:String>
+    <sys:String x:Key="LOCAS_NotificationCategories">Notificaciones por cambios</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDevice">Cambios de dispositivo de salida</sys:String>
     <sys:String x:Key="LOCAS_NotifyInputDevice">Cambios de dispositivo de entrada</sys:String>
     <sys:String x:Key="LOCAS_NotifyVolume">Cambios de volumen</sys:String>
