@@ -81,8 +81,17 @@
     <sys:String x:Key="LOCAS_GameProfileApplied">Perfil de juego aplicado</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Sonido espacial</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: permite que Audio Switcher llame a un ejecutable externo de SoundVolumeView o svcl para cambiar el Sonido espacial de Windows en la salida predeterminada actual.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundNotBundled">Audio Switcher no incluye estas herramientas de terceros. Descarga una de ellas desde NirSoft y selecciona aquí su ejecutable.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolInfo">SoundVolumeView es una utilidad portable de NirSoft para gestionar el audio de Windows con interfaz grafica y soporte de linea de comandos. svcl es la version solo consola de la misma herramienta y usa la misma sintaxis de comandos.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Activar integración experimental de Sonido espacial</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolPath">Ruta de SoundVolumeView.exe o svcl.exe</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundBrowseTitle">Seleccionar SoundVolumeView.exe o svcl.exe</sys:String>
+    <sys:String x:Key="LOCAS_Browse">Examinar</sys:String>
+    <sys:String x:Key="LOCAS_Test">Probar</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusEmpty">No se ha seleccionado ninguna herramienta de Sonido espacial.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusMissing">El archivo seleccionado no existe.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusReady">{0} detectado.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusUnknownExe">El archivo seleccionado no parece ser SoundVolumeView.exe ni svcl.exe.</sys:String>
     <sys:String x:Key="LOCAS_SpatialDoNotChange">No cambiar</sys:String>
     <sys:String x:Key="LOCAS_SpatialOff">Desactivado</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">La ruta de la herramienta de Sonido espacial no está configurada o no existe.</sys:String>

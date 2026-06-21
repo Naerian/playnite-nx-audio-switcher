@@ -96,11 +96,13 @@ Audio Switcher can optionally call an external tool to change Windows Spatial So
 
 This feature is disabled by default and Audio Switcher does not bundle third-party executables. To test it:
 
-1. Download either SoundVolumeView or svcl from NirSoft.
+1. Download either [SoundVolumeView](https://www.nirsoft.net/utils/sound_volume_view.html) or [svcl](https://www.nirsoft.net/utils/sound_volume_command_line.html) from NirSoft.
 2. Open Audio Switcher settings.
 3. Enable the experimental Spatial Sound integration.
-4. Set the path to `SoundVolumeView.exe` or `svcl.exe`.
+4. Set the path to `SoundVolumeView.exe` or `svcl.exe`, or use the **Browse** button in the Spatial sound settings tab.
 5. Use a game's `Audio Switcher > Spatial sound` submenu to choose `Do not change`, `Off`, `Windows Sonic for Headphones`, `Dolby Atmos for Headphones`, or `Dolby Atmos for home theater`.
+
+`SoundVolumeView.exe` is NirSoft's portable Windows audio utility with a graphical interface and command-line support. `svcl.exe` is NirSoft's console-only version of the same tool and uses the same command syntax.
 
 When a game profile starts, Audio Switcher switches the configured output device first and then applies the selected Spatial Sound mode to the current default render device.
 

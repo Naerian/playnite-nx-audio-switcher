@@ -140,14 +140,61 @@
                                    TextWrapping="Wrap"
                                    Margin="0,0,0,8" />
 
+                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundNotBundled}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
+
+                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolInfo}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,4" />
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,0,12">
+                            <TextBlock Margin="0,0,16,0">
+                                <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_view.html"
+                                           RequestNavigate="OpenExternalLink">
+                                    SoundVolumeView
+                                </Hyperlink>
+                            </TextBlock>
+                            <TextBlock>
+                                <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_command_line.html"
+                                           RequestNavigate="OpenExternalLink">
+                                    svcl
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+
                         <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
                                   IsChecked="{Binding SpatialSoundIntegrationEnabled}"
                                   Margin="0,0,0,8" />
 
                         <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}"
                                    Margin="0,0,0,3" />
-                        <TextBox Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
-                                 Margin="0,0,0,12" />
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="SpatialSoundToolPathBox"
+                                     Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
+                                     TextChanged="SpatialSoundToolPathChanged"
+                                     Margin="0,0,8,0" />
+                            <Button Grid.Column="1"
+                                    Content="{DynamicResource LOCAS_Browse}"
+                                    MinWidth="90"
+                                    Margin="0,0,8,0"
+                                    Click="BrowseSpatialSoundToolPath" />
+                            <Button Grid.Column="2"
+                                    Content="{DynamicResource LOCAS_Test}"
+                                    MinWidth="80"
+                                    Click="TestSpatialSoundToolPath" />
+                        </Grid>
+
+                        <TextBlock x:Name="SpatialSoundToolStatus"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.85"
+                                   Margin="0,-4,0,12" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

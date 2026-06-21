@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
+using Microsoft.Win32;
+using IoFile = System.IO.File;
+using IoPath = System.IO.Path;
 
 namespace PlayniteAudioSwitcher
 {
@@ -14,7 +19,11 @@ namespace PlayniteAudioSwitcher
         {
             InitializeComponent();
             DataContextChanged += (_, __) => RebuildDeviceRows();
-            Loaded += (_, __) => RebuildDeviceRows();
+            Loaded += (_, __) =>
+            {
+                RebuildDeviceRows();
+                UpdateSpatialSoundToolStatus();
+            };
         }
 
         private void RebuildDeviceRows()
@@ -229,6 +238,92 @@ namespace PlayniteAudioSwitcher
             var hasValue = enabled.IsChecked == true;
             slider.IsEnabled = hasValue;
             value.Text = hasValue ? $"{Math.Max(0, Math.Min(100, device.DefaultVolumePercent ?? (int)Math.Round(slider.Value)))}%" : "-";
+        }
+
+        private void BrowseSpatialSoundToolPath(object sender, RoutedEventArgs e)
+        {
+            if (!(DataContext is AudioSwitcherSettings settings))
+            {
+                return;
+            }
+
+            var dialog = new OpenFileDialog
+            {
+                Title = TryFindResource("LOCAS_SpatialSoundBrowseTitle") as string ?? "Select SoundVolumeView.exe or svcl.exe",
+                Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*",
+                CheckFileExists = true,
+                Multiselect = false
+            };
+
+            if (!string.IsNullOrWhiteSpace(settings.SpatialSoundToolPath) && IoFile.Exists(settings.SpatialSoundToolPath))
+            {
+                dialog.InitialDirectory = IoPath.GetDirectoryName(settings.SpatialSoundToolPath);
+                dialog.FileName = IoPath.GetFileName(settings.SpatialSoundToolPath);
+            }
+
+            if (dialog.ShowDialog() == true)
+            {
+                settings.SpatialSoundToolPath = dialog.FileName;
+                UpdateSpatialSoundToolStatus();
+            }
+        }
+
+        private void SpatialSoundToolPathChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateSpatialSoundToolStatus();
+        }
+
+        private void TestSpatialSoundToolPath(object sender, RoutedEventArgs e)
+        {
+            var title = TryFindResource("LOCAS_SpatialSoundTitle") as string ?? "Spatial sound";
+            MessageBox.Show(GetSpatialSoundToolStatus(), title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void UpdateSpatialSoundToolStatus()
+        {
+            if (SpatialSoundToolStatus == null)
+            {
+                return;
+            }
+
+            SpatialSoundToolStatus.Text = GetSpatialSoundToolStatus();
+        }
+
+        private string GetSpatialSoundToolStatus()
+        {
+            var path = (DataContext as AudioSwitcherSettings)?.SpatialSoundToolPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return TryFindResource("LOCAS_SpatialSoundToolStatusEmpty") as string ?? "No Spatial Sound tool selected.";
+            }
+
+            if (!IoFile.Exists(path))
+            {
+                return TryFindResource("LOCAS_SpatialSoundToolStatusMissing") as string ?? "The selected file does not exist.";
+            }
+
+            var fileName = IoPath.GetFileName(path);
+            if (string.Equals(fileName, "SoundVolumeView.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Format(TryFindResource("LOCAS_SpatialSoundToolStatusReady") as string ?? "{0} detected.", "SoundVolumeView.exe");
+            }
+
+            if (string.Equals(fileName, "svcl.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Format(TryFindResource("LOCAS_SpatialSoundToolStatusReady") as string ?? "{0} detected.", "svcl.exe");
+            }
+
+            return TryFindResource("LOCAS_SpatialSoundToolStatusUnknownExe") as string ??
+                   "The selected file does not look like SoundVolumeView.exe or svcl.exe.";
+        }
+
+        private void OpenExternalLink(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true
+            });
+            e.Handled = true;
         }
 
         private static DataTemplate CreateIconTemplate()

@@ -81,8 +81,17 @@
     <sys:String x:Key="LOCAS_GameProfileApplied">Game profile applied</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundTitle">Spatial sound</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: allows Audio Switcher to call an external SoundVolumeView or svcl executable to change Windows Spatial Sound on the current default output device.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundNotBundled">Audio Switcher does not include these third-party tools. Download one of them from NirSoft and select its executable here.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolInfo">SoundVolumeView is NirSoft's portable Windows audio utility with a graphical interface and command-line support. svcl is the console-only version of the same tool and uses the same command syntax.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Enable experimental Spatial Sound integration</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolPath">SoundVolumeView.exe or svcl.exe path</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundBrowseTitle">Select SoundVolumeView.exe or svcl.exe</sys:String>
+    <sys:String x:Key="LOCAS_Browse">Browse</sys:String>
+    <sys:String x:Key="LOCAS_Test">Test</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusEmpty">No Spatial Sound tool selected.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusMissing">The selected file does not exist.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusReady">{0} detected.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialSoundToolStatusUnknownExe">The selected file does not look like SoundVolumeView.exe or svcl.exe.</sys:String>
     <sys:String x:Key="LOCAS_SpatialDoNotChange">Do not change</sys:String>
     <sys:String x:Key="LOCAS_SpatialOff">Off</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">Spatial Sound tool path is not configured or does not exist.</sys:String>
