@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">音频输入</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">配置的音频输入设备当前未处于活动状态。</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">音频输入切换失败</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">没有可用的录音设备</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">未知设备</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">快速切换会循环所有活动设备</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">快速切换会循环活动的输出设备。</sys:String>

@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">Аудиоввод</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">Настроенное устройство аудиоввода сейчас не активно.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">Не удалось переключить аудиоввод</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">Нет доступного устройства записи</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Неизвестное устройство</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Быстрое переключение перебирает все активные устройства</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Быстрое переключение перебирает активные устройства вывода.</sys:String>

@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">오디오 입력</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">설정된 오디오 입력 장치가 현재 활성 상태가 아닙니다.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">오디오 입력 전환 실패</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">사용 가능한 녹음 장치가 없습니다</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">알 수 없는 장치</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">빠른 전환은 모든 활성 장치를 순환합니다</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">빠른 전환은 활성 출력 장치를 순환합니다.</sys:String>

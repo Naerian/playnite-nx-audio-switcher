@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">Ses girişi</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">Yapılandırılan ses giriş aygıtı şu anda etkin değil.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">Ses girişi değiştirilemedi</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">Kullanılabilir kayıt aygıtı yok</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Bilinmeyen aygıt</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Hızlı geçiş tüm etkin aygıtlar arasında dolaşır</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Hızlı geçiş etkin çıkış aygıtları arasında dolaşır.</sys:String>

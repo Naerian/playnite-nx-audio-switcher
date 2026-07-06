@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">Audioeingabe</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">Das konfigurierte Audioeingabegerät ist derzeit nicht aktiv.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">Wechsel der Audioeingabe fehlgeschlagen</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">Kein Aufnahmegerät verfügbar</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Unbekanntes Gerät</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Schnellwechsel durchläuft alle aktiven Geräte</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Der Schnellwechsel durchläuft aktive Ausgabegeräte.</sys:String>

@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">Entrada de audio</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">El dispositivo de entrada configurado no está activo ahora mismo.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">No se pudo cambiar la entrada de audio</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">No hay dispositivo de grabación disponible</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Dispositivo desconocido</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">El acceso rápido alterna entre todos los dispositivos activos</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">El acceso rápido alterna entre los dispositivos de salida activos.</sys:String>

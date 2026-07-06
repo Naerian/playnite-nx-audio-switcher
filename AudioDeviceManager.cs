@@ -6,6 +6,8 @@ namespace PlayniteAudioSwitcher
 {
     public sealed class AudioDeviceManager
     {
+        private const int HResultElementNotFound = unchecked((int)0x80070490);
+
         public IReadOnlyList<AudioDevice> GetPlaybackDevices()
         {
             return GetDevices(EDataFlow.eRender);
@@ -119,7 +121,13 @@ namespace PlayniteAudioSwitcher
         private AudioDevice GetDefaultDevice(EDataFlow dataFlow)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device));
+            var result = enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device);
+            if (IsEndpointNotFound(result))
+            {
+                return null;
+            }
+
+            Marshal.ThrowExceptionForHR(result);
             Marshal.ThrowExceptionForHR(device.GetId(out var id));
 
             return new AudioDevice
@@ -146,6 +154,11 @@ namespace PlayniteAudioSwitcher
         private AudioVolumeState GetDefaultVolume(EDataFlow dataFlow)
         {
             var volume = GetDefaultVolumeEndpoint(dataFlow);
+            if (volume == null)
+            {
+                return new AudioVolumeState();
+            }
+
             Marshal.ThrowExceptionForHR(volume.GetMasterVolumeLevelScalar(out var level));
             Marshal.ThrowExceptionForHR(volume.GetMute(out var isMuted));
 
@@ -159,6 +172,11 @@ namespace PlayniteAudioSwitcher
         private void SetDefaultVolume(EDataFlow dataFlow, float volume)
         {
             var endpoint = GetDefaultVolumeEndpoint(dataFlow);
+            if (endpoint == null)
+            {
+                return;
+            }
+
             var eventContext = Guid.Empty;
             Marshal.ThrowExceptionForHR(endpoint.SetMasterVolumeLevelScalar(Clamp01(volume), ref eventContext));
         }
@@ -166,6 +184,11 @@ namespace PlayniteAudioSwitcher
         private void SetDefaultMute(EDataFlow dataFlow, bool isMuted)
         {
             var endpoint = GetDefaultVolumeEndpoint(dataFlow);
+            if (endpoint == null)
+            {
+                return;
+            }
+
             var eventContext = Guid.Empty;
             Marshal.ThrowExceptionForHR(endpoint.SetMute(isMuted, ref eventContext));
         }
@@ -178,7 +201,13 @@ namespace PlayniteAudioSwitcher
         private IAudioEndpointVolume GetDefaultVolumeEndpoint(EDataFlow dataFlow)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device));
+            var result = enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device);
+            if (IsEndpointNotFound(result))
+            {
+                return null;
+            }
+
+            Marshal.ThrowExceptionForHR(result);
             var interfaceId = typeof(IAudioEndpointVolume).GUID;
             Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
             try
@@ -191,11 +220,27 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public static bool IsEndpointNotFoundException(Exception exception)
+        {
+            return exception is COMException comException && IsEndpointNotFound(comException.ErrorCode);
+        }
+
+        private static bool IsEndpointNotFound(int hresult)
+        {
+            return hresult == HResultElementNotFound;
+        }
+
         private static string GetDefaultDeviceId(IMMDeviceEnumerator enumerator, EDataFlow dataFlow)
         {
             try
             {
-                Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device));
+                var result = enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device);
+                if (IsEndpointNotFound(result))
+                {
+                    return null;
+                }
+
+                Marshal.ThrowExceptionForHR(result);
                 Marshal.ThrowExceptionForHR(device.GetId(out var id));
                 return id;
             }

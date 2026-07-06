@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">Entrée audio</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">Le périphérique d'entrée audio configuré n'est pas actif actuellement.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">Échec du changement d'entrée audio</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">Aucun périphérique d'enregistrement disponible</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Périphérique inconnu</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Le changement rapide parcourt tous les périphériques actifs</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Le changement rapide parcourt les périphériques de sortie actifs.</sys:String>

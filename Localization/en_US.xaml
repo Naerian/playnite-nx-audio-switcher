@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">Audio input</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">The configured audio input device is not currently active.</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">Audio input switch failed</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">No recording device available</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">Unknown device</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">Quick switch cycles through all active devices</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Quick switch cycles through active output devices.</sys:String>

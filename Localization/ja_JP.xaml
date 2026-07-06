@@ -63,6 +63,7 @@
     <sys:String x:Key="LOCAS_AudioInput">オーディオ入力</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredInputDeviceInactive">設定されたオーディオ入力デバイスは現在アクティブではありません。</sys:String>
     <sys:String x:Key="LOCAS_InputSwitchFailed">オーディオ入力の切り替えに失敗しました</sys:String>
+    <sys:String x:Key="LOCAS_NoRecordingDevicesAvailable">利用可能な録音デバイスがありません</sys:String>
     <sys:String x:Key="LOCAS_UnknownDevice">不明なデバイス</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchAllDevices">クイック切り替えですべてのアクティブデバイスを順に切り替える</sys:String>
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">クイック切り替えはアクティブな出力デバイスを順に切り替えます。</sys:String>

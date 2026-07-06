@@ -1,5 +1,14 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.0.5
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-07-06
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.0.5/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_0_5.pext
+    Changelog:
+      - Fixed game context menu failures when Windows has no default recording device.
+      - Treated Core Audio HRESULT 0x80070490 as no endpoint available instead of a fatal error.
+      - Added defensive handling for missing or dynamically changed playback and recording devices.
+      - Added clearer logs for missing audio endpoints versus real audio errors.
   - Version: 1.0.4
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-06-21
