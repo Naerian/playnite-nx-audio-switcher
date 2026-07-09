@@ -32,9 +32,16 @@ namespace PlayniteAudioSwitcher
         private int currentInputVolumePercent;
         private string currentInputVolumeLabel;
         private bool isInputMuted;
+        private float currentGameVolume;
+        private int currentGameVolumePercent;
+        private string currentGameVolumeLabel;
+        private bool isGameMuted;
+        private bool hasActiveGameAudioSession;
+        private string currentGameName;
         private int volumeStepPercent;
         private bool isRefreshingVolume;
         private bool isRefreshingInputVolume;
+        private bool isRefreshingGameVolume;
         private int highlightedDeviceIndex = -1;
         private DateTime confirmAvailableAt = DateTime.MinValue;
 
@@ -75,6 +82,11 @@ namespace PlayniteAudioSwitcher
             ToggleInputMuteCommand = new RelayCommand(ToggleInputMute);
             RefreshInputVolumeCommand = new RelayCommand(RefreshInputVolume);
             SetInputVolumeCommand = new RelayCommand<object>(SetInputVolume);
+            GameVolumeUpCommand = new RelayCommand(() => ChangeGameVolume(1));
+            GameVolumeDownCommand = new RelayCommand(() => ChangeGameVolume(-1));
+            ToggleGameMuteCommand = new RelayCommand(ToggleGameMute);
+            RefreshGameVolumeCommand = new RelayCommand(RefreshGameVolume);
+            SetGameVolumeCommand = new RelayCommand<object>(SetGameVolume);
         }
 
         public ObservableCollection<AudioSwitcherThemeDevice> Devices { get; }
@@ -120,6 +132,16 @@ namespace PlayniteAudioSwitcher
         public ICommand RefreshInputVolumeCommand { get; }
 
         public ICommand SetInputVolumeCommand { get; }
+
+        public ICommand GameVolumeUpCommand { get; }
+
+        public ICommand GameVolumeDownCommand { get; }
+
+        public ICommand ToggleGameMuteCommand { get; }
+
+        public ICommand RefreshGameVolumeCommand { get; }
+
+        public ICommand SetGameVolumeCommand { get; }
 
         public bool IsSelectorOpen
         {
@@ -279,6 +301,64 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref isInputMuted, value);
         }
 
+        public float CurrentGameVolume
+        {
+            get => currentGameVolume;
+            set
+            {
+                var normalized = Math.Max(0f, Math.Min(1f, value));
+                if (isRefreshingGameVolume)
+                {
+                    SetValue(ref currentGameVolume, normalized);
+                    return;
+                }
+
+                plugin.SetGameVolume(normalized, false);
+                RefreshGameVolume();
+            }
+        }
+
+        public int CurrentGameVolumePercent
+        {
+            get => currentGameVolumePercent;
+            set
+            {
+                var normalized = Math.Max(0, Math.Min(100, value));
+                if (isRefreshingGameVolume)
+                {
+                    SetValue(ref currentGameVolumePercent, normalized);
+                    return;
+                }
+
+                plugin.SetGameVolume(normalized / 100f, false);
+                RefreshGameVolume();
+            }
+        }
+
+        public string CurrentGameVolumeLabel
+        {
+            get => currentGameVolumeLabel;
+            private set => SetValue(ref currentGameVolumeLabel, value);
+        }
+
+        public bool IsGameMuted
+        {
+            get => isGameMuted;
+            private set => SetValue(ref isGameMuted, value);
+        }
+
+        public bool HasActiveGameAudioSession
+        {
+            get => hasActiveGameAudioSession;
+            private set => SetValue(ref hasActiveGameAudioSession, value);
+        }
+
+        public string CurrentGameName
+        {
+            get => currentGameName;
+            private set => SetValue(ref currentGameName, value);
+        }
+
         public int VolumeStepPercent
         {
             get => volumeStepPercent;
@@ -389,6 +469,8 @@ namespace PlayniteAudioSwitcher
             CurrentInputDeviceLabel = plugin.GetCurrentInputDeviceDisplayLabel();
             CurrentInputDeviceIconGeometry = plugin.GetCurrentInputDeviceIconGeometry() ?? plugin.GetIconGeometry("mic");
             RefreshInputVolume();
+            CurrentGameName = plugin.GetCurrentGameName();
+            RefreshGameVolume();
 
             var devices = plugin.GetThemeSelectorDevices(false)
                 .OrderBy(a => a.EffectiveName)
@@ -590,6 +672,38 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        private void RefreshGameVolume()
+        {
+            try
+            {
+                var state = plugin.GetCurrentGameVolumeState();
+                SetGameVolumeState(state.Volume, state.VolumePercent, state.IsMuted, state.IsAvailable);
+            }
+            catch
+            {
+                SetGameVolumeState(0, 0, false, false, string.Empty);
+            }
+        }
+
+        private void SetGameVolumeState(float volume, int volumePercent, bool muted, bool isAvailable, string label = null)
+        {
+            isRefreshingGameVolume = true;
+            try
+            {
+                CurrentGameVolume = volume;
+                CurrentGameVolumePercent = volumePercent;
+                IsGameMuted = muted;
+                HasActiveGameAudioSession = isAvailable;
+                CurrentGameVolumeLabel = label ?? (isAvailable
+                    ? muted ? plugin.Loc("LOCAS_GameMuted") : $"{volumePercent}%"
+                    : plugin.Loc("LOCAS_GameVolumeUnavailable"));
+            }
+            finally
+            {
+                isRefreshingGameVolume = false;
+            }
+        }
+
         private void ChangeVolume(int direction)
         {
             plugin.ChangeVolumeByStep(direction);
@@ -602,6 +716,12 @@ namespace PlayniteAudioSwitcher
             RefreshInputVolume();
         }
 
+        private void ChangeGameVolume(int direction)
+        {
+            plugin.ChangeGameVolumeByStep(direction);
+            RefreshGameVolume();
+        }
+
         private void ToggleMute()
         {
             plugin.ToggleMute();
@@ -612,6 +732,12 @@ namespace PlayniteAudioSwitcher
         {
             plugin.ToggleInputMute();
             RefreshInputVolume();
+        }
+
+        private void ToggleGameMute()
+        {
+            plugin.ToggleGameMute();
+            RefreshGameVolume();
         }
 
         private void SetVolume(object parameter)
@@ -634,6 +760,17 @@ namespace PlayniteAudioSwitcher
 
             plugin.SetInputVolume(volume, false);
             RefreshInputVolume();
+        }
+
+        private void SetGameVolume(object parameter)
+        {
+            if (!TryGetVolumeScalar(parameter, out var volume))
+            {
+                return;
+            }
+
+            plugin.SetGameVolume(volume, false);
+            RefreshGameVolume();
         }
 
         private static bool TryGetVolumeScalar(object parameter, out float volume)

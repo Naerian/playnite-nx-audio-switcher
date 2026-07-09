@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
@@ -109,4 +109,10 @@
     <sys:String x:Key="LOCAS_InputMuted">麦克风已静音</sys:String>
     <sys:String x:Key="LOCAS_InputUnmuted">麦克风已开启</sys:String>
     <sys:String x:Key="LOCAS_InputVolumeFailed">输入音量更改失败</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeTitle">游戏音量</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeDefault">不更改游戏音量</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeUnavailable">没有游戏音频</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeFailed">游戏音量更改失败</sys:String>
+    <sys:String x:Key="LOCAS_GameMuted">游戏已静音</sys:String>
+    <sys:String x:Key="LOCAS_GameUnmuted">游戏声音已开启</sys:String>
 </ResourceDictionary>

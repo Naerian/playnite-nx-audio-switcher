@@ -17,7 +17,7 @@ It is designed for couch and console-like setups where users often move between 
 - Hide audio devices you do not want to see in Audio Switcher menus.
 - Full device selector for manual switching.
 - Native volume controls for the current default output and input devices.
-- Game-specific output and input audio profiles from the game context menu.
+- Game-specific output, input, Spatial Sound, and game session volume profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
 - Theme integration controls for theme authors.
@@ -50,7 +50,7 @@ The settings window is organized by task:
 - **Output**: friendly names, icons, visibility, and default volume for playback devices.
 - **Input**: friendly names, icons, visibility, and default input volume for recording devices.
 - **Fullscreen**: controller quick switch and the volume step used by Fullscreen theme sliders or theme volume buttons.
-- **Game profiles**: automatic output/input switching per game and restore behavior after closing a game.
+- **Game profiles**: automatic output/input switching, Spatial Sound, game session volume, and restore behavior after closing a game.
 - **Spatial sound**: experimental integration through a user-provided `SoundVolumeView.exe` or `svcl.exe`.
 - **Notifications**: informational notifications by category, including output changes, input changes, volume, mute, game profiles, and Spatial Sound.
 
@@ -82,13 +82,17 @@ Open a game's context menu and go to:
 
 You can set an output device from `Audio Switcher > Choose output device`. The `Choose input device` submenu lets you set a microphone, headset mic, webcam mic, capture card input, or any other active Windows recording device for that game.
 
-If the game does not have a saved profile yet, the current Windows default output and input devices are marked in their respective menus. When the game starts, the plugin switches to the selected devices if game profiles are enabled. When the game stops, the plugin can restore the previous output and input devices if that option is enabled.
+The `Game volume` submenu lets you optionally choose a launch volume for that specific game. Audio Switcher applies this after Playnite reports the game process as started, then retries briefly while Windows creates the game's audio session.
+
+If the game does not have a saved profile yet, the current Windows default output and input devices are marked in their respective menus. When the game starts, the plugin switches to the selected devices and applies the selected game volume if game profiles are enabled. When the game stops, the plugin can restore the previous output and input devices if that option is enabled.
 
 Use `Audio Switcher > Reset game profile` to remove all saved Audio Switcher settings for that game.
 
 Some games keep using the audio device they opened on startup. If a running game does not move to the new output, switch audio before launching it or restart the game.
 
 The same caveat may apply to input devices: some games only read the microphone device during startup or voice chat initialization.
+
+Game volume control uses the same Windows audio session API that backs the Windows volume mixer. Audio Switcher first follows the process started by Playnite and its child processes, then falls back to running processes inside the game's install directory and newly created mixer sessions after launch. This covers common launcher flows while avoiding changes to unrelated apps.
 
 ## Experimental Spatial Sound
 
@@ -170,6 +174,12 @@ Useful properties:
 - `CurrentVolumePercent`
 - `CurrentVolumeLabel`
 - `IsMuted`
+- `CurrentGameName`
+- `CurrentGameVolume`
+- `CurrentGameVolumePercent`
+- `CurrentGameVolumeLabel`
+- `IsGameMuted`
+- `HasActiveGameAudioSession`
 - `VolumeStepPercent`
 - `Devices`
 - `AllDevices`
@@ -180,6 +190,8 @@ Useful properties:
 `CurrentDeviceName` is the friendly/custom name for the current output device. `CurrentDeviceIconGeometry` exposes the configured SVG icon geometry, falling back to a speaker icon when needed. `CurrentDeviceLabel` is a convenience label that combines icon text and device name for simple text-based placements.
 
 `CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted. `CurrentVolume` and `CurrentVolumePercent` can also be written by custom theme controls; writing either value changes the Windows volume.
+
+`CurrentGameVolume` and `CurrentGameVolumePercent` work the same way, but target the audio session of the game currently launched by Playnite. `HasActiveGameAudioSession` is `false` when no game is running or Windows has not created a matching game audio session yet. This is useful for overlays that should hide or disable a game-volume slider until it can actually control something.
 
 `VolumeStepPercent` is writable and controls how many percentage points the volume changes when a Fullscreen theme uses left/right on `AudioSwitcher_VolumeSlider`, `VolumeUpCommand`, or `VolumeDownCommand`. Desktop volume actions use the same step.
 
@@ -196,6 +208,11 @@ Useful commands:
 - `SetVolumeCommand`
 - `ToggleMuteCommand`
 - `RefreshVolumeCommand`
+- `GameVolumeUpCommand`
+- `GameVolumeDownCommand`
+- `SetGameVolumeCommand`
+- `ToggleGameMuteCommand`
+- `RefreshGameVolumeCommand`
 
 Example icon button:
 
@@ -256,6 +273,23 @@ Theme authors who prefer their own slider can bind to `CurrentVolumePercent` wit
 <Slider Minimum="0"
         Maximum="100"
         Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumePercent, Mode=TwoWay}" />
+```
+
+Recommended bundled current game volume slider:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_GameVolumeSlider" />
+```
+
+`AudioSwitcher_GameVolumeSlider` creates a real focusable slider for the running game's Windows audio session, supports left/right keyboard or gamepad navigation, uses `VolumeStepPercent`, and disables itself when no matching game audio session is available.
+
+Custom current game volume slider:
+
+```xml
+<Slider Minimum="0"
+        Maximum="100"
+        IsEnabled="{PluginSettings Plugin=AudioSwitcher, Path=HasActiveGameAudioSession}"
+        Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentGameVolumePercent, Mode=TwoWay}" />
 ```
 
 Input devices use the same pattern with input-specific properties and commands:
@@ -370,6 +404,12 @@ Place a controller-friendly volume slider:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_VolumeSlider" />
+```
+
+Place a controller-friendly current game volume slider:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_GameVolumeSlider" />
 ```
 
 Place a controller-friendly input device list and input volume slider:

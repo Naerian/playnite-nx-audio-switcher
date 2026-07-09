@@ -109,6 +109,12 @@
     <sys:String x:Key="LOCAS_InputMuted">Micrófono silenciado</sys:String>
     <sys:String x:Key="LOCAS_InputUnmuted">Micrófono activado</sys:String>
     <sys:String x:Key="LOCAS_InputVolumeFailed">No se pudo cambiar el volumen de entrada</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeTitle">Volumen del juego</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeDefault">No cambiar el volumen del juego</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeUnavailable">Sin audio del juego</sys:String>
+    <sys:String x:Key="LOCAS_GameVolumeFailed">No se pudo cambiar el volumen del juego</sys:String>
+    <sys:String x:Key="LOCAS_GameMuted">Juego silenciado</sys:String>
+    <sys:String x:Key="LOCAS_GameUnmuted">Sonido del juego activado</sys:String>
 </ResourceDictionary>
 
 

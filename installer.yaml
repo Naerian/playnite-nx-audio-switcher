@@ -1,5 +1,16 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.1.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-07-10
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.1.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_1_0.pext
+    Changelog:
+      - Added per-game volume profiles through the game context menu.
+      - Added Windows audio session volume control for the currently running game.
+      - Added Fullscreen theme integration for game volume through AudioSwitcher_GameVolumeSlider.
+      - Added writable PluginSettings properties and commands for custom game-volume theme controls.
+      - Improved game audio session detection for launchers, Steam games, install-directory processes, and newly created mixer sessions.
+      - Fixed audio session enumeration by using the correct IAudioSessionControl COM interface.
   - Version: 1.0.5
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-07-06

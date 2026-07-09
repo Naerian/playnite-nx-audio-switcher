@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace PlayniteAudioSwitcher
@@ -70,6 +71,98 @@ namespace PlayniteAudioSwitcher
             SetDefaultRecordingVolume(state.Volume + delta);
         }
 
+        public AudioVolumeState GetProcessTreeVolume(int rootProcessId)
+        {
+            var session = GetProcessTreeVolumeSessions(rootProcessId).FirstOrDefault();
+            if (session == null)
+            {
+                return new AudioVolumeState { IsAvailable = false };
+            }
+
+            Marshal.ThrowExceptionForHR(session.GetMasterVolume(out var level));
+            Marshal.ThrowExceptionForHR(session.GetMute(out var isMuted));
+
+            return new AudioVolumeState
+            {
+                IsAvailable = true,
+                Volume = Clamp01(level),
+                IsMuted = isMuted
+            };
+        }
+
+        public bool SetProcessTreeVolume(int rootProcessId, float volume)
+        {
+            var sessions = GetProcessTreeVolumeSessions(rootProcessId);
+            return SetVolumeForSessions(sessions, volume);
+        }
+
+        public bool ChangeProcessTreeVolume(int rootProcessId, float delta)
+        {
+            var state = GetProcessTreeVolume(rootProcessId);
+            if (!state.IsAvailable)
+            {
+                return false;
+            }
+
+            return SetProcessTreeVolume(rootProcessId, state.Volume + delta);
+        }
+
+        public bool SetProcessTreeMute(int rootProcessId, bool isMuted)
+        {
+            var sessions = GetProcessTreeVolumeSessions(rootProcessId);
+            return SetMuteForSessions(sessions, isMuted);
+        }
+
+        public bool ToggleProcessTreeMute(int rootProcessId)
+        {
+            var state = GetProcessTreeVolume(rootProcessId);
+            if (!state.IsAvailable)
+            {
+                return false;
+            }
+
+            return SetProcessTreeMute(rootProcessId, !state.IsMuted);
+        }
+
+        public IReadOnlyCollection<uint> GetPlaybackAudioSessionProcessIds()
+        {
+            return GetPlaybackAudioSessionProcessIds(null);
+        }
+
+        public IReadOnlyCollection<uint> GetProcessTreeAudioSessionProcessIds(int rootProcessId)
+        {
+            return GetPlaybackAudioSessionProcessIds(GetProcessTreeIds(rootProcessId));
+        }
+
+        public bool SetProcessVolumes(IEnumerable<uint> processIds, float volume)
+        {
+            return SetVolumeForSessions(GetVolumeSessionsForProcessIds(new HashSet<uint>(processIds ?? Enumerable.Empty<uint>())), volume);
+        }
+
+        public bool SetProcessMutes(IEnumerable<uint> processIds, bool isMuted)
+        {
+            return SetMuteForSessions(GetVolumeSessionsForProcessIds(new HashSet<uint>(processIds ?? Enumerable.Empty<uint>())), isMuted);
+        }
+
+        public AudioVolumeState GetProcessVolume(IEnumerable<uint> processIds)
+        {
+            var session = GetVolumeSessionsForProcessIds(new HashSet<uint>(processIds ?? Enumerable.Empty<uint>())).FirstOrDefault();
+            if (session == null)
+            {
+                return new AudioVolumeState { IsAvailable = false };
+            }
+
+            Marshal.ThrowExceptionForHR(session.GetMasterVolume(out var level));
+            Marshal.ThrowExceptionForHR(session.GetMute(out var isMuted));
+
+            return new AudioVolumeState
+            {
+                IsAvailable = true,
+                Volume = Clamp01(level),
+                IsMuted = isMuted
+            };
+        }
+
         public void SetDefaultPlaybackMute(bool isMuted)
         {
             SetDefaultMute(EDataFlow.eRender, isMuted);
@@ -116,6 +209,268 @@ namespace PlayniteAudioSwitcher
             }
 
             return devices;
+        }
+
+        private IReadOnlyList<ISimpleAudioVolume> GetProcessTreeVolumeSessions(int rootProcessId)
+        {
+            var processIds = GetProcessTreeIds(rootProcessId);
+            return GetVolumeSessionsForProcessIds(processIds);
+        }
+
+        private IReadOnlyCollection<uint> GetPlaybackAudioSessionProcessIds(HashSet<uint> filterProcessIds)
+        {
+            var processIds = new HashSet<uint>();
+            foreach (var session in EnumeratePlaybackSessions(filterProcessIds))
+            {
+                processIds.Add(session.ProcessId);
+            }
+
+            return processIds;
+        }
+
+        private IReadOnlyList<ISimpleAudioVolume> GetVolumeSessionsForProcessIds(HashSet<uint> processIds)
+        {
+            var sessions = new List<ISimpleAudioVolume>();
+            if (processIds == null || processIds.Count == 0)
+            {
+                return sessions;
+            }
+
+            foreach (var session in EnumeratePlaybackSessions(processIds))
+            {
+                if (session.Volume != null)
+                {
+                    sessions.Add(session.Volume);
+                }
+            }
+
+            return sessions;
+        }
+
+        private IReadOnlyList<AudioSessionInfo> EnumeratePlaybackSessions(HashSet<uint> filterProcessIds)
+        {
+            var sessions = new List<AudioSessionInfo>();
+            foreach (var device in GetEndpointDevices(EDataFlow.eRender))
+            {
+                try
+                {
+                    var interfaceId = typeof(IAudioSessionManager2).GUID;
+                    Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
+                    try
+                    {
+                        var manager = (IAudioSessionManager2)Marshal.GetObjectForIUnknown(interfacePointer);
+                        Marshal.ThrowExceptionForHR(manager.GetSessionEnumerator(out var sessionEnumerator));
+                        Marshal.ThrowExceptionForHR(sessionEnumerator.GetCount(out var count));
+
+                        for (var i = 0; i < count; i++)
+                        {
+                            Marshal.ThrowExceptionForHR(sessionEnumerator.GetSession(i, out var control));
+                            var control2 = QueryAudioSessionControl2(control);
+                            if (control2 == null)
+                            {
+                                continue;
+                            }
+
+                            Marshal.ThrowExceptionForHR(control2.GetProcessId(out var sessionProcessId));
+                            if (sessionProcessId == 0 ||
+                                filterProcessIds != null && !filterProcessIds.Contains(sessionProcessId))
+                            {
+                                continue;
+                            }
+
+                            var volume = QuerySimpleAudioVolume(control);
+                            if (volume != null)
+                            {
+                                sessions.Add(new AudioSessionInfo
+                                {
+                                    ProcessId = sessionProcessId,
+                                    Volume = volume
+                                });
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.Release(interfacePointer);
+                    }
+                }
+                catch
+                {
+                    // Sessions are short-lived; ignore endpoints/sessions that disappear while enumerating.
+                }
+            }
+
+            return sessions;
+        }
+
+        private static bool SetVolumeForSessions(IReadOnlyList<ISimpleAudioVolume> sessions, float volume)
+        {
+            if (sessions == null || sessions.Count == 0)
+            {
+                return false;
+            }
+
+            var eventContext = Guid.Empty;
+            foreach (var session in sessions)
+            {
+                Marshal.ThrowExceptionForHR(session.SetMasterVolume(Clamp01(volume), ref eventContext));
+            }
+
+            return true;
+        }
+
+        private static bool SetMuteForSessions(IReadOnlyList<ISimpleAudioVolume> sessions, bool isMuted)
+        {
+            if (sessions == null || sessions.Count == 0)
+            {
+                return false;
+            }
+
+            var eventContext = Guid.Empty;
+            foreach (var session in sessions)
+            {
+                Marshal.ThrowExceptionForHR(session.SetMute(isMuted, ref eventContext));
+            }
+
+            return true;
+        }
+
+        private IReadOnlyList<IMMDevice> GetEndpointDevices(EDataFlow dataFlow)
+        {
+            var devices = new List<IMMDevice>();
+            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active, out var collection));
+            Marshal.ThrowExceptionForHR(collection.GetCount(out var count));
+
+            for (uint i = 0; i < count; i++)
+            {
+                Marshal.ThrowExceptionForHR(collection.Item(i, out var device));
+                devices.Add(device);
+            }
+
+            return devices;
+        }
+
+        private static ISimpleAudioVolume QuerySimpleAudioVolume(IAudioSessionControl control)
+        {
+            var unknown = Marshal.GetIUnknownForObject(control);
+            try
+            {
+                var interfaceId = typeof(ISimpleAudioVolume).GUID;
+                var result = Marshal.QueryInterface(unknown, ref interfaceId, out var interfacePointer);
+                if (result != 0 || interfacePointer == IntPtr.Zero)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    return (ISimpleAudioVolume)Marshal.GetObjectForIUnknown(interfacePointer);
+                }
+                finally
+                {
+                    Marshal.Release(interfacePointer);
+                }
+            }
+            finally
+            {
+                Marshal.Release(unknown);
+            }
+        }
+
+        private static IAudioSessionControl2 QueryAudioSessionControl2(IAudioSessionControl control)
+        {
+            var unknown = Marshal.GetIUnknownForObject(control);
+            try
+            {
+                var interfaceId = typeof(IAudioSessionControl2).GUID;
+                var result = Marshal.QueryInterface(unknown, ref interfaceId, out var interfacePointer);
+                if (result != 0 || interfacePointer == IntPtr.Zero)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    return (IAudioSessionControl2)Marshal.GetObjectForIUnknown(interfacePointer);
+                }
+                finally
+                {
+                    Marshal.Release(interfacePointer);
+                }
+            }
+            finally
+            {
+                Marshal.Release(unknown);
+            }
+        }
+
+        private static HashSet<uint> GetProcessTreeIds(int rootProcessId)
+        {
+            var result = new HashSet<uint>();
+            if (rootProcessId <= 0)
+            {
+                return result;
+            }
+
+            var root = (uint)rootProcessId;
+            result.Add(root);
+
+            var snapshot = CreateToolhelp32Snapshot(0x00000002, 0);
+            if (snapshot == IntPtr.Zero || snapshot == new IntPtr(-1))
+            {
+                return result;
+            }
+
+            try
+            {
+                var processes = new List<ProcessEntry32>();
+                var entry = new ProcessEntry32
+                {
+                    dwSize = (uint)Marshal.SizeOf(typeof(ProcessEntry32))
+                };
+
+                if (!Process32First(snapshot, ref entry))
+                {
+                    return result;
+                }
+
+                do
+                {
+                    processes.Add(entry);
+                }
+                while (Process32Next(snapshot, ref entry));
+
+                var added = true;
+                while (added)
+                {
+                    added = false;
+                    foreach (var process in processes)
+                    {
+                        if (result.Contains(process.th32ProcessID) ||
+                            !result.Contains(process.th32ParentProcessID))
+                        {
+                            continue;
+                        }
+
+                        result.Add(process.th32ProcessID);
+                        added = true;
+                    }
+                }
+            }
+            finally
+            {
+                CloseHandle(snapshot);
+            }
+
+            return result;
+        }
+
+        private sealed class AudioSessionInfo
+        {
+            public uint ProcessId { get; set; }
+
+            public ISimpleAudioVolume Volume { get; set; }
         }
 
         private AudioDevice GetDefaultDevice(EDataFlow dataFlow)
@@ -409,6 +764,144 @@ namespace PlayniteAudioSwitcher
         }
 
         [ComImport]
+        [Guid("77AA99A0-1BD6-484F-8BC7-2C654C9A9B6F")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioSessionManager2
+        {
+            [PreserveSig]
+            int GetAudioSessionControl(ref Guid audioSessionGuid, uint streamFlags, out IAudioSessionControl sessionControl);
+
+            [PreserveSig]
+            int GetSimpleAudioVolume(ref Guid audioSessionGuid, uint streamFlags, out ISimpleAudioVolume audioVolume);
+
+            [PreserveSig]
+            int GetSessionEnumerator(out IAudioSessionEnumerator sessionEnumerator);
+
+            [PreserveSig]
+            int RegisterSessionNotification(IntPtr sessionNotification);
+
+            [PreserveSig]
+            int UnregisterSessionNotification(IntPtr sessionNotification);
+
+            [PreserveSig]
+            int RegisterDuckNotification([MarshalAs(UnmanagedType.LPWStr)] string sessionId, IntPtr duckNotification);
+
+            [PreserveSig]
+            int UnregisterDuckNotification(IntPtr duckNotification);
+        }
+
+        [ComImport]
+        [Guid("E2F5BB11-0570-40CA-ACDD-3AA01277DEE8")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioSessionEnumerator
+        {
+            [PreserveSig]
+            int GetCount(out int sessionCount);
+
+            [PreserveSig]
+            int GetSession(int sessionIndex, out IAudioSessionControl sessionControl);
+        }
+
+        [ComImport]
+        [Guid("F4B1A599-7266-4319-A8CA-E70ACB11E8CD")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioSessionControl
+        {
+            [PreserveSig]
+            int GetState(out int state);
+
+            [PreserveSig]
+            int GetDisplayName([MarshalAs(UnmanagedType.LPWStr)] out string displayName);
+
+            [PreserveSig]
+            int SetDisplayName([MarshalAs(UnmanagedType.LPWStr)] string displayName, ref Guid eventContext);
+
+            [PreserveSig]
+            int GetIconPath([MarshalAs(UnmanagedType.LPWStr)] out string iconPath);
+
+            [PreserveSig]
+            int SetIconPath([MarshalAs(UnmanagedType.LPWStr)] string iconPath, ref Guid eventContext);
+
+            [PreserveSig]
+            int GetGroupingParam(out Guid groupingId);
+
+            [PreserveSig]
+            int SetGroupingParam(ref Guid groupingId, ref Guid eventContext);
+
+            [PreserveSig]
+            int RegisterAudioSessionNotification(IntPtr newNotifications);
+
+            [PreserveSig]
+            int UnregisterAudioSessionNotification(IntPtr newNotifications);
+        }
+
+        [ComImport]
+        [Guid("BFB7FF88-7239-4FC9-8FA2-07C950BE9C6D")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IAudioSessionControl2
+        {
+            [PreserveSig]
+            int GetState(out int state);
+
+            [PreserveSig]
+            int GetDisplayName([MarshalAs(UnmanagedType.LPWStr)] out string displayName);
+
+            [PreserveSig]
+            int SetDisplayName([MarshalAs(UnmanagedType.LPWStr)] string displayName, ref Guid eventContext);
+
+            [PreserveSig]
+            int GetIconPath([MarshalAs(UnmanagedType.LPWStr)] out string iconPath);
+
+            [PreserveSig]
+            int SetIconPath([MarshalAs(UnmanagedType.LPWStr)] string iconPath, ref Guid eventContext);
+
+            [PreserveSig]
+            int GetGroupingParam(out Guid groupingId);
+
+            [PreserveSig]
+            int SetGroupingParam(ref Guid groupingId, ref Guid eventContext);
+
+            [PreserveSig]
+            int RegisterAudioSessionNotification(IntPtr newNotifications);
+
+            [PreserveSig]
+            int UnregisterAudioSessionNotification(IntPtr newNotifications);
+
+            [PreserveSig]
+            int GetSessionIdentifier([MarshalAs(UnmanagedType.LPWStr)] out string retVal);
+
+            [PreserveSig]
+            int GetSessionInstanceIdentifier([MarshalAs(UnmanagedType.LPWStr)] out string retVal);
+
+            [PreserveSig]
+            int GetProcessId(out uint processId);
+
+            [PreserveSig]
+            int IsSystemSoundsSession();
+
+            [PreserveSig]
+            int SetDuckingPreference([MarshalAs(UnmanagedType.Bool)] bool optOut);
+        }
+
+        [ComImport]
+        [Guid("87CE5498-68D6-44E5-9215-6DA47EF883D8")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface ISimpleAudioVolume
+        {
+            [PreserveSig]
+            int SetMasterVolume(float level, ref Guid eventContext);
+
+            [PreserveSig]
+            int GetMasterVolume(out float level);
+
+            [PreserveSig]
+            int SetMute([MarshalAs(UnmanagedType.Bool)] bool isMuted, ref Guid eventContext);
+
+            [PreserveSig]
+            int GetMute([MarshalAs(UnmanagedType.Bool)] out bool isMuted);
+        }
+
+        [ComImport]
         [Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface IPropertyStore
@@ -520,5 +1013,37 @@ namespace PlayniteAudioSwitcher
 
         [DllImport("ole32.dll")]
         private static extern int PropVariantClear(IntPtr propVariant);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr CreateToolhelp32Snapshot(uint flags, uint processId);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool Process32First(IntPtr snapshot, ref ProcessEntry32 entry);
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool Process32Next(IntPtr snapshot, ref ProcessEntry32 entry);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool CloseHandle(IntPtr handle);
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        private struct ProcessEntry32
+        {
+            public uint dwSize;
+            public uint cntUsage;
+            public uint th32ProcessID;
+            public IntPtr th32DefaultHeapID;
+            public uint th32ModuleID;
+            public uint cntThreads;
+            public uint th32ParentProcessID;
+            public int pcPriClassBase;
+            public uint dwFlags;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            public string szExeFile;
+        }
     }
 }

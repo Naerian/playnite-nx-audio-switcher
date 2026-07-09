@@ -7,5 +7,7 @@ namespace PlayniteAudioSwitcher
         public string InputDeviceId { get; set; }
 
         public string SpatialSoundMode { get; set; }
+
+        public int? GameVolumePercent { get; set; }
     }
 }

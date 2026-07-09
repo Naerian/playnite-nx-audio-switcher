@@ -10,6 +10,8 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Threading.Tasks;
+using Microsoft.Win32;
 using Playnite.SDK;
 using Playnite.SDK.Controls;
 using Playnite.SDK.Events;
@@ -24,6 +26,7 @@ namespace PlayniteAudioSwitcher
         private readonly HashSet<ControllerInput> pressedInputs = new HashSet<ControllerInput>();
         private readonly Dictionary<Guid, AudioDevice> previousDevicesByGame = new Dictionary<Guid, AudioDevice>();
         private readonly Dictionary<Guid, AudioDevice> previousInputDevicesByGame = new Dictionary<Guid, AudioDevice>();
+        private readonly Dictionary<Guid, HashSet<uint>> audioSessionBaselineByGame = new Dictionary<Guid, HashSet<uint>>();
         private AudioSwitcherSettings settings;
         private GameAudioProfileStore gameProfiles;
         private DateTime lastQuickSwitch = DateTime.MinValue;
@@ -32,6 +35,10 @@ namespace PlayniteAudioSwitcher
         private AudioDeviceListControl activeThemeSelectorList;
         private Func<bool> isThemeSelectorOpen;
         private Action closeThemeSelector;
+        private Guid? activeGameId;
+        private int activeGameProcessId;
+        private string activeGameName;
+        private HashSet<uint> activeGameAudioSessionProcessIds = new HashSet<uint>();
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -62,7 +69,8 @@ namespace PlayniteAudioSwitcher
                     "DeviceList",
                     "VolumeSlider",
                     "InputDeviceList",
-                    "InputVolumeSlider"
+                    "InputVolumeSlider",
+                    "GameVolumeSlider"
                 }
             });
 
@@ -285,6 +293,8 @@ namespace PlayniteAudioSwitcher
                     });
                 }
 
+                AddGameVolumeProfileMenuItems(items, root, game, currentProfile);
+
                 items.Add(new GameMenuItem
                 {
                     MenuSection = root,
@@ -347,6 +357,11 @@ namespace PlayniteAudioSwitcher
                 return new AudioInputVolumeSliderControl(this);
             }
 
+            if (args.Name == "GameVolumeSlider")
+            {
+                return new AudioGameVolumeSliderControl(this);
+            }
+
             return null;
         }
 
@@ -375,7 +390,8 @@ namespace PlayniteAudioSwitcher
             if (profile == null ||
                 string.IsNullOrWhiteSpace(profile.DeviceId) &&
                 string.IsNullOrWhiteSpace(profile.InputDeviceId) &&
-                string.IsNullOrWhiteSpace(profile.SpatialSoundMode))
+                string.IsNullOrWhiteSpace(profile.SpatialSoundMode) &&
+                !profile.GameVolumePercent.HasValue)
             {
                 return;
             }
@@ -383,6 +399,10 @@ namespace PlayniteAudioSwitcher
             try
             {
                 var appliedParts = new List<string>();
+                if (profile.GameVolumePercent.HasValue && args.Game != null)
+                {
+                    audioSessionBaselineByGame[args.Game.Id] = new HashSet<uint>(AudioDevices.GetPlaybackAudioSessionProcessIds());
+                }
 
                 if (!string.IsNullOrWhiteSpace(profile.DeviceId))
                 {
@@ -417,7 +437,10 @@ namespace PlayniteAudioSwitcher
                     }
                 }
 
-                ShowGameProfileAppliedMessage(args.Game?.Name, appliedParts);
+                if (appliedParts.Count > 0)
+                {
+                    ShowGameProfileAppliedMessage(args.Game?.Name, appliedParts);
+                }
             }
             catch (Exception ex)
             {
@@ -426,8 +449,47 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public override void OnGameStarted(OnGameStartedEventArgs args)
+        {
+            activeGameId = args.Game?.Id;
+            activeGameProcessId = args.StartedProcessId;
+            activeGameName = args.Game?.Name;
+            activeGameAudioSessionProcessIds = new HashSet<uint>();
+            Theme?.Refresh();
+
+            if (!settings.GameProfilesEnabled || args.Game == null || args.StartedProcessId <= 0)
+            {
+                if (args.Game != null && args.StartedProcessId > 0)
+                {
+                    ScheduleRefreshGameVolume(args.Game, args.StartedProcessId);
+                }
+
+                return;
+            }
+
+            var profile = gameProfiles.GetProfile(args.Game);
+            if (profile?.GameVolumePercent == null)
+            {
+                ScheduleRefreshGameVolume(args.Game, args.StartedProcessId);
+                return;
+            }
+
+            audioSessionBaselineByGame.TryGetValue(args.Game.Id, out var baselineProcessIds);
+            ScheduleApplyGameVolume(args.Game, args.StartedProcessId, profile.GameVolumePercent.Value, baselineProcessIds);
+        }
+
         public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
+            if (args.Game != null && activeGameId == args.Game.Id)
+            {
+                activeGameId = null;
+                activeGameProcessId = 0;
+                activeGameName = null;
+                activeGameAudioSessionProcessIds.Clear();
+                audioSessionBaselineByGame.Remove(args.Game.Id);
+                Theme?.Refresh();
+            }
+
             if (!settings.RestoreDeviceAfterGameProfile || args.Game == null)
             {
                 return;
@@ -450,6 +512,321 @@ namespace PlayniteAudioSwitcher
                     SetInputDevice(previousInputDevice.Id, GetInputDeviceDisplayName(previousInputDevice), false);
                 }
             }
+        }
+
+        private void ScheduleApplyGameVolume(Game game, int processId, int volumePercent, HashSet<uint> baselineProcessIds)
+        {
+            var gameId = game.Id;
+            var gameName = game.Name;
+            var normalizedVolume = Math.Max(0, Math.Min(100, volumePercent)) / 100f;
+            var baseline = baselineProcessIds ?? new HashSet<uint>();
+
+            Task.Run(async () =>
+            {
+                for (var attempt = 0; attempt < 40; attempt++)
+                {
+                    if (activeGameId != gameId || activeGameProcessId != processId)
+                    {
+                        return;
+                    }
+
+                    try
+                    {
+                        var targetProcessIds = GetTargetGameAudioSessionProcessIds(game, processId, baseline);
+                        if (targetProcessIds.Count > 0 && AudioDevices.SetProcessVolumes(targetProcessIds, normalizedVolume))
+                        {
+                            Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
+                            {
+                                activeGameAudioSessionProcessIds = targetProcessIds;
+                                Theme?.Refresh();
+                                ShowGameProfileAppliedMessage(gameName, new[] { $"{Loc("LOCAS_GameVolumeTitle")} {volumePercent}%" });
+                            }));
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Warn(ex, $"Failed to apply game session volume for {gameName}.");
+                    }
+
+                    await Task.Delay(750).ConfigureAwait(false);
+                }
+
+                logger.Info($"No active audio session was found for {gameName} after launch. Game volume profile was not applied.");
+            });
+        }
+
+        private HashSet<uint> GetTargetGameAudioSessionProcessIds(Game game, int processId, HashSet<uint> baselineProcessIds)
+        {
+            var targetProcessIds = new HashSet<uint>(AudioDevices.GetProcessTreeAudioSessionProcessIds(processId));
+            if (targetProcessIds.Count > 0)
+            {
+                return targetProcessIds;
+            }
+
+            foreach (var installProcessId in GetRunningGameInstallDirectoryProcessIds(game))
+            {
+                targetProcessIds.Add(installProcessId);
+            }
+
+            if (targetProcessIds.Count > 0)
+            {
+                return targetProcessIds;
+            }
+
+            var currentProcessId = (uint)Process.GetCurrentProcess().Id;
+            var newSessionProcessIds = AudioDevices.GetPlaybackAudioSessionProcessIds()
+                .Where(id => id != currentProcessId && (baselineProcessIds == null || !baselineProcessIds.Contains(id)))
+                .ToList();
+
+            if (newSessionProcessIds.Count == 1)
+            {
+                targetProcessIds.Add(newSessionProcessIds[0]);
+            }
+            else if (newSessionProcessIds.Count > 1)
+            {
+                logger.Info($"Multiple new audio sessions were detected after game launch: {string.Join(", ", newSessionProcessIds)}. Game volume profile was not applied automatically.");
+            }
+
+            return targetProcessIds;
+        }
+
+        private HashSet<uint> GetRunningGameInstallDirectoryProcessIds(Game game)
+        {
+            var processIds = new HashSet<uint>();
+            var installDirectories = GetGameInstallDirectories(game).ToList();
+            if (installDirectories.Count == 0)
+            {
+                return processIds;
+            }
+
+            var normalizedInstallDirectories = installDirectories
+                .Where(Directory.Exists)
+                .Select(path => Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            foreach (var process in Process.GetProcesses())
+            {
+                try
+                {
+                    if (process.Id == Process.GetCurrentProcess().Id)
+                    {
+                        continue;
+                    }
+
+                    var modulePath = process.MainModule?.FileName;
+                    if (string.IsNullOrWhiteSpace(modulePath))
+                    {
+                        continue;
+                    }
+
+                    var normalizedModulePath = Path.GetFullPath(modulePath);
+                    if (normalizedInstallDirectories.Any(directory => normalizedModulePath.StartsWith(directory, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        processIds.Add((uint)process.Id);
+                    }
+                }
+                catch
+                {
+                    // Some system or protected processes do not expose MainModule. Ignore them.
+                }
+                finally
+                {
+                    process.Dispose();
+                }
+            }
+
+            if (processIds.Count > 0)
+            {
+                logger.Info($"Detected running game processes from install directory for {game?.Name}: {string.Join(", ", processIds)}.");
+            }
+
+            return processIds;
+        }
+
+        private IEnumerable<string> GetGameInstallDirectories(Game game)
+        {
+            if (!string.IsNullOrWhiteSpace(game?.InstallDirectory))
+            {
+                yield return game.InstallDirectory;
+            }
+
+            var steamDirectory = TryResolveSteamAppInstallDirectory(game?.GameId);
+            if (!string.IsNullOrWhiteSpace(steamDirectory))
+            {
+                yield return steamDirectory;
+            }
+        }
+
+        private string TryResolveSteamAppInstallDirectory(string gameId)
+        {
+            if (string.IsNullOrWhiteSpace(gameId) || !gameId.All(char.IsDigit))
+            {
+                return null;
+            }
+
+            foreach (var library in GetSteamLibraryDirectories())
+            {
+                try
+                {
+                    var manifestPath = Path.Combine(library, "steamapps", $"appmanifest_{gameId}.acf");
+                    if (!File.Exists(manifestPath))
+                    {
+                        continue;
+                    }
+
+                    var installDir = ReadSteamManifestValue(manifestPath, "installdir");
+                    if (string.IsNullOrWhiteSpace(installDir))
+                    {
+                        continue;
+                    }
+
+                    var fullPath = Path.Combine(library, "steamapps", "common", installDir);
+                    if (Directory.Exists(fullPath))
+                    {
+                        return fullPath;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, $"Failed to resolve Steam install directory for app {gameId}.");
+                }
+            }
+
+            return null;
+        }
+
+        private IEnumerable<string> GetSteamLibraryDirectories()
+        {
+            var steamRoots = new List<string>();
+            try
+            {
+                var steamPath = Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam")?.GetValue("SteamPath")?.ToString();
+                if (!string.IsNullOrWhiteSpace(steamPath))
+                {
+                    steamRoots.Add(steamPath.Replace('/', Path.DirectorySeparatorChar));
+                }
+            }
+            catch
+            {
+            }
+
+            steamRoots.Add(@"C:\Program Files (x86)\Steam");
+            steamRoots.Add(@"C:\Program Files\Steam");
+
+            foreach (var root in steamRoots.Where(Directory.Exists).Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                yield return root;
+
+                var libraryFoldersPath = Path.Combine(root, "steamapps", "libraryfolders.vdf");
+                if (!File.Exists(libraryFoldersPath))
+                {
+                    continue;
+                }
+
+                foreach (var path in ReadSteamLibraryFolderPaths(libraryFoldersPath))
+                {
+                    if (Directory.Exists(path))
+                    {
+                        yield return path;
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<string> ReadSteamLibraryFolderPaths(string libraryFoldersPath)
+        {
+            foreach (var line in File.ReadLines(libraryFoldersPath))
+            {
+                var trimmed = line.Trim();
+                if (!trimmed.StartsWith("\"path\"", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var value = TryGetSecondQuotedValue(trimmed);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    yield return value.Replace(@"\\", @"\");
+                }
+            }
+        }
+
+        private static string ReadSteamManifestValue(string manifestPath, string key)
+        {
+            foreach (var line in File.ReadLines(manifestPath))
+            {
+                var trimmed = line.Trim();
+                if (!trimmed.StartsWith($"\"{key}\"", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var value = TryGetSecondQuotedValue(trimmed);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        private static string TryGetSecondQuotedValue(string line)
+        {
+            var values = new List<string>();
+            var index = 0;
+            while (index < line.Length)
+            {
+                var start = line.IndexOf('"', index);
+                if (start < 0)
+                {
+                    break;
+                }
+
+                var end = line.IndexOf('"', start + 1);
+                if (end < 0)
+                {
+                    break;
+                }
+
+                values.Add(line.Substring(start + 1, end - start - 1));
+                index = end + 1;
+            }
+
+            return values.Count >= 2 ? values[1] : null;
+        }
+
+        private void ScheduleRefreshGameVolume(Game game, int processId)
+        {
+            var gameId = game.Id;
+
+            Task.Run(async () =>
+            {
+                for (var attempt = 0; attempt < 20; attempt++)
+                {
+                    if (activeGameId != gameId || activeGameProcessId != processId)
+                    {
+                        return;
+                    }
+
+                    try
+                    {
+                        if (AudioDevices.GetProcessTreeVolume(processId).IsAvailable)
+                        {
+                            Application.Current?.Dispatcher?.BeginInvoke(new Action(() => Theme?.Refresh()));
+                            return;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Warn(ex, $"Failed to refresh game session volume for {game.Name}.");
+                    }
+
+                    await Task.Delay(500).ConfigureAwait(false);
+                }
+            });
         }
 
         public override void OnControllerButtonStateChanged(OnControllerButtonStateChangedArgs args)
@@ -913,6 +1290,26 @@ namespace PlayniteAudioSwitcher
             return AudioDevices.GetDefaultRecordingVolume();
         }
 
+        public AudioVolumeState GetCurrentGameVolumeState()
+        {
+            if (activeGameAudioSessionProcessIds.Count > 0)
+            {
+                return AudioDevices.GetProcessVolume(activeGameAudioSessionProcessIds);
+            }
+
+            if (activeGameProcessId <= 0)
+            {
+                return new AudioVolumeState { IsAvailable = false };
+            }
+
+            return AudioDevices.GetProcessTreeVolume(activeGameProcessId);
+        }
+
+        public string GetCurrentGameName()
+        {
+            return activeGameName;
+        }
+
         public void SetVolume(float volume)
         {
             SetVolume(volume, true);
@@ -959,6 +1356,43 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void SetGameVolume(float volume)
+        {
+            SetGameVolume(volume, true);
+        }
+
+        public void SetGameVolume(float volume, bool notify)
+        {
+            if (activeGameProcessId <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var changed = activeGameAudioSessionProcessIds.Count > 0
+                    ? AudioDevices.SetProcessVolumes(activeGameAudioSessionProcessIds, volume)
+                    : AudioDevices.SetProcessTreeVolume(activeGameProcessId, volume);
+                if (!changed)
+                {
+                    logger.Info($"No active game audio session found while setting volume for {activeGameName ?? "current game"}.");
+                    Theme?.Refresh();
+                    return;
+                }
+
+                Theme?.Refresh();
+                if (notify && ShouldShowVolumeNotifications())
+                {
+                    ShowGameVolumeInfoMessage();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to set current game volume.");
+                ShowMessage($"{Loc("LOCAS_GameVolumeFailed")}: {ex.Message}");
+            }
+        }
+
         public void ChangeVolumeByStep(int direction)
         {
             try
@@ -997,6 +1431,47 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void ChangeGameVolumeByStep(int direction)
+        {
+            if (activeGameProcessId <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
+                var changed = false;
+                if (activeGameAudioSessionProcessIds.Count > 0)
+                {
+                    var state = AudioDevices.GetProcessVolume(activeGameAudioSessionProcessIds);
+                    changed = state.IsAvailable && AudioDevices.SetProcessVolumes(activeGameAudioSessionProcessIds, state.Volume + step * Math.Sign(direction));
+                }
+                else
+                {
+                    changed = AudioDevices.ChangeProcessTreeVolume(activeGameProcessId, step * Math.Sign(direction));
+                }
+
+                if (!changed)
+                {
+                    logger.Info($"No active game audio session found while changing volume for {activeGameName ?? "current game"}.");
+                    Theme?.Refresh();
+                    return;
+                }
+
+                Theme?.Refresh();
+                if (ShouldShowVolumeNotifications())
+                {
+                    ShowGameVolumeInfoMessage();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to change current game volume.");
+                ShowMessage($"{Loc("LOCAS_GameVolumeFailed")}: {ex.Message}");
+            }
+        }
+
         public void ToggleMute()
         {
             try
@@ -1026,6 +1501,44 @@ namespace PlayniteAudioSwitcher
             {
                 logger.Error(ex, "Failed to toggle default recording mute.");
                 ShowMessage($"{Loc("LOCAS_InputVolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ToggleGameMute()
+        {
+            if (activeGameProcessId <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var changed = false;
+                if (activeGameAudioSessionProcessIds.Count > 0)
+                {
+                    var gameState = AudioDevices.GetProcessVolume(activeGameAudioSessionProcessIds);
+                    changed = gameState.IsAvailable && AudioDevices.SetProcessMutes(activeGameAudioSessionProcessIds, !gameState.IsMuted);
+                }
+                else
+                {
+                    changed = AudioDevices.ToggleProcessTreeMute(activeGameProcessId);
+                }
+
+                if (!changed)
+                {
+                    logger.Info($"No active game audio session found while toggling mute for {activeGameName ?? "current game"}.");
+                    Theme?.Refresh();
+                    return;
+                }
+
+                Theme?.Refresh();
+                var currentGameState = GetCurrentGameVolumeState();
+                ShowMuteInfoMessage(currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to toggle current game mute.");
+                ShowMessage($"{Loc("LOCAS_GameVolumeFailed")}: {ex.Message}");
             }
         }
 
@@ -1297,6 +1810,38 @@ namespace PlayniteAudioSwitcher
                 Description = Loc("LOCAS_ToggleMute"),
                 Action = _ => ToggleMute()
             });
+        }
+
+        private void AddGameVolumeProfileMenuItems(List<GameMenuItem> items, string root, Game game, GameAudioProfile currentProfile)
+        {
+            var section = $"{root}|{Loc("LOCAS_GameVolumeTitle")}";
+            var selectedPercent = currentProfile?.GameVolumePercent;
+            items.Add(new GameMenuItem
+            {
+                MenuSection = section,
+                Description = GetCheckedMenuText(Loc("LOCAS_GameVolumeDefault"), !selectedPercent.HasValue),
+                Action = _ =>
+                {
+                    gameProfiles.SetGameVolumePercent(game, null);
+                    ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_GameVolumeDefault")}");
+                }
+            });
+
+            foreach (var percent in new[] { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 })
+            {
+                var value = percent;
+                var text = $"{value}%";
+                items.Add(new GameMenuItem
+                {
+                    MenuSection = section,
+                    Description = GetCheckedMenuText(text, selectedPercent == value),
+                    Action = _ =>
+                    {
+                        gameProfiles.SetGameVolumePercent(game, value);
+                        ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_GameVolumeTitle")} {text}");
+                    }
+                });
+            }
         }
 
         private bool ApplySpatialSoundMode(string modeId, bool notify)
@@ -1859,6 +2404,26 @@ namespace PlayniteAudioSwitcher
             {
                 var state = AudioDevices.GetDefaultRecordingVolume();
                 ShowInfoMessage($"{Loc("LOCAS_AudioInput")}: {state.VolumePercent}%");
+            }
+            catch
+            {
+            }
+        }
+
+        private void ShowGameVolumeInfoMessage()
+        {
+            try
+            {
+                var state = GetCurrentGameVolumeState();
+                if (!state.IsAvailable)
+                {
+                    return;
+                }
+
+                var prefix = string.IsNullOrWhiteSpace(activeGameName)
+                    ? Loc("LOCAS_GameVolumeTitle")
+                    : $"{Loc("LOCAS_GameVolumeTitle")}: {activeGameName}";
+                ShowInfoMessage($"{prefix}: {state.VolumePercent}%");
             }
             catch
             {
