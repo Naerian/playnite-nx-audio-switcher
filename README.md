@@ -9,7 +9,7 @@ It is designed for couch and console-like setups where users often move between 
 - Switch the default Windows playback device from Playnite.
 - Switch the default Windows recording/input device from Playnite.
 - Works from both Desktop and Fullscreen mode extension menus.
-- Fullscreen quick switch with `Back + RB`.
+- Optional Fullscreen quick switch with `Back + RB`.
 - Custom names for any number of output and input audio devices.
 - Optional icon per renamed audio device.
 - Expanded bundled Lucide icon set for speakers, headsets, microphones, webcams, capture devices, Bluetooth, HDMI, USB and generic audio states.
@@ -82,7 +82,7 @@ Use `Choose output device` to open the list of active Windows output devices. Us
 
 The current device is marked with a check in each list. If you configured a custom name for a device, Audio Switcher shows that friendly name instead of the full Windows device name.
 
-The optional `Back + RB` controller shortcut cycles through active output devices.
+The optional `Back + RB` controller shortcut is disabled by default and can be enabled in `Audio Switcher settings > Fullscreen`. It cycles through visible output devices. If `Quick switch all devices` is enabled, it cycles through every visible output device; otherwise it only cycles through visible devices with a custom name. At least two matching output devices are required.
 
 The native Playnite extension menu is text-only, so custom SVG icons are not shown there. Icons are available to Fullscreen themes through the theme integration API and bundled controls.
 
