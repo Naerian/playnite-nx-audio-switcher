@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">Oyun sesi değiştirilemedi</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">Oyun sessize alındı</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">Oyun sesi açık</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">Ayar yedeği içe aktarılamadı</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">Araçlar</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">Ses oturumu tanılaması başarısız oldu</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">Ayar yedeği içe aktarıldı</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">Seçilen yedek dosyası geçerli değil</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">Yedekleme ve geri yükleme</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">Ayar yedeği dışa aktarılamadı</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">Ses oturumu tanılaması kaydedildi</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">Ayar yedeğini dışa aktar</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">Ayar yedeğini içe aktar</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">Ses oturumu tanılama</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">Ayar yedeği dışa aktarıldı</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">Bakım</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">Tanılama</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Audio Switcher’ın görebildiği Windows oynatma oturumlarını içeren bir rapor dışa aktarır. Oyun ses profili veya tema kaydırıcısı beklenen işlemi algılamadığında kullanın.</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Yedekleme ve geri yükleme</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Audio Switcher ayarlarını, cihaz özelleştirmelerini ve oyun başına ses profillerini dışa veya içe aktarın.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">Tanılama dışa aktarma</sys:String>
 </ResourceDictionary>

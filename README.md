@@ -20,6 +20,8 @@ It is designed for couch and console-like setups where users often move between 
 - Game-specific output, input, Spatial Sound, and game session volume profiles from the game context menu.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
+- Audio session diagnostics export for troubleshooting Windows mixer and game-session detection.
+- Settings backup and restore, including device customizations and per-game audio profiles.
 - Theme integration controls for theme authors.
 - Localizable UI through Playnite resource dictionaries.
 
@@ -57,6 +59,18 @@ The settings window is organized by task:
 Devices without a custom name still appear in selectors. Custom names and icons are only used to make the device list easier to read.
 
 Notification settings live in their own **Notifications** tab. Disabling the master notification option hides normal informational messages, and each category can also be controlled separately. Important error messages are still shown. When a game profile changes multiple things at launch, Audio Switcher groups the result into one profile notification instead of showing one message per device or mode.
+
+## Backup And Diagnostics
+
+In Playnite Desktop mode, open:
+
+`Main menu > Extensions > Audio Switcher`
+
+Available maintenance actions:
+
+- `Tools > Audio session diagnostics`: exports a text report with the playback sessions Windows currently exposes to Audio Switcher, including PID, process name, executable path, session display name, icon path, volume, and mute state. This is useful when a game volume profile or theme game-volume slider cannot find the expected process.
+- `Backup and restore > Export settings backup`: exports a JSON backup with Audio Switcher settings and per-game profiles.
+- `Backup and restore > Import settings backup`: imports a previously exported JSON backup.
 
 ## Fullscreen Usage
 
@@ -123,6 +137,8 @@ Theme authors have two integration paths:
 
 The native Playnite extension menu can only display text rows. Theme integrations are the recommended way to build a richer console-like selector with icons, custom layout, and gamepad-friendly focus states.
 
+An example XAML file is included in the repository and package at `Examples/FullscreenThemeIntegration.xaml`.
+
 For Fullscreen themes, the safest setup is an icon button plus the bundled `AudioSwitcher_DeviceList` inside a theme panel:
 
 ```xml
@@ -175,6 +191,10 @@ Useful properties:
 - `CurrentVolumeLabel`
 - `IsMuted`
 - `CurrentGameName`
+- `CurrentGameProcessName`
+- `CurrentGameProcessPath`
+- `CurrentGameSessionName`
+- `CurrentGameSessionIconPath`
 - `CurrentGameVolume`
 - `CurrentGameVolumePercent`
 - `CurrentGameVolumeLabel`
@@ -192,6 +212,8 @@ Useful properties:
 `CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted. `CurrentVolume` and `CurrentVolumePercent` can also be written by custom theme controls; writing either value changes the Windows volume.
 
 `CurrentGameVolume` and `CurrentGameVolumePercent` work the same way, but target the audio session of the game currently launched by Playnite. `HasActiveGameAudioSession` is `false` when no game is running or Windows has not created a matching game audio session yet. This is useful for overlays that should hide or disable a game-volume slider until it can actually control something.
+
+`CurrentGameProcessName`, `CurrentGameProcessPath`, `CurrentGameSessionName`, and `CurrentGameSessionIconPath` expose the Windows audio session currently matched by Audio Switcher for the running game. Theme authors can use these values for debugging overlays or richer game-audio widgets. Cover art and game metadata should still usually come from Playnite/theme data, because Audio Switcher only exposes the Windows audio session it controls.
 
 `VolumeStepPercent` is writable and controls how many percentage points the volume changes when a Fullscreen theme uses left/right on `AudioSwitcher_VolumeSlider`, `VolumeUpCommand`, or `VolumeDownCommand`. Desktop volume actions use the same step.
 

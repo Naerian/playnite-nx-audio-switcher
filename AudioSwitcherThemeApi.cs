@@ -38,6 +38,10 @@ namespace PlayniteAudioSwitcher
         private bool isGameMuted;
         private bool hasActiveGameAudioSession;
         private string currentGameName;
+        private string currentGameProcessName;
+        private string currentGameProcessPath;
+        private string currentGameSessionName;
+        private string currentGameSessionIconPath;
         private int volumeStepPercent;
         private bool isRefreshingVolume;
         private bool isRefreshingInputVolume;
@@ -359,6 +363,30 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref currentGameName, value);
         }
 
+        public string CurrentGameProcessName
+        {
+            get => currentGameProcessName;
+            private set => SetValue(ref currentGameProcessName, value);
+        }
+
+        public string CurrentGameProcessPath
+        {
+            get => currentGameProcessPath;
+            private set => SetValue(ref currentGameProcessPath, value);
+        }
+
+        public string CurrentGameSessionName
+        {
+            get => currentGameSessionName;
+            private set => SetValue(ref currentGameSessionName, value);
+        }
+
+        public string CurrentGameSessionIconPath
+        {
+            get => currentGameSessionIconPath;
+            private set => SetValue(ref currentGameSessionIconPath, value);
+        }
+
         public int VolumeStepPercent
         {
             get => volumeStepPercent;
@@ -471,6 +499,7 @@ namespace PlayniteAudioSwitcher
             RefreshInputVolume();
             CurrentGameName = plugin.GetCurrentGameName();
             RefreshGameVolume();
+            RefreshGameSessionInfo();
 
             var devices = plugin.GetThemeSelectorDevices(false)
                 .OrderBy(a => a.EffectiveName)
@@ -682,6 +711,25 @@ namespace PlayniteAudioSwitcher
             catch
             {
                 SetGameVolumeState(0, 0, false, false, string.Empty);
+            }
+        }
+
+        private void RefreshGameSessionInfo()
+        {
+            try
+            {
+                var session = plugin.GetCurrentGameSessionInfo();
+                CurrentGameProcessName = session?.ProcessName ?? string.Empty;
+                CurrentGameProcessPath = session?.ProcessPath ?? string.Empty;
+                CurrentGameSessionName = session?.FriendlyName ?? string.Empty;
+                CurrentGameSessionIconPath = session?.IconPath ?? string.Empty;
+            }
+            catch
+            {
+                CurrentGameProcessName = string.Empty;
+                CurrentGameProcessPath = string.Empty;
+                CurrentGameSessionName = string.Empty;
+                CurrentGameSessionIconPath = string.Empty;
             }
         }
 

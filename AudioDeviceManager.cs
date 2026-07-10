@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -217,12 +218,40 @@ namespace PlayniteAudioSwitcher
             return GetVolumeSessionsForProcessIds(processIds);
         }
 
+        public IReadOnlyList<AudioSessionInfo> GetPlaybackAudioSessions()
+        {
+            return EnumeratePlaybackSessions(null)
+                .Select(a => a.Info)
+                .ToList();
+        }
+
+        public IReadOnlyList<AudioSessionInfo> GetProcessAudioSessions(IEnumerable<uint> processIds)
+        {
+            var filter = processIds != null ? new HashSet<uint>(processIds) : null;
+            if (filter == null || filter.Count == 0)
+            {
+                return new List<AudioSessionInfo>();
+            }
+
+            return EnumeratePlaybackSessions(filter)
+                .Select(a => a.Info)
+                .ToList();
+        }
+
+        public AudioSessionInfo GetFirstProcessAudioSession(IEnumerable<uint> processIds)
+        {
+            return GetProcessAudioSessions(processIds)
+                .OrderBy(a => string.IsNullOrWhiteSpace(a.DisplayName) ? 1 : 0)
+                .ThenBy(a => a.ProcessName)
+                .FirstOrDefault();
+        }
+
         private IReadOnlyCollection<uint> GetPlaybackAudioSessionProcessIds(HashSet<uint> filterProcessIds)
         {
             var processIds = new HashSet<uint>();
             foreach (var session in EnumeratePlaybackSessions(filterProcessIds))
             {
-                processIds.Add(session.ProcessId);
+                processIds.Add(session.Info.ProcessId);
             }
 
             return processIds;
@@ -247,9 +276,9 @@ namespace PlayniteAudioSwitcher
             return sessions;
         }
 
-        private IReadOnlyList<AudioSessionInfo> EnumeratePlaybackSessions(HashSet<uint> filterProcessIds)
+        private IReadOnlyList<AudioSessionHandle> EnumeratePlaybackSessions(HashSet<uint> filterProcessIds)
         {
-            var sessions = new List<AudioSessionInfo>();
+            var sessions = new List<AudioSessionHandle>();
             foreach (var device in GetEndpointDevices(EDataFlow.eRender))
             {
                 try
@@ -281,9 +310,9 @@ namespace PlayniteAudioSwitcher
                             var volume = QuerySimpleAudioVolume(control);
                             if (volume != null)
                             {
-                                sessions.Add(new AudioSessionInfo
+                                sessions.Add(new AudioSessionHandle
                                 {
-                                    ProcessId = sessionProcessId,
+                                    Info = CreateAudioSessionInfo(control, control2, volume, sessionProcessId),
                                     Volume = volume
                                 });
                             }
@@ -301,6 +330,96 @@ namespace PlayniteAudioSwitcher
             }
 
             return sessions;
+        }
+
+        private static AudioSessionInfo CreateAudioSessionInfo(
+            IAudioSessionControl control,
+            IAudioSessionControl2 control2,
+            ISimpleAudioVolume volume,
+            uint processId)
+        {
+            var info = new AudioSessionInfo
+            {
+                ProcessId = processId
+            };
+
+            try
+            {
+                if (control.GetDisplayName(out var displayName) == 0)
+                {
+                    info.DisplayName = displayName;
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (control.GetIconPath(out var iconPath) == 0)
+                {
+                    info.IconPath = iconPath;
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (control2.GetSessionIdentifier(out var identifier) == 0)
+                {
+                    info.SessionIdentifier = identifier;
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                if (volume.GetMasterVolume(out var level) == 0)
+                {
+                    info.Volume = Clamp01(level);
+                    info.VolumePercent = (int)Math.Round(info.Volume * 100);
+                }
+
+                if (volume.GetMute(out var isMuted) == 0)
+                {
+                    info.IsMuted = isMuted;
+                }
+            }
+            catch
+            {
+            }
+
+            TryPopulateProcessInfo(info);
+            return info;
+        }
+
+        private static void TryPopulateProcessInfo(AudioSessionInfo info)
+        {
+            if (info == null || info.ProcessId == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                var process = Process.GetProcessById((int)info.ProcessId);
+                info.ProcessName = process.ProcessName;
+                try
+                {
+                    info.ProcessPath = process.MainModule?.FileName;
+                }
+                catch
+                {
+                    // Some protected processes do not expose their executable path.
+                }
+            }
+            catch
+            {
+            }
         }
 
         private static bool SetVolumeForSessions(IReadOnlyList<ISimpleAudioVolume> sessions, float volume)
@@ -466,9 +585,9 @@ namespace PlayniteAudioSwitcher
             return result;
         }
 
-        private sealed class AudioSessionInfo
+        private sealed class AudioSessionHandle
         {
-            public uint ProcessId { get; set; }
+            public AudioSessionInfo Info { get; set; }
 
             public ISimpleAudioVolume Volume { get; set; }
         }

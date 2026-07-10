@@ -279,6 +279,21 @@ namespace PlayniteAudioSwitcher
             MessageBox.Show(GetSpatialSoundToolStatus(), title, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private void ExportAudioSessionDiagnostics(object sender, RoutedEventArgs e)
+        {
+            (DataContext as AudioSwitcherSettings)?.ExportAudioSessionDiagnostics();
+        }
+
+        private void ExportSettingsBackup(object sender, RoutedEventArgs e)
+        {
+            (DataContext as AudioSwitcherSettings)?.ExportSettingsBackup();
+        }
+
+        private void ImportSettingsBackup(object sender, RoutedEventArgs e)
+        {
+            (DataContext as AudioSwitcherSettings)?.ImportSettingsBackup();
+        }
+
         private void UpdateSpatialSoundToolStatus()
         {
             if (SpatialSoundToolStatus == null)

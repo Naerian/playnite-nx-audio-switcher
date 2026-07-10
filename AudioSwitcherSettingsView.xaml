@@ -199,6 +199,43 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="{DynamicResource LOCAS_MaintenanceTab}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+
+                        <Button Content="{DynamicResource LOCAS_AudioSessionDiagnostics}"
+                                MinWidth="220"
+                                HorizontalAlignment="Left"
+                                Margin="0,0,0,18"
+                                Click="ExportAudioSessionDiagnostics" />
+
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{DynamicResource LOCAS_ExportSettingsBackup}"
+                                    MinWidth="180"
+                                    Margin="0,0,8,0"
+                                    Click="ExportSettingsBackup" />
+                            <Button Content="{DynamicResource LOCAS_ImportSettingsBackup}"
+                                    MinWidth="180"
+                                    Click="ImportSettingsBackup" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="{DynamicResource LOCAS_NotificationsTitle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled">
@@ -239,6 +276,10 @@
 
                         <CheckBox Content="{DynamicResource LOCAS_NotifySpatialSound}"
                                   IsChecked="{Binding ShowSpatialSoundNotifications}"
+                                  Margin="0,0,0,8" />
+
+                        <CheckBox Content="{DynamicResource LOCAS_NotifyDiagnostics}"
+                                  IsChecked="{Binding ShowDiagnosticNotifications}"
                                   Margin="0,0,0,12" />
                     </StackPanel>
                 </ScrollViewer>

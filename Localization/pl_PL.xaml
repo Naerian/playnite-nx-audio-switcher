@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">Nie udało się zmienić głośności gry</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">Gra wyciszona</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">Dźwięk gry włączony</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">Import kopii ustawień nie powiódł się</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">Narzędzia</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">Diagnostyka sesji audio nie powiodła się</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">Kopia ustawień zaimportowana</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">Wybrany plik kopii jest nieprawidłowy</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">Kopia i przywracanie</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">Eksport kopii ustawień nie powiódł się</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">Diagnostyka sesji audio zapisana</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">Eksportuj kopię ustawień</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">Importuj kopię ustawień</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">Diagnostyka sesji audio</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">Kopia ustawień wyeksportowana</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">Konserwacja</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">Diagnostyka</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Eksportuje raport z sesjami odtwarzania Windows widocznymi dla Audio Switcher. Użyj go, gdy profil głośności gry lub suwak motywu nie wykrywa oczekiwanego procesu.</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Kopia i przywracanie</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Eksportuj lub importuj ustawienia Audio Switcher, personalizacje urządzeń i profile audio dla gier.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">Eksport diagnostyki</sys:String>
 </ResourceDictionary>

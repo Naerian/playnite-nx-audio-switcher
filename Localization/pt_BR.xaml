@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">Falha ao alterar volume do jogo</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">Jogo silenciado</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">Som do jogo ativado</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">Falha ao importar backup das configurações</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">Ferramentas</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">Falha no diagnóstico de sessões de áudio</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">Backup das configurações importado</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">O arquivo de backup selecionado não é válido</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">Backup e restauração</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">Falha ao exportar backup das configurações</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">Diagnóstico de sessões de áudio salvo</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">Exportar backup das configurações</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">Importar backup das configurações</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">Diagnóstico de sessões de áudio</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">Backup das configurações exportado</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">Manutenção</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">Diagnóstico</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Exporta um relatório com as sessões de reprodução do Windows que o Audio Switcher consegue ver. Use quando um perfil de volume de jogo ou slider de tema não detectar o processo esperado.</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Backup e restauração</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Exporte ou importe as configurações do Audio Switcher, personalizações de dispositivos e perfis de áudio por jogo.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">Exportação de diagnóstico</sys:String>
 </ResourceDictionary>

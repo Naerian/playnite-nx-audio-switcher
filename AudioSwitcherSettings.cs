@@ -26,6 +26,7 @@ namespace PlayniteAudioSwitcher
         private bool showMuteNotifications;
         private bool showGameProfileNotifications = true;
         private bool showSpatialSoundNotifications = true;
+        private bool showDiagnosticNotifications = true;
         private bool fullscreenOnlyFavorites = true;
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
@@ -70,6 +71,7 @@ namespace PlayniteAudioSwitcher
                 ShowMuteNotifications = savedSettings.ShowMuteNotifications;
                 ShowGameProfileNotifications = savedSettings.ShowGameProfileNotifications;
                 ShowSpatialSoundNotifications = savedSettings.ShowSpatialSoundNotifications;
+                ShowDiagnosticNotifications = savedSettings.ShowDiagnosticNotifications;
                 VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
             }
 
@@ -217,6 +219,12 @@ namespace PlayniteAudioSwitcher
         {
             get => showSpatialSoundNotifications;
             set => SetValue(ref showSpatialSoundNotifications, value);
+        }
+
+        public bool ShowDiagnosticNotifications
+        {
+            get => showDiagnosticNotifications;
+            set => SetValue(ref showDiagnosticNotifications, value);
         }
 
         public bool FullscreenOnlyFavorites
@@ -464,6 +472,7 @@ namespace PlayniteAudioSwitcher
             ShowMuteNotifications = editingClone.ShowMuteNotifications;
             ShowGameProfileNotifications = editingClone.ShowGameProfileNotifications;
             ShowSpatialSoundNotifications = editingClone.ShowSpatialSoundNotifications;
+            ShowDiagnosticNotifications = editingClone.ShowDiagnosticNotifications;
             FullscreenOnlyFavorites = editingClone.FullscreenOnlyFavorites;
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
             QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
@@ -518,6 +527,26 @@ namespace PlayniteAudioSwitcher
         {
             errors = new List<string>();
             return true;
+        }
+
+        public AudioSwitcherSettings GetSerializableClone()
+        {
+            return Clone();
+        }
+
+        public void ExportAudioSessionDiagnostics()
+        {
+            plugin?.ExportAudioSessionDiagnostics();
+        }
+
+        public void ExportSettingsBackup()
+        {
+            plugin?.ExportSettingsBackup();
+        }
+
+        public void ImportSettingsBackup()
+        {
+            plugin?.ImportSettingsBackup();
         }
 
         private void MigrateFavoritesToAliases()
@@ -576,6 +605,7 @@ namespace PlayniteAudioSwitcher
                 ShowMuteNotifications = ShowMuteNotifications,
                 ShowGameProfileNotifications = ShowGameProfileNotifications,
                 ShowSpatialSoundNotifications = ShowSpatialSoundNotifications,
+                ShowDiagnosticNotifications = ShowDiagnosticNotifications,
                 FullscreenOnlyFavorites = FullscreenOnlyFavorites,
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,

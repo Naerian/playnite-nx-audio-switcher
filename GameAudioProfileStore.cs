@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 
@@ -55,6 +56,25 @@ namespace PlayniteAudioSwitcher
             lock (syncRoot)
             {
                 return profiles.TryGetValue(game.Id, out var profile) ? profile : null;
+            }
+        }
+
+        public Dictionary<Guid, GameAudioProfile> GetProfilesSnapshot()
+        {
+            lock (syncRoot)
+            {
+                return profiles.ToDictionary(a => a.Key, a => CloneProfile(a.Value));
+            }
+        }
+
+        public void ReplaceProfiles(Dictionary<Guid, GameAudioProfile> importedProfiles)
+        {
+            lock (syncRoot)
+            {
+                profiles = (importedProfiles ?? new Dictionary<Guid, GameAudioProfile>())
+                    .Where(a => !IsEmpty(a.Value))
+                    .ToDictionary(a => a.Key, a => CloneProfile(a.Value));
+                Save();
             }
         }
 
@@ -228,6 +248,22 @@ namespace PlayniteAudioSwitcher
                 string.IsNullOrWhiteSpace(profile.InputDeviceId) &&
                 string.IsNullOrWhiteSpace(profile.SpatialSoundMode) &&
                 !profile.GameVolumePercent.HasValue;
+        }
+
+        private static GameAudioProfile CloneProfile(GameAudioProfile profile)
+        {
+            if (profile == null)
+            {
+                return null;
+            }
+
+            return new GameAudioProfile
+            {
+                DeviceId = profile.DeviceId,
+                InputDeviceId = profile.InputDeviceId,
+                SpatialSoundMode = profile.SpatialSoundMode,
+                GameVolumePercent = profile.GameVolumePercent
+            };
         }
     }
 }

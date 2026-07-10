@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using Playnite.SDK;
 using Playnite.SDK.Controls;
+using Playnite.SDK.Data;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
@@ -185,6 +186,24 @@ namespace PlayniteAudioSwitcher
                     MenuSection = MenuRoot,
                     Description = Loc("LOCAS_MenuRefreshDevices"),
                     Action = _ => settings.RefreshDevices()
+                },
+                new MainMenuItem
+                {
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuTools")}",
+                    Description = Loc("LOCAS_AudioSessionDiagnostics"),
+                    Action = _ => ExportAudioSessionDiagnostics()
+                },
+                new MainMenuItem
+                {
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuBackupRestore")}",
+                    Description = Loc("LOCAS_ExportSettingsBackup"),
+                    Action = _ => ExportSettingsBackup()
+                },
+                new MainMenuItem
+                {
+                    MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuBackupRestore")}",
+                    Description = Loc("LOCAS_ImportSettingsBackup"),
+                    Action = _ => ImportSettingsBackup()
                 }
             };
 
@@ -1310,6 +1329,30 @@ namespace PlayniteAudioSwitcher
             return activeGameName;
         }
 
+        public AudioSessionInfo GetCurrentGameSessionInfo()
+        {
+            try
+            {
+                if (activeGameAudioSessionProcessIds.Count > 0)
+                {
+                    return AudioDevices.GetFirstProcessAudioSession(activeGameAudioSessionProcessIds);
+                }
+
+                if (activeGameProcessId <= 0)
+                {
+                    return null;
+                }
+
+                var processIds = AudioDevices.GetProcessTreeAudioSessionProcessIds(activeGameProcessId);
+                return AudioDevices.GetFirstProcessAudioSession(processIds);
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, $"Failed to read current game audio session information for {activeGameName ?? "current game"}.");
+                return null;
+            }
+        }
+
         public void SetVolume(float volume)
         {
             SetVolume(volume, true);
@@ -1810,6 +1853,129 @@ namespace PlayniteAudioSwitcher
                 Description = Loc("LOCAS_ToggleMute"),
                 Action = _ => ToggleMute()
             });
+        }
+
+        public void ExportAudioSessionDiagnostics()
+        {
+            try
+            {
+                var sessions = AudioDevices.GetPlaybackAudioSessions();
+                var path = Path.Combine(GetPluginUserDataPath(), "audio-session-diagnostics.txt");
+                using (var writer = new StreamWriter(path, false))
+                {
+                    writer.WriteLine("Audio Switcher - Windows audio session diagnostics");
+                    writer.WriteLine($"Created: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                    writer.WriteLine($"Session count: {sessions.Count}");
+                    writer.WriteLine();
+
+                    if (sessions.Count == 0)
+                    {
+                        writer.WriteLine("No active playback audio sessions were reported by Windows.");
+                    }
+
+                    foreach (var session in sessions.OrderBy(a => a.ProcessName).ThenBy(a => a.ProcessId))
+                    {
+                        writer.WriteLine($"PID: {session.ProcessId}");
+                        writer.WriteLine($"Process: {session.ProcessName ?? string.Empty}");
+                        writer.WriteLine($"Path: {session.ProcessPath ?? string.Empty}");
+                        writer.WriteLine($"Display name: {session.DisplayName ?? string.Empty}");
+                        writer.WriteLine($"Icon path: {session.IconPath ?? string.Empty}");
+                        writer.WriteLine($"Session id: {session.SessionIdentifier ?? string.Empty}");
+                        writer.WriteLine($"Volume: {session.VolumePercent}%");
+                        writer.WriteLine($"Muted: {session.IsMuted}");
+                        writer.WriteLine();
+                    }
+                }
+
+                logger.Info($"Audio session diagnostics exported to {path}.");
+                if (ShouldShowDiagnosticNotifications())
+                {
+                    ShowMessage($"{Loc("LOCAS_AudioSessionDiagnosticsSaved")}: {path}");
+                }
+
+                if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+                {
+                    Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to export audio session diagnostics.");
+                ShowMessage($"{Loc("LOCAS_AudioSessionDiagnosticsFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ExportSettingsBackup()
+        {
+            try
+            {
+                var dialog = new SaveFileDialog
+                {
+                    Title = Loc("LOCAS_ExportSettingsBackup"),
+                    Filter = "JSON (*.json)|*.json",
+                    FileName = $"AudioSwitcherBackup_{DateTime.Now:yyyyMMdd_HHmmss}.json"
+                };
+
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var backup = new AudioSwitcherBackup
+                {
+                    Settings = settings.GetSerializableClone(),
+                    GameProfiles = gameProfiles.GetProfilesSnapshot()
+                };
+
+                File.WriteAllText(dialog.FileName, Serialization.ToJson(backup, true));
+                logger.Info($"Audio Switcher settings backup exported to {dialog.FileName}.");
+                ShowMessage(Loc("LOCAS_BackupExported"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to export Audio Switcher settings backup.");
+                ShowMessage($"{Loc("LOCAS_BackupExportFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ImportSettingsBackup()
+        {
+            try
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Title = Loc("LOCAS_ImportSettingsBackup"),
+                    Filter = "JSON (*.json)|*.json"
+                };
+
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                if (!Serialization.TryFromJsonFile<AudioSwitcherBackup>(dialog.FileName, out var backup) ||
+                    backup == null ||
+                    backup.Settings == null)
+                {
+                    ShowMessage(Loc("LOCAS_BackupImportInvalid"));
+                    return;
+                }
+
+                SavePluginSettings(backup.Settings);
+                gameProfiles.ReplaceProfiles(backup.GameProfiles);
+                ReloadSettings();
+                ApplyDefaultVolumeForCurrentDevice();
+                ApplyDefaultInputVolumeForCurrentDevice();
+                Theme?.Refresh();
+
+                logger.Info($"Audio Switcher settings backup imported from {dialog.FileName}.");
+                ShowMessage(Loc("LOCAS_BackupImported"));
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to import Audio Switcher settings backup.");
+                ShowMessage($"{Loc("LOCAS_BackupImportFailed")}: {ex.Message}");
+            }
         }
 
         private void AddGameVolumeProfileMenuItems(List<GameMenuItem> items, string root, Game game, GameAudioProfile currentProfile)
@@ -2498,6 +2664,11 @@ namespace PlayniteAudioSwitcher
         private bool ShouldShowSpatialSoundNotifications()
         {
             return settings.ShowNotifications && settings.ShowSpatialSoundNotifications;
+        }
+
+        private bool ShouldShowDiagnosticNotifications()
+        {
+            return settings.ShowNotifications && settings.ShowDiagnosticNotifications;
         }
 
         private void ShowMessage(string message)

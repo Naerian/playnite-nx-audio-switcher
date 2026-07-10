@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">게임 볼륨 변경 실패</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">게임 음소거됨</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">게임 소리 켜짐</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">설정 백업 가져오기 실패</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">도구</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">오디오 세션 진단 실패</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">설정 백업을 가져왔습니다</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">선택한 백업 파일이 올바르지 않습니다</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">백업 및 복원</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">설정 백업 내보내기 실패</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">오디오 세션 진단 저장됨</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">설정 백업 내보내기</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">설정 백업 가져오기</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">오디오 세션 진단</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">설정 백업을 내보냈습니다</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">유지 관리</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">진단</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Audio Switcher가 볼 수 있는 Windows 재생 세션 보고서를 내보냅니다. 게임 볼륨 프로필이나 테마 슬라이더가 예상한 프로세스를 감지하지 못할 때 사용하세요.</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">백업 및 복원</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Audio Switcher 설정, 장치 사용자 지정, 게임별 오디오 프로필을 내보내거나 가져옵니다.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">진단 내보내기</sys:String>
 </ResourceDictionary>

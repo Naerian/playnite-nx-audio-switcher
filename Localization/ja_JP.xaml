@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">ゲーム音量の変更に失敗しました</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">ゲームをミュートしました</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">ゲーム音声オン</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">設定バックアップのインポートに失敗しました</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">ツール</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">オーディオセッション診断に失敗しました</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">設定バックアップをインポートしました</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">選択したバックアップファイルは無効です</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">バックアップと復元</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">設定バックアップのエクスポートに失敗しました</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">オーディオセッション診断を保存しました</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">設定バックアップをエクスポート</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">設定バックアップをインポート</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">オーディオセッション診断</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">設定バックアップをエクスポートしました</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">メンテナンス</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">診断</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Audio Switcher が認識できる Windows 再生セッションのレポートをエクスポートします。ゲーム音量プロファイルやテーマのスライダーが想定したプロセスを検出しない場合に使用します。</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">バックアップと復元</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Audio Switcher の設定、デバイスのカスタマイズ、ゲーム別オーディオプロファイルをエクスポートまたはインポートします。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">診断エクスポート</sys:String>
 </ResourceDictionary>

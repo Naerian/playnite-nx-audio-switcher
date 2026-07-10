@@ -115,6 +115,24 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">Game volume change failed</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">Game muted</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">Game sound on</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">Settings backup import failed</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">Tools</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">Audio session diagnostics failed</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">Settings backup imported</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">The selected backup file is not valid</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">Backup and restore</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">Settings backup export failed</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">Audio session diagnostics saved</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">Export settings backup</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">Import settings backup</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">Audio session diagnostics</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">Settings backup exported</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">Maintenance</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">Diagnostics</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Export a report with the Windows playback sessions Audio Switcher can see. Use it when a game volume profile or theme slider does not detect the expected process.</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Backup and restore</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Export or import Audio Switcher settings, device customizations, and per-game audio profiles.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">Diagnostics export</sys:String>
 </ResourceDictionary>
 
 

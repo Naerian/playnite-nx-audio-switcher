@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">Не удалось изменить громкость игры</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">Игра отключена</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">Звук игры включен</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">Не удалось импортировать резервную копию настроек</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">Инструменты</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">Не удалось выполнить диагностику аудиосессий</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">Резервная копия настроек импортирована</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">Выбранный файл резервной копии недействителен</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">Резервная копия и восстановление</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">Не удалось экспортировать резервную копию настроек</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">Диагностика аудиосессий сохранена</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">Экспортировать резервную копию настроек</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">Импортировать резервную копию настроек</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">Диагностика аудиосессий</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">Резервная копия настроек экспортирована</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">Обслуживание</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">Диагностика</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">Экспортирует отчет о сеансах воспроизведения Windows, которые видит Audio Switcher. Используйте его, если профиль громкости игры или слайдер темы не находит нужный процесс.</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Резервная копия и восстановление</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Экспортируйте или импортируйте настройки Audio Switcher, настройки устройств и аудиопрофили для игр.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">Экспорт диагностики</sys:String>
 </ResourceDictionary>

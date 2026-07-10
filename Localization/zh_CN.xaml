@@ -115,4 +115,22 @@
     <sys:String x:Key="LOCAS_GameVolumeFailed">游戏音量更改失败</sys:String>
     <sys:String x:Key="LOCAS_GameMuted">游戏已静音</sys:String>
     <sys:String x:Key="LOCAS_GameUnmuted">游戏声音已开启</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportFailed">设置备份导入失败</sys:String>
+    <sys:String x:Key="LOCAS_MenuTools">工具</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsFailed">音频会话诊断失败</sys:String>
+    <sys:String x:Key="LOCAS_BackupImported">设置备份已导入</sys:String>
+    <sys:String x:Key="LOCAS_BackupImportInvalid">所选备份文件无效</sys:String>
+    <sys:String x:Key="LOCAS_MenuBackupRestore">备份和还原</sys:String>
+    <sys:String x:Key="LOCAS_BackupExportFailed">设置备份导出失败</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnosticsSaved">音频会话诊断已保存</sys:String>
+    <sys:String x:Key="LOCAS_ExportSettingsBackup">导出设置备份</sys:String>
+    <sys:String x:Key="LOCAS_ImportSettingsBackup">导入设置备份</sys:String>
+    <sys:String x:Key="LOCAS_AudioSessionDiagnostics">音频会话诊断</sys:String>
+    <sys:String x:Key="LOCAS_BackupExported">设置备份已导出</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceTab">维护</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsTitle">诊断</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceDiagnosticsHelp">导出 Audio Switcher 可见的 Windows 播放会话报告。当游戏音量配置或主题滑块无法检测到预期进程时使用。</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupTitle">备份和还原</sys:String>
+    <sys:String x:Key="LOCAS_MaintenanceBackupHelp">导出或导入 Audio Switcher 设置、设备自定义和每个游戏的音频配置。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnostics">诊断导出</sys:String>
 </ResourceDictionary>
