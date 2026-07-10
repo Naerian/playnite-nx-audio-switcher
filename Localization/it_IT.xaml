@@ -133,4 +133,7 @@
     <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Backup e ripristino</sys:String>
     <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Esporta o importa impostazioni di Audio Switcher, personalizzazioni dei dispositivi e profili audio per gioco.</sys:String>
     <sys:String x:Key="LOCAS_NotifyDiagnostics">Esportazione diagnostica</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionNoGame">Nessun gioco in esecuzione</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionWaiting">In attesa della sessione audio del gioco</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionControlling">Controllo di {0}</sys:String>
 </ResourceDictionary>

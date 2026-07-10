@@ -28,20 +28,29 @@ namespace PlayniteAudioSwitcher
         private int currentVolumePercent;
         private string currentVolumeLabel;
         private bool isMuted;
+        private bool isOutputMuted;
+        private Geometry currentOutputVolumeIconGeometry;
         private float currentInputVolume;
         private int currentInputVolumePercent;
         private string currentInputVolumeLabel;
         private bool isInputMuted;
+        private Geometry currentInputVolumeIconGeometry;
         private float currentGameVolume;
         private int currentGameVolumePercent;
         private string currentGameVolumeLabel;
         private bool isGameMuted;
+        private Geometry currentGameVolumeIconGeometry;
         private bool hasActiveGameAudioSession;
+        private string gameSessionStatusLabel;
         private string currentGameName;
         private string currentGameProcessName;
         private string currentGameProcessPath;
         private string currentGameSessionName;
         private string currentGameSessionIconPath;
+        private string lastChangeType;
+        private string lastChangeMessage;
+        private DateTime lastChangeAt;
+        private Geometry lastChangeIconGeometry;
         private int volumeStepPercent;
         private bool isRefreshingVolume;
         private bool isRefreshingInputVolume;
@@ -259,6 +268,18 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref isMuted, value);
         }
 
+        public bool IsOutputMuted
+        {
+            get => isOutputMuted;
+            private set => SetValue(ref isOutputMuted, value);
+        }
+
+        public Geometry CurrentOutputVolumeIconGeometry
+        {
+            get => currentOutputVolumeIconGeometry;
+            private set => SetValue(ref currentOutputVolumeIconGeometry, value);
+        }
+
         public float CurrentInputVolume
         {
             get => currentInputVolume;
@@ -303,6 +324,12 @@ namespace PlayniteAudioSwitcher
         {
             get => isInputMuted;
             private set => SetValue(ref isInputMuted, value);
+        }
+
+        public Geometry CurrentInputVolumeIconGeometry
+        {
+            get => currentInputVolumeIconGeometry;
+            private set => SetValue(ref currentInputVolumeIconGeometry, value);
         }
 
         public float CurrentGameVolume
@@ -351,10 +378,22 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref isGameMuted, value);
         }
 
+        public Geometry CurrentGameVolumeIconGeometry
+        {
+            get => currentGameVolumeIconGeometry;
+            private set => SetValue(ref currentGameVolumeIconGeometry, value);
+        }
+
         public bool HasActiveGameAudioSession
         {
             get => hasActiveGameAudioSession;
             private set => SetValue(ref hasActiveGameAudioSession, value);
+        }
+
+        public string GameSessionStatusLabel
+        {
+            get => gameSessionStatusLabel;
+            private set => SetValue(ref gameSessionStatusLabel, value);
         }
 
         public string CurrentGameName
@@ -385,6 +424,30 @@ namespace PlayniteAudioSwitcher
         {
             get => currentGameSessionIconPath;
             private set => SetValue(ref currentGameSessionIconPath, value);
+        }
+
+        public string LastChangeType
+        {
+            get => lastChangeType;
+            private set => SetValue(ref lastChangeType, value);
+        }
+
+        public string LastChangeMessage
+        {
+            get => lastChangeMessage;
+            private set => SetValue(ref lastChangeMessage, value);
+        }
+
+        public DateTime LastChangeAt
+        {
+            get => lastChangeAt;
+            private set => SetValue(ref lastChangeAt, value);
+        }
+
+        public Geometry LastChangeIconGeometry
+        {
+            get => lastChangeIconGeometry;
+            private set => SetValue(ref lastChangeIconGeometry, value);
         }
 
         public int VolumeStepPercent
@@ -531,6 +594,14 @@ namespace PlayniteAudioSwitcher
             RefreshInputDevices(currentInputId: CurrentInputDeviceId);
         }
 
+        public void RecordChange(string changeType, string message, Geometry iconGeometry = null)
+        {
+            LastChangeType = changeType ?? string.Empty;
+            LastChangeMessage = message ?? string.Empty;
+            LastChangeIconGeometry = iconGeometry;
+            LastChangeAt = DateTime.Now;
+        }
+
         private AudioSwitcherThemeDevice CreateThemeDevice(AudioDevice device, string currentId)
         {
             return new AudioSwitcherThemeDevice
@@ -664,7 +735,9 @@ namespace PlayniteAudioSwitcher
                 CurrentVolume = volume;
                 CurrentVolumePercent = volumePercent;
                 IsMuted = muted;
+                IsOutputMuted = muted;
                 CurrentVolumeLabel = label ?? (muted ? plugin.Loc("LOCAS_Muted") : $"{volumePercent}%");
+                CurrentOutputVolumeIconGeometry = GetVolumeIconGeometry(muted, volumePercent, false);
             }
             finally
             {
@@ -694,6 +767,7 @@ namespace PlayniteAudioSwitcher
                 CurrentInputVolumePercent = volumePercent;
                 IsInputMuted = muted;
                 CurrentInputVolumeLabel = label ?? (muted ? plugin.Loc("LOCAS_InputMuted") : $"{volumePercent}%");
+                CurrentInputVolumeIconGeometry = GetVolumeIconGeometry(muted, volumePercent, true);
             }
             finally
             {
@@ -723,6 +797,7 @@ namespace PlayniteAudioSwitcher
                 CurrentGameProcessPath = session?.ProcessPath ?? string.Empty;
                 CurrentGameSessionName = session?.FriendlyName ?? string.Empty;
                 CurrentGameSessionIconPath = session?.IconPath ?? string.Empty;
+                UpdateGameSessionStatusLabel();
             }
             catch
             {
@@ -730,6 +805,7 @@ namespace PlayniteAudioSwitcher
                 CurrentGameProcessPath = string.Empty;
                 CurrentGameSessionName = string.Empty;
                 CurrentGameSessionIconPath = string.Empty;
+                UpdateGameSessionStatusLabel();
             }
         }
 
@@ -745,11 +821,58 @@ namespace PlayniteAudioSwitcher
                 CurrentGameVolumeLabel = label ?? (isAvailable
                     ? muted ? plugin.Loc("LOCAS_GameMuted") : $"{volumePercent}%"
                     : plugin.Loc("LOCAS_GameVolumeUnavailable"));
+                CurrentGameVolumeIconGeometry = GetVolumeIconGeometry(muted || !isAvailable, volumePercent, false);
+                UpdateGameSessionStatusLabel();
             }
             finally
             {
                 isRefreshingGameVolume = false;
             }
+        }
+
+        private Geometry GetVolumeIconGeometry(bool muted, int volumePercent, bool input)
+        {
+            if (muted)
+            {
+                return plugin.GetIconGeometry(input ? "mic-off" : "volume-x");
+            }
+
+            if (input)
+            {
+                return plugin.GetIconGeometry("mic");
+            }
+
+            if (volumePercent <= 0)
+            {
+                return plugin.GetIconGeometry("volume-off");
+            }
+
+            if (volumePercent < 50)
+            {
+                return plugin.GetIconGeometry("volume-1");
+            }
+
+            return plugin.GetIconGeometry("volume-2");
+        }
+
+        private void UpdateGameSessionStatusLabel()
+        {
+            if (string.IsNullOrWhiteSpace(CurrentGameName))
+            {
+                GameSessionStatusLabel = plugin.Loc("LOCAS_GameSessionNoGame");
+                return;
+            }
+
+            if (!HasActiveGameAudioSession)
+            {
+                GameSessionStatusLabel = plugin.Loc("LOCAS_GameSessionWaiting");
+                return;
+            }
+
+            var sessionName = !string.IsNullOrWhiteSpace(CurrentGameSessionName)
+                ? CurrentGameSessionName
+                : CurrentGameName;
+            GameSessionStatusLabel = string.Format(plugin.Loc("LOCAS_GameSessionControlling"), sessionName);
         }
 
         private void ChangeVolume(int direction)

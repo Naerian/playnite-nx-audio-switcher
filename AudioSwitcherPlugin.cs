@@ -71,7 +71,10 @@ namespace PlayniteAudioSwitcher
                     "VolumeSlider",
                     "InputDeviceList",
                     "InputVolumeSlider",
-                    "GameVolumeSlider"
+                    "GameVolumeSlider",
+                    "OutputWidget",
+                    "InputWidget",
+                    "GameVolumeWidget"
                 }
             });
 
@@ -379,6 +382,21 @@ namespace PlayniteAudioSwitcher
             if (args.Name == "GameVolumeSlider")
             {
                 return new AudioGameVolumeSliderControl(this);
+            }
+
+            if (args.Name == "OutputWidget")
+            {
+                return new AudioOutputWidgetControl(this);
+            }
+
+            if (args.Name == "InputWidget")
+            {
+                return new AudioInputWidgetControl(this);
+            }
+
+            if (args.Name == "GameVolumeWidget")
+            {
+                return new AudioGameVolumeWidgetControl(this);
             }
 
             return null;
@@ -1364,6 +1382,7 @@ namespace PlayniteAudioSwitcher
             {
                 AudioDevices.SetDefaultPlaybackVolume(volume);
                 Theme?.Refresh();
+                RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
                 if (notify && ShouldShowVolumeNotifications())
                 {
                     ShowVolumeInfoMessage();
@@ -1387,6 +1406,7 @@ namespace PlayniteAudioSwitcher
             {
                 AudioDevices.SetDefaultRecordingVolume(volume);
                 Theme?.Refresh();
+                RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
                 if (notify && ShouldShowVolumeNotifications())
                 {
                     ShowInputVolumeInfoMessage();
@@ -1424,6 +1444,7 @@ namespace PlayniteAudioSwitcher
                 }
 
                 Theme?.Refresh();
+                RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
                 if (notify && ShouldShowVolumeNotifications())
                 {
                     ShowGameVolumeInfoMessage();
@@ -1443,6 +1464,7 @@ namespace PlayniteAudioSwitcher
                 var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
                 AudioDevices.ChangeDefaultPlaybackVolume(step * Math.Sign(direction));
                 Theme?.Refresh();
+                RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
                 if (ShouldShowVolumeNotifications())
                 {
                     ShowVolumeInfoMessage();
@@ -1462,6 +1484,7 @@ namespace PlayniteAudioSwitcher
                 var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
                 AudioDevices.ChangeDefaultRecordingVolume(step * Math.Sign(direction));
                 Theme?.Refresh();
+                RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
                 if (ShouldShowVolumeNotifications())
                 {
                     ShowInputVolumeInfoMessage();
@@ -1503,6 +1526,7 @@ namespace PlayniteAudioSwitcher
                 }
 
                 Theme?.Refresh();
+                RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
                 if (ShouldShowVolumeNotifications())
                 {
                     ShowGameVolumeInfoMessage();
@@ -1522,6 +1546,7 @@ namespace PlayniteAudioSwitcher
                 AudioDevices.ToggleDefaultPlaybackMute();
                 Theme?.Refresh();
                 var state = AudioDevices.GetDefaultPlaybackVolume();
+                RecordThemeChange("mute", state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"), Theme?.CurrentOutputVolumeIconGeometry);
                 ShowMuteInfoMessage(state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"));
             }
             catch (Exception ex)
@@ -1538,6 +1563,7 @@ namespace PlayniteAudioSwitcher
                 AudioDevices.ToggleDefaultRecordingMute();
                 Theme?.Refresh();
                 var state = AudioDevices.GetDefaultRecordingVolume();
+                RecordThemeChange("input-mute", state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"), Theme?.CurrentInputVolumeIconGeometry);
                 ShowMuteInfoMessage(state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"));
             }
             catch (Exception ex)
@@ -1576,6 +1602,7 @@ namespace PlayniteAudioSwitcher
 
                 Theme?.Refresh();
                 var currentGameState = GetCurrentGameVolumeState();
+                RecordThemeChange("game-mute", currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"), Theme?.CurrentGameVolumeIconGeometry);
                 ShowMuteInfoMessage(currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"));
             }
             catch (Exception ex)
@@ -1738,6 +1765,7 @@ namespace PlayniteAudioSwitcher
                 TryApplyDefaultVolume(deviceId);
                 settings.RefreshDevices();
                 Theme?.Refresh();
+                RecordThemeChange("output-device", GetOutputNotificationText(deviceName), GetCurrentDeviceIconGeometry());
                 if (notify && ShouldShowOutputDeviceNotifications())
                 {
                     ShowMessage(GetOutputNotificationText(deviceName));
@@ -1763,6 +1791,7 @@ namespace PlayniteAudioSwitcher
                 TryApplyDefaultInputVolume(deviceId);
                 settings.RefreshDevices();
                 Theme?.Refresh();
+                RecordThemeChange("input-device", $"{Loc("LOCAS_AudioInput")}: {deviceName}", GetCurrentInputDeviceIconGeometry());
                 if (notify && ShouldShowInputDeviceNotifications())
                 {
                     ShowMessage($"{Loc("LOCAS_AudioInput")}: {deviceName}");
@@ -1853,6 +1882,11 @@ namespace PlayniteAudioSwitcher
                 Description = Loc("LOCAS_ToggleMute"),
                 Action = _ => ToggleMute()
             });
+        }
+
+        private void RecordThemeChange(string changeType, string message, Geometry iconGeometry = null)
+        {
+            Theme?.RecordChange(changeType, message, iconGeometry);
         }
 
         public void ExportAudioSessionDiagnostics()

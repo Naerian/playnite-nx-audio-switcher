@@ -139,6 +139,16 @@ The native Playnite extension menu can only display text rows. Theme integration
 
 An example XAML file is included in the repository and package at `Examples/FullscreenThemeIntegration.xaml`.
 
+For a quick integration, start with the bundled widgets:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_OutputWidget" />
+<ContentControl x:Name="AudioSwitcher_InputWidget" />
+<ContentControl x:Name="AudioSwitcher_GameVolumeWidget" />
+```
+
+These compact controls are intended for topbars and overlays. They expose the current output device, current input device, or current game audio session with icon, label, volume state, and the most common action.
+
 For Fullscreen themes, the safest setup is an icon button plus the bundled `AudioSwitcher_DeviceList` inside a theme panel:
 
 ```xml
@@ -190,16 +200,24 @@ Useful properties:
 - `CurrentVolumePercent`
 - `CurrentVolumeLabel`
 - `IsMuted`
+- `IsOutputMuted`
+- `CurrentOutputVolumeIconGeometry`
 - `CurrentGameName`
 - `CurrentGameProcessName`
 - `CurrentGameProcessPath`
 - `CurrentGameSessionName`
 - `CurrentGameSessionIconPath`
+- `GameSessionStatusLabel`
 - `CurrentGameVolume`
 - `CurrentGameVolumePercent`
 - `CurrentGameVolumeLabel`
 - `IsGameMuted`
+- `CurrentGameVolumeIconGeometry`
 - `HasActiveGameAudioSession`
+- `LastChangeType`
+- `LastChangeMessage`
+- `LastChangeAt`
+- `LastChangeIconGeometry`
 - `VolumeStepPercent`
 - `Devices`
 - `AllDevices`
@@ -211,9 +229,15 @@ Useful properties:
 
 `CurrentVolume` is a 0.0 to 1.0 scalar value, `CurrentVolumePercent` is the same value as 0 to 100, `CurrentVolumeLabel` is ready for display, and `IsMuted` reports whether the current default output is muted. `CurrentVolume` and `CurrentVolumePercent` can also be written by custom theme controls; writing either value changes the Windows volume.
 
+`IsOutputMuted` is an alias for output mute state, useful when a theme wants symmetric output/input/game names. `CurrentOutputVolumeIconGeometry`, `CurrentInputVolumeIconGeometry`, and `CurrentGameVolumeIconGeometry` expose ready-to-render icon geometry for mute and volume state.
+
 `CurrentGameVolume` and `CurrentGameVolumePercent` work the same way, but target the audio session of the game currently launched by Playnite. `HasActiveGameAudioSession` is `false` when no game is running or Windows has not created a matching game audio session yet. This is useful for overlays that should hide or disable a game-volume slider until it can actually control something.
 
 `CurrentGameProcessName`, `CurrentGameProcessPath`, `CurrentGameSessionName`, and `CurrentGameSessionIconPath` expose the Windows audio session currently matched by Audio Switcher for the running game. Theme authors can use these values for debugging overlays or richer game-audio widgets. Cover art and game metadata should still usually come from Playnite/theme data, because Audio Switcher only exposes the Windows audio session it controls.
+
+`GameSessionStatusLabel` is a localized, display-ready status string for the current game session, such as no game running, waiting for a game audio session, or controlling a specific process/session.
+
+`LastChangeType`, `LastChangeMessage`, `LastChangeAt`, and `LastChangeIconGeometry` let themes build their own in-theme toast or notification area when Audio Switcher changes output, input, volume, mute, or game-session volume.
 
 `VolumeStepPercent` is writable and controls how many percentage points the volume changes when a Fullscreen theme uses left/right on `AudioSwitcher_VolumeSlider`, `VolumeUpCommand`, or `VolumeDownCommand`. Desktop volume actions use the same step.
 
@@ -235,6 +259,38 @@ Useful commands:
 - `SetGameVolumeCommand`
 - `ToggleGameMuteCommand`
 - `RefreshGameVolumeCommand`
+
+Minimal topbar button:
+
+```xml
+<StackPanel Orientation="Horizontal">
+    <ContentControl x:Name="AudioSwitcher_OpenSelectorButton" />
+    <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceName}" />
+</StackPanel>
+```
+
+Minimal overlay panel:
+
+```xml
+<StackPanel>
+    <ContentControl x:Name="AudioSwitcher_OutputWidget" />
+    <ContentControl x:Name="AudioSwitcher_DeviceList" />
+    <ContentControl x:Name="AudioSwitcher_VolumeSlider" />
+    <ContentControl x:Name="AudioSwitcher_InputWidget" />
+    <ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
+    <ContentControl x:Name="AudioSwitcher_GameVolumeWidget" />
+    <ContentControl x:Name="AudioSwitcher_GameVolumeSlider" />
+</StackPanel>
+```
+
+Minimal in-theme change toast:
+
+```xml
+<StackPanel Orientation="Horizontal">
+    <Path Data="{PluginSettings Plugin=AudioSwitcher, Path=LastChangeIconGeometry}" />
+    <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=LastChangeMessage}" />
+</StackPanel>
+```
 
 Example icon button:
 
@@ -324,6 +380,7 @@ Input devices use the same pattern with input-specific properties and commands:
 - `CurrentInputVolumePercent`
 - `CurrentInputVolumeLabel`
 - `IsInputMuted`
+- `CurrentInputVolumeIconGeometry`
 - `InputDevices`
 - `AllInputDevices`
 - `HasInputDevices`

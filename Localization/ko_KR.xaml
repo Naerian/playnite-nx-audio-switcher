@@ -133,4 +133,7 @@
     <sys:String x:Key="LOCAS_MaintenanceBackupTitle">백업 및 복원</sys:String>
     <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Audio Switcher 설정, 장치 사용자 지정, 게임별 오디오 프로필을 내보내거나 가져옵니다.</sys:String>
     <sys:String x:Key="LOCAS_NotifyDiagnostics">진단 내보내기</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionNoGame">실행 중인 게임 없음</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionWaiting">게임 오디오 세션 대기 중</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionControlling">{0} 제어 중</sys:String>
 </ResourceDictionary>

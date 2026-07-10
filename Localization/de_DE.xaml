@@ -133,4 +133,7 @@
     <sys:String x:Key="LOCAS_MaintenanceBackupTitle">Sichern und Wiederherstellen</sys:String>
     <sys:String x:Key="LOCAS_MaintenanceBackupHelp">Exportieren oder importieren Sie Audio Switcher-Einstellungen, Geräteanpassungen und Audio-Profile pro Spiel.</sys:String>
     <sys:String x:Key="LOCAS_NotifyDiagnostics">Diagnoseexport</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionNoGame">Kein Spiel läuft</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionWaiting">Warte auf die Audiositzung des Spiels</sys:String>
+    <sys:String x:Key="LOCAS_GameSessionControlling">Steuert {0}</sys:String>
 </ResourceDictionary>
