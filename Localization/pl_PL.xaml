@@ -136,4 +136,9 @@
     <sys:String x:Key="LOCAS_GameSessionNoGame">Brak uruchomionej gry</sys:String>
     <sys:String x:Key="LOCAS_GameSessionWaiting">Oczekiwanie na sesję audio gry</sys:String>
     <sys:String x:Key="LOCAS_GameSessionControlling">Sterowanie {0}</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionTitle">Dźwięk multimediów</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnavailable">Brak dźwięku multimediów</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionMuted">Multimedia wyciszone</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnmuted">Dźwięk multimediów włączony</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Nie udało się zmienić dźwięku multimediów</sys:String>
 </ResourceDictionary>

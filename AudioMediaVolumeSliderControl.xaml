@@ -1,0 +1,31 @@
+<playnite:PluginUserControl x:Class="PlayniteAudioSwitcher.AudioMediaVolumeSliderControl"
+                            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                            xmlns:playnite="clr-namespace:Playnite.SDK.Controls;assembly=Playnite.SDK"
+                            Focusable="True"
+                            KeyboardNavigation.DirectionalNavigation="Contained"
+                            KeyboardNavigation.TabNavigation="Cycle">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Slider x:Name="VolumeSlider"
+                Minimum="0"
+                Maximum="100"
+                IsSnapToTickEnabled="False"
+                Focusable="True"
+                VerticalAlignment="Center"
+                ValueChanged="VolumeSlider_ValueChanged"
+                PreviewKeyDown="VolumeSlider_PreviewKeyDown" />
+
+        <TextBlock x:Name="VolumeLabel"
+                   Grid.Column="1"
+                   MinWidth="90"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center"
+                   TextAlignment="Right"
+                   Foreground="{DynamicResource TextBrush}" />
+    </Grid>
+</playnite:PluginUserControl>

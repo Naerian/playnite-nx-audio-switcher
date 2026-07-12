@@ -136,4 +136,9 @@
     <sys:String x:Key="LOCAS_GameSessionNoGame">Aucun jeu en cours</sys:String>
     <sys:String x:Key="LOCAS_GameSessionWaiting">En attente de la session audio du jeu</sys:String>
     <sys:String x:Key="LOCAS_GameSessionControlling">Contrôle de {0}</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionTitle">Audio multimédia</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnavailable">Aucun audio multimédia</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionMuted">Multimédia coupé</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnmuted">Audio multimédia activé</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Échec du changement audio multimédia</sys:String>
 </ResourceDictionary>

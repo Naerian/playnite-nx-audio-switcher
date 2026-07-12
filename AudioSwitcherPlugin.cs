@@ -40,6 +40,7 @@ namespace PlayniteAudioSwitcher
         private int activeGameProcessId;
         private string activeGameName;
         private HashSet<uint> activeGameAudioSessionProcessIds = new HashSet<uint>();
+        private string currentMediaSessionId;
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -74,7 +75,11 @@ namespace PlayniteAudioSwitcher
                     "GameVolumeSlider",
                     "OutputWidget",
                     "InputWidget",
-                    "GameVolumeWidget"
+                    "GameVolumeWidget",
+                    "MediaSessionList",
+                    "MediaVolumeSlider",
+                    "MediaWidget",
+                    "MediaMixer"
                 }
             });
 
@@ -397,6 +402,26 @@ namespace PlayniteAudioSwitcher
             if (args.Name == "GameVolumeWidget")
             {
                 return new AudioGameVolumeWidgetControl(this);
+            }
+
+            if (args.Name == "MediaSessionList")
+            {
+                return new AudioMediaSessionListControl(this);
+            }
+
+            if (args.Name == "MediaVolumeSlider")
+            {
+                return new AudioMediaVolumeSliderControl(this);
+            }
+
+            if (args.Name == "MediaWidget")
+            {
+                return new AudioMediaWidgetControl(this);
+            }
+
+            if (args.Name == "MediaMixer")
+            {
+                return new AudioMediaMixerControl(this);
             }
 
             return null;
@@ -1371,6 +1396,208 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public IReadOnlyList<AudioSessionInfo> GetMediaAudioSessions()
+        {
+            try
+            {
+                var excludedProcessIds = GetCurrentGameAudioSessionProcessIds();
+                return AudioDevices.GetPlaybackAudioSessions()
+                    .Where(session => !string.IsNullOrWhiteSpace(session.Id))
+                    .Where(session => session.ProcessId != 0)
+                    .Where(session => !excludedProcessIds.Contains(session.ProcessId))
+                    .Where(session => !IsIgnoredMediaSession(session))
+                    .Where(IsLikelyMediaSession)
+                    .GroupBy(session => session.Id)
+                    .Select(group => group.First())
+                    .OrderByDescending(GetMediaSessionPriority)
+                    .ThenBy(session => GetMediaSessionDisplayName(session))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to enumerate media audio sessions.");
+                return new List<AudioSessionInfo>();
+            }
+        }
+
+        public string GetCurrentMediaSessionId()
+        {
+            var sessions = GetMediaAudioSessions();
+            if (sessions.Count == 0)
+            {
+                currentMediaSessionId = null;
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(currentMediaSessionId) ||
+                sessions.All(session => !string.Equals(session.Id, currentMediaSessionId, StringComparison.OrdinalIgnoreCase)))
+            {
+                currentMediaSessionId = sessions[0].Id;
+            }
+
+            return currentMediaSessionId;
+        }
+
+        public AudioSessionInfo GetCurrentMediaSessionInfo()
+        {
+            var sessionId = GetCurrentMediaSessionId();
+            return string.IsNullOrWhiteSpace(sessionId)
+                ? null
+                : GetMediaAudioSessions().FirstOrDefault(session => string.Equals(session.Id, sessionId, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public AudioVolumeState GetCurrentMediaSessionVolumeState()
+        {
+            var sessionId = GetCurrentMediaSessionId();
+            return string.IsNullOrWhiteSpace(sessionId)
+                ? new AudioVolumeState { IsAvailable = false }
+                : AudioDevices.GetPlaybackAudioSessionVolume(sessionId);
+        }
+
+        public void SetThemeSelectedMediaSession(string sessionId)
+        {
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return;
+            }
+
+            currentMediaSessionId = sessionId;
+            Theme?.Refresh();
+        }
+
+        public string GetMediaSessionDisplayName(AudioSessionInfo session)
+        {
+            if (session == null)
+            {
+                return Loc("LOCAS_MediaSessionUnavailable");
+            }
+
+            if (!string.IsNullOrWhiteSpace(session.DisplayName))
+            {
+                return session.DisplayName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(session.ProcessName))
+            {
+                return GetFriendlyProcessName(session.ProcessName);
+            }
+
+            return session.FriendlyName;
+        }
+
+        public void SetMediaSessionVolume(float volume)
+        {
+            SetMediaSessionVolume(volume, true);
+        }
+
+        public void SetMediaSessionVolume(float volume, bool notify)
+        {
+            var sessionId = GetCurrentMediaSessionId();
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return;
+            }
+
+            SetMediaSessionVolume(sessionId, volume, notify);
+        }
+
+        public void SetMediaSessionVolume(string sessionId, float volume, bool notify)
+        {
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return;
+            }
+
+            try
+            {
+                if (!AudioDevices.SetPlaybackAudioSessionVolume(sessionId, volume))
+                {
+                    logger.Info("No active media audio session found while setting volume.");
+                    Theme?.Refresh();
+                    return;
+                }
+
+                Theme?.Refresh();
+                if (notify)
+                {
+                    var state = AudioDevices.GetPlaybackAudioSessionVolume(sessionId);
+                    RecordThemeChange("media-volume", $"{Loc("LOCAS_MediaSessionTitle")}: {state.VolumePercent}%", Theme?.CurrentMediaSessionVolumeIconGeometry);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to set media audio session volume.");
+                ShowMessage($"{Loc("LOCAS_MediaSessionVolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ChangeMediaSessionVolumeByStep(int direction)
+        {
+            var sessionId = GetCurrentMediaSessionId();
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return;
+            }
+
+            try
+            {
+                var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
+                if (!AudioDevices.ChangePlaybackAudioSessionVolume(sessionId, step * Math.Sign(direction)))
+                {
+                    logger.Info("No active media audio session found while changing volume.");
+                    Theme?.Refresh();
+                    return;
+                }
+
+                Theme?.Refresh();
+                var state = GetCurrentMediaSessionVolumeState();
+                RecordThemeChange("media-volume", $"{Loc("LOCAS_MediaSessionTitle")}: {state.VolumePercent}%", Theme?.CurrentMediaSessionVolumeIconGeometry);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to change media audio session volume.");
+                ShowMessage($"{Loc("LOCAS_MediaSessionVolumeFailed")}: {ex.Message}");
+            }
+        }
+
+        public void ToggleMediaSessionMute()
+        {
+            var sessionId = GetCurrentMediaSessionId();
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return;
+            }
+
+            ToggleMediaSessionMute(sessionId);
+        }
+
+        public void ToggleMediaSessionMute(string sessionId)
+        {
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return;
+            }
+
+            try
+            {
+                if (!AudioDevices.TogglePlaybackAudioSessionMute(sessionId))
+                {
+                    logger.Info("No active media audio session found while toggling mute.");
+                    Theme?.Refresh();
+                    return;
+                }
+
+                Theme?.Refresh();
+                var state = AudioDevices.GetPlaybackAudioSessionVolume(sessionId);
+                RecordThemeChange("media-mute", state.IsMuted ? Loc("LOCAS_MediaSessionMuted") : Loc("LOCAS_MediaSessionUnmuted"), Theme?.CurrentMediaSessionVolumeIconGeometry);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to toggle media audio session mute.");
+                ShowMessage($"{Loc("LOCAS_MediaSessionVolumeFailed")}: {ex.Message}");
+            }
+        }
+
         public void SetVolume(float volume)
         {
             SetVolume(volume, true);
@@ -1887,6 +2114,177 @@ namespace PlayniteAudioSwitcher
         private void RecordThemeChange(string changeType, string message, Geometry iconGeometry = null)
         {
             Theme?.RecordChange(changeType, message, iconGeometry);
+        }
+
+        private HashSet<uint> GetCurrentGameAudioSessionProcessIds()
+        {
+            var processIds = new HashSet<uint>(activeGameAudioSessionProcessIds);
+            if (activeGameProcessId <= 0)
+            {
+                return processIds;
+            }
+
+            try
+            {
+                foreach (var processId in AudioDevices.GetProcessTreeAudioSessionProcessIds(activeGameProcessId))
+                {
+                    processIds.Add(processId);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, $"Failed to read game audio session process ids for {activeGameName ?? "current game"}.");
+            }
+
+            return processIds;
+        }
+
+        private static bool IsIgnoredMediaSession(AudioSessionInfo session)
+        {
+            var processName = session?.ProcessName;
+            if (string.IsNullOrWhiteSpace(processName))
+            {
+                return true;
+            }
+
+            switch (processName.ToLowerInvariant())
+            {
+                case "audiodg":
+                case "playnite":
+                case "playnite.desktopapp":
+                case "playnite.fullscreenapp":
+                case "steam":
+                case "steamwebhelper":
+                case "xboxpcapp":
+                case "gamebar":
+                case "gamebarftserver":
+                case "gamingservices":
+                case "gamingservicesnet":
+                case "applicationframehost":
+                case "shellexperiencehost":
+                case "startmenuexperiencehost":
+                case "explorer":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsLikelyMediaSession(AudioSessionInfo session)
+        {
+            if (session == null)
+            {
+                return false;
+            }
+
+            var processName = session.ProcessName?.ToLowerInvariant() ?? string.Empty;
+            var displayName = session.DisplayName?.ToLowerInvariant() ?? string.Empty;
+            var iconPath = session.IconPath?.ToLowerInvariant() ?? string.Empty;
+            var text = $"{processName} {displayName} {iconPath}";
+
+            if (IsKnownMediaProcess(processName) ||
+                text.Contains("spotify") ||
+                text.Contains("youtube") ||
+                text.Contains("music") ||
+                text.Contains("media") ||
+                text.Contains("uniplaysong"))
+            {
+                return true;
+            }
+
+            return session.IsActive && IsBrowserProcess(processName);
+        }
+
+        private static bool IsKnownMediaProcess(string processName)
+        {
+            if (string.IsNullOrWhiteSpace(processName))
+            {
+                return false;
+            }
+
+            switch (processName.ToLowerInvariant())
+            {
+                case "spotify":
+                case "uniplaysong":
+                case "vlc":
+                case "wmplayer":
+                case "music.ui":
+                case "musicbee":
+                case "foobar2000":
+                case "aimp":
+                case "itunes":
+                case "winamp":
+                case "plexamp":
+                case "tidal":
+                case "deezer":
+                case "amazon music":
+                case "soundcloud":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsBrowserProcess(string processName)
+        {
+            if (string.IsNullOrWhiteSpace(processName))
+            {
+                return false;
+            }
+
+            switch (processName.ToLowerInvariant())
+            {
+                case "chrome":
+                case "msedge":
+                case "firefox":
+                case "brave":
+                case "opera":
+                case "opera_gx":
+                case "vivaldi":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static int GetMediaSessionPriority(AudioSessionInfo session)
+        {
+            var processName = session?.ProcessName?.ToLowerInvariant() ?? string.Empty;
+            if (IsKnownMediaProcess(processName))
+            {
+                return 30;
+            }
+
+            if (IsBrowserProcess(processName))
+            {
+                return 20;
+            }
+
+            return 10;
+        }
+
+        private static string GetFriendlyProcessName(string processName)
+        {
+            if (string.IsNullOrWhiteSpace(processName))
+            {
+                return string.Empty;
+            }
+
+            switch (processName.ToLowerInvariant())
+            {
+                case "chrome":
+                    return "Google Chrome";
+                case "msedge":
+                    return "Microsoft Edge";
+                case "firefox":
+                    return "Firefox";
+                case "brave":
+                    return "Brave";
+                case "spotify":
+                    return "Spotify";
+                default:
+                    return processName;
+            }
         }
 
         public void ExportAudioSessionDiagnostics()

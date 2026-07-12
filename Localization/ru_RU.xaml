@@ -136,4 +136,9 @@
     <sys:String x:Key="LOCAS_GameSessionNoGame">Игра не запущена</sys:String>
     <sys:String x:Key="LOCAS_GameSessionWaiting">Ожидание аудиосессии игры</sys:String>
     <sys:String x:Key="LOCAS_GameSessionControlling">Управление {0}</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionTitle">Медиа-аудио</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnavailable">Нет медиа-аудио</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionMuted">Медиа заглушено</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnmuted">Медиа-аудио включено</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Не удалось изменить медиа-аудио</sys:String>
 </ResourceDictionary>

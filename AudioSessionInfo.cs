@@ -2,6 +2,8 @@ namespace PlayniteAudioSwitcher
 {
     public sealed class AudioSessionInfo
     {
+        public string Id { get; set; }
+
         public uint ProcessId { get; set; }
 
         public string ProcessName { get; set; }
@@ -13,6 +15,10 @@ namespace PlayniteAudioSwitcher
         public string IconPath { get; set; }
 
         public string SessionIdentifier { get; set; }
+
+        public int State { get; set; }
+
+        public bool IsActive => State == 1;
 
         public int VolumePercent { get; set; }
 

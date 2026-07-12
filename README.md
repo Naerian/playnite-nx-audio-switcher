@@ -18,6 +18,7 @@ It is designed for couch and console-like setups where users often move between 
 - Full device selector for manual switching.
 - Native volume controls for the current default output and input devices.
 - Game-specific output, input, Spatial Sound, and game session volume profiles from the game context menu.
+- Media/background audio session controls for apps such as Spotify, browsers, YouTube, or UniPlaySong when they expose normal Windows audio sessions.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
 - Audio session diagnostics export for troubleshooting Windows mixer and game-session detection.
@@ -145,9 +146,11 @@ For a quick integration, start with the bundled widgets:
 <ContentControl x:Name="AudioSwitcher_OutputWidget" />
 <ContentControl x:Name="AudioSwitcher_InputWidget" />
 <ContentControl x:Name="AudioSwitcher_GameVolumeWidget" />
+<ContentControl x:Name="AudioSwitcher_MediaWidget" />
+<ContentControl x:Name="AudioSwitcher_MediaMixer" />
 ```
 
-These compact controls are intended for topbars and overlays. They expose the current output device, current input device, or current game audio session with icon, label, volume state, and the most common action.
+These compact controls are intended for topbars and overlays. They expose the current output device, current input device, current game audio session, or selected media/background audio session with icon, label, volume state, and the most common action.
 
 For Fullscreen themes, the safest setup is an icon button plus the bundled `AudioSwitcher_DeviceList` inside a theme panel:
 
@@ -214,6 +217,19 @@ Useful properties:
 - `IsGameMuted`
 - `CurrentGameVolumeIconGeometry`
 - `HasActiveGameAudioSession`
+- `MediaSessions`
+- `CurrentMediaSessionId`
+- `CurrentMediaSessionName`
+- `CurrentMediaSessionProcessName`
+- `CurrentMediaSessionProcessPath`
+- `CurrentMediaSessionIconPath`
+- `CurrentMediaSessionVolume`
+- `CurrentMediaSessionVolumePercent`
+- `CurrentMediaSessionVolumeLabel`
+- `IsCurrentMediaSessionMuted`
+- `CurrentMediaSessionVolumeIconGeometry`
+- `HasMediaSessions`
+- `HasSelectedMediaSession`
 - `LastChangeType`
 - `LastChangeMessage`
 - `LastChangeAt`
@@ -237,6 +253,10 @@ Useful properties:
 
 `GameSessionStatusLabel` is a localized, display-ready status string for the current game session, such as no game running, waiting for a game audio session, or controlling a specific process/session.
 
+`MediaSessions` exposes active Windows playback sessions that are not the current game audio session. It is intended for background audio such as Spotify, browsers/YouTube, UniPlaySong, or any app that exposes a normal Core Audio session. If several apps are playing, a theme can show `AudioSwitcher_MediaMixer` to control all of them at once, or show `AudioSwitcher_MediaSessionList` / call `SetMediaSessionCommand` when it wants one selected session plus a separate media slider.
+
+`CurrentMediaSessionName`, `CurrentMediaSessionProcessName`, `CurrentMediaSessionProcessPath`, and `CurrentMediaSessionIconPath` describe the selected media/background session. Browsers are exposed by Windows as browser processes/sessions, not individual tabs, so YouTube usually appears as Chrome, Edge, Firefox, or similar.
+
 `LastChangeType`, `LastChangeMessage`, `LastChangeAt`, and `LastChangeIconGeometry` let themes build their own in-theme toast or notification area when Audio Switcher changes output, input, volume, mute, or game-session volume.
 
 `VolumeStepPercent` is writable and controls how many percentage points the volume changes when a Fullscreen theme uses left/right on `AudioSwitcher_VolumeSlider`, `VolumeUpCommand`, or `VolumeDownCommand`. Desktop volume actions use the same step.
@@ -259,6 +279,12 @@ Useful commands:
 - `SetGameVolumeCommand`
 - `ToggleGameMuteCommand`
 - `RefreshGameVolumeCommand`
+- `RefreshMediaSessionsCommand`
+- `SetMediaSessionCommand`
+- `MediaSessionVolumeUpCommand`
+- `MediaSessionVolumeDownCommand`
+- `SetMediaSessionVolumeCommand`
+- `ToggleMediaSessionMuteCommand`
 
 Minimal topbar button:
 
@@ -280,6 +306,10 @@ Minimal overlay panel:
     <ContentControl x:Name="AudioSwitcher_InputVolumeSlider" />
     <ContentControl x:Name="AudioSwitcher_GameVolumeWidget" />
     <ContentControl x:Name="AudioSwitcher_GameVolumeSlider" />
+    <ContentControl x:Name="AudioSwitcher_MediaWidget" />
+    <ContentControl x:Name="AudioSwitcher_MediaMixer" />
+    <ContentControl x:Name="AudioSwitcher_MediaSessionList" />
+    <ContentControl x:Name="AudioSwitcher_MediaVolumeSlider" />
 </StackPanel>
 ```
 
@@ -368,6 +398,43 @@ Custom current game volume slider:
         Maximum="100"
         IsEnabled="{PluginSettings Plugin=AudioSwitcher, Path=HasActiveGameAudioSession}"
         Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentGameVolumePercent, Mode=TwoWay}" />
+```
+
+Recommended bundled media/background audio controls:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_MediaMixer" />
+<ContentControl x:Name="AudioSwitcher_MediaSessionList" />
+<ContentControl x:Name="AudioSwitcher_MediaVolumeSlider" />
+<ContentControl x:Name="AudioSwitcher_MediaWidget" />
+```
+
+`AudioSwitcher_MediaMixer` creates one row per active background/media playback session, excluding the currently launched game's audio session. Each row has its own focusable slider and mute button, so users can control Spotify, a browser/YouTube, UniPlaySong, or another media app without first switching the selected session.
+
+`AudioSwitcher_MediaSessionList` creates focusable buttons for active background/media playback sessions. `AudioSwitcher_MediaVolumeSlider` controls the selected media session volume and supports left/right keyboard or gamepad navigation with `VolumeStepPercent`. `AudioSwitcher_MediaWidget` is a compact overlay widget for the selected session.
+
+Custom media/background session list:
+
+```xml
+<ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=MediaSessions}">
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=SetMediaSessionCommand}"
+                    CommandParameter="{Binding Id}">
+                <TextBlock Text="{Binding DisplayName}" />
+            </Button>
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+</ItemsControl>
+```
+
+Custom media/background volume slider:
+
+```xml
+<Slider Minimum="0"
+        Maximum="100"
+        IsEnabled="{PluginSettings Plugin=AudioSwitcher, Path=HasSelectedMediaSession}"
+        Value="{PluginSettings Plugin=AudioSwitcher, Path=CurrentMediaSessionVolumePercent, Mode=TwoWay}" />
 ```
 
 Input devices use the same pattern with input-specific properties and commands:
@@ -489,6 +556,15 @@ Place a controller-friendly current game volume slider:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_GameVolumeSlider" />
+```
+
+Place controller-friendly media/background audio controls:
+
+```xml
+<ContentControl x:Name="AudioSwitcher_MediaMixer" />
+<ContentControl x:Name="AudioSwitcher_MediaSessionList" />
+<ContentControl x:Name="AudioSwitcher_MediaVolumeSlider" />
+<ContentControl x:Name="AudioSwitcher_MediaWidget" />
 ```
 
 Place a controller-friendly input device list and input volume slider:

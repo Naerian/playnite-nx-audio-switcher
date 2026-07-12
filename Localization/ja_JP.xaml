@@ -136,4 +136,9 @@
     <sys:String x:Key="LOCAS_GameSessionNoGame">実行中のゲームはありません</sys:String>
     <sys:String x:Key="LOCAS_GameSessionWaiting">ゲームのオーディオセッションを待機中</sys:String>
     <sys:String x:Key="LOCAS_GameSessionControlling">{0} を制御中</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionTitle">メディア音声</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnavailable">メディア音声なし</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionMuted">メディアをミュート中</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnmuted">メディア音声を有効化</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">メディア音声の変更に失敗しました</sys:String>
 </ResourceDictionary>

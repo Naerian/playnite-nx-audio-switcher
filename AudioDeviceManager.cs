@@ -147,7 +147,12 @@ namespace PlayniteAudioSwitcher
 
         public AudioVolumeState GetProcessVolume(IEnumerable<uint> processIds)
         {
-            var session = GetVolumeSessionsForProcessIds(new HashSet<uint>(processIds ?? Enumerable.Empty<uint>())).FirstOrDefault();
+            return GetVolumeForSessions(GetVolumeSessionsForProcessIds(new HashSet<uint>(processIds ?? Enumerable.Empty<uint>())));
+        }
+
+        private AudioVolumeState GetVolumeForSessions(IReadOnlyList<ISimpleAudioVolume> sessions)
+        {
+            var session = sessions?.FirstOrDefault();
             if (session == null)
             {
                 return new AudioVolumeState { IsAvailable = false };
@@ -225,6 +230,41 @@ namespace PlayniteAudioSwitcher
                 .ToList();
         }
 
+        public AudioVolumeState GetPlaybackAudioSessionVolume(string sessionId)
+        {
+            var sessions = GetPlaybackAudioSessionHandles(sessionId);
+            return GetVolumeForSessions(sessions.Select(a => a.Volume).ToList());
+        }
+
+        public bool SetPlaybackAudioSessionVolume(string sessionId, float volume)
+        {
+            var sessions = GetPlaybackAudioSessionHandles(sessionId);
+            return SetVolumeForSessions(sessions.Select(a => a.Volume).ToList(), volume);
+        }
+
+        public bool ChangePlaybackAudioSessionVolume(string sessionId, float volumeDelta)
+        {
+            var state = GetPlaybackAudioSessionVolume(sessionId);
+            if (!state.IsAvailable)
+            {
+                return false;
+            }
+
+            return SetPlaybackAudioSessionVolume(sessionId, state.Volume + volumeDelta);
+        }
+
+        public bool SetPlaybackAudioSessionMute(string sessionId, bool isMuted)
+        {
+            var sessions = GetPlaybackAudioSessionHandles(sessionId);
+            return SetMuteForSessions(sessions.Select(a => a.Volume).ToList(), isMuted);
+        }
+
+        public bool TogglePlaybackAudioSessionMute(string sessionId)
+        {
+            var state = GetPlaybackAudioSessionVolume(sessionId);
+            return state.IsAvailable && SetPlaybackAudioSessionMute(sessionId, !state.IsMuted);
+        }
+
         public IReadOnlyList<AudioSessionInfo> GetProcessAudioSessions(IEnumerable<uint> processIds)
         {
             var filter = processIds != null ? new HashSet<uint>(processIds) : null;
@@ -274,6 +314,18 @@ namespace PlayniteAudioSwitcher
             }
 
             return sessions;
+        }
+
+        private IReadOnlyList<AudioSessionHandle> GetPlaybackAudioSessionHandles(string sessionId)
+        {
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                return new List<AudioSessionHandle>();
+            }
+
+            return EnumeratePlaybackSessions(null)
+                .Where(a => string.Equals(a.Info.Id, sessionId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
 
         private IReadOnlyList<AudioSessionHandle> EnumeratePlaybackSessions(HashSet<uint> filterProcessIds)
@@ -345,6 +397,17 @@ namespace PlayniteAudioSwitcher
 
             try
             {
+                if (control.GetState(out var state) == 0)
+                {
+                    info.State = state;
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
                 if (control.GetDisplayName(out var displayName) == 0)
                 {
                     info.DisplayName = displayName;
@@ -394,6 +457,9 @@ namespace PlayniteAudioSwitcher
             }
 
             TryPopulateProcessInfo(info);
+            info.Id = !string.IsNullOrWhiteSpace(info.SessionIdentifier)
+                ? info.SessionIdentifier
+                : $"pid:{info.ProcessId}";
             return info;
         }
 

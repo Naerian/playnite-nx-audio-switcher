@@ -136,4 +136,9 @@
     <sys:String x:Key="LOCAS_GameSessionNoGame">Çalışan oyun yok</sys:String>
     <sys:String x:Key="LOCAS_GameSessionWaiting">Oyun ses oturumu bekleniyor</sys:String>
     <sys:String x:Key="LOCAS_GameSessionControlling">Kontrol ediliyor: {0}</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionTitle">Medya sesi</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnavailable">Medya sesi yok</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionMuted">Medya sessize alındı</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnmuted">Medya sesi etkin</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Medya sesi değiştirilemedi</sys:String>
 </ResourceDictionary>

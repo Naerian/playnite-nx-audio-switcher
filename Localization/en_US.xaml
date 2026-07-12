@@ -136,6 +136,11 @@
     <sys:String x:Key="LOCAS_GameSessionNoGame">No game running</sys:String>
     <sys:String x:Key="LOCAS_GameSessionWaiting">Waiting for game audio session</sys:String>
     <sys:String x:Key="LOCAS_GameSessionControlling">Controlling {0}</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionTitle">Media audio</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnavailable">No media audio</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionMuted">Media muted</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionUnmuted">Media audio enabled</sys:String>
+    <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Media audio change failed</sys:String>
 </ResourceDictionary>
 
 
