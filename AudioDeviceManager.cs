@@ -152,20 +152,28 @@ namespace PlayniteAudioSwitcher
 
         private AudioVolumeState GetVolumeForSessions(IReadOnlyList<ISimpleAudioVolume> sessions)
         {
-            var session = sessions?.FirstOrDefault();
-            if (session == null)
+            if (sessions == null || sessions.Count == 0)
             {
                 return new AudioVolumeState { IsAvailable = false };
             }
 
-            Marshal.ThrowExceptionForHR(session.GetMasterVolume(out var level));
-            Marshal.ThrowExceptionForHR(session.GetMute(out var isMuted));
+            var levels = new List<float>();
+            var muteStates = new List<bool>();
+            foreach (var session in sessions)
+            {
+                Marshal.ThrowExceptionForHR(session.GetMasterVolume(out var level));
+                Marshal.ThrowExceptionForHR(session.GetMute(out var isMuted));
+                levels.Add(Clamp01(level));
+                muteStates.Add(isMuted);
+            }
+
+            var averageLevel = levels.Count > 0 ? levels.Average() : 0f;
 
             return new AudioVolumeState
             {
                 IsAvailable = true,
-                Volume = Clamp01(level),
-                IsMuted = isMuted
+                Volume = Clamp01(averageLevel),
+                IsMuted = muteStates.Count > 0 && muteStates.All(a => a)
             };
         }
 
@@ -232,13 +240,23 @@ namespace PlayniteAudioSwitcher
 
         public AudioVolumeState GetPlaybackAudioSessionVolume(string sessionId)
         {
-            var sessions = GetPlaybackAudioSessionHandles(sessionId);
+            return GetPlaybackAudioSessionVolume(new[] { sessionId });
+        }
+
+        public AudioVolumeState GetPlaybackAudioSessionVolume(IEnumerable<string> sessionIds)
+        {
+            var sessions = GetPlaybackAudioSessionHandles(sessionIds);
             return GetVolumeForSessions(sessions.Select(a => a.Volume).ToList());
         }
 
         public bool SetPlaybackAudioSessionVolume(string sessionId, float volume)
         {
-            var sessions = GetPlaybackAudioSessionHandles(sessionId);
+            return SetPlaybackAudioSessionVolume(new[] { sessionId }, volume);
+        }
+
+        public bool SetPlaybackAudioSessionVolume(IEnumerable<string> sessionIds, float volume)
+        {
+            var sessions = GetPlaybackAudioSessionHandles(sessionIds);
             return SetVolumeForSessions(sessions.Select(a => a.Volume).ToList(), volume);
         }
 
@@ -255,7 +273,12 @@ namespace PlayniteAudioSwitcher
 
         public bool SetPlaybackAudioSessionMute(string sessionId, bool isMuted)
         {
-            var sessions = GetPlaybackAudioSessionHandles(sessionId);
+            return SetPlaybackAudioSessionMute(new[] { sessionId }, isMuted);
+        }
+
+        public bool SetPlaybackAudioSessionMute(IEnumerable<string> sessionIds, bool isMuted)
+        {
+            var sessions = GetPlaybackAudioSessionHandles(sessionIds);
             return SetMuteForSessions(sessions.Select(a => a.Volume).ToList(), isMuted);
         }
 
@@ -323,8 +346,21 @@ namespace PlayniteAudioSwitcher
                 return new List<AudioSessionHandle>();
             }
 
+            return GetPlaybackAudioSessionHandles(new[] { sessionId });
+        }
+
+        private IReadOnlyList<AudioSessionHandle> GetPlaybackAudioSessionHandles(IEnumerable<string> sessionIds)
+        {
+            var filter = new HashSet<string>(
+                sessionIds?.Where(a => !string.IsNullOrWhiteSpace(a)) ?? Enumerable.Empty<string>(),
+                StringComparer.OrdinalIgnoreCase);
+            if (filter.Count == 0)
+            {
+                return new List<AudioSessionHandle>();
+            }
+
             return EnumeratePlaybackSessions(null)
-                .Where(a => string.Equals(a.Info.Id, sessionId, StringComparison.OrdinalIgnoreCase))
+                .Where(a => filter.Contains(a.Info.Id))
                 .ToList();
         }
 
@@ -460,6 +496,7 @@ namespace PlayniteAudioSwitcher
             info.Id = !string.IsNullOrWhiteSpace(info.SessionIdentifier)
                 ? info.SessionIdentifier
                 : $"pid:{info.ProcessId}";
+            info.SourceSessionIds = new List<string> { info.Id };
             return info;
         }
 

@@ -19,6 +19,7 @@ It is designed for couch and console-like setups where users often move between 
 - Native volume controls for the current default output and input devices.
 - Game-specific output, input, Spatial Sound, and game session volume profiles from the game context menu.
 - Media/background audio session controls for apps such as Spotify, browsers, YouTube, or UniPlaySong when they expose normal Windows audio sessions.
+- Optional real application icons and app-level grouping for media/background sessions in Fullscreen themes.
 - Optional restore of the previous audio device after closing a game-specific profile.
 - Experimental Spatial Sound switching through a user-provided external tool.
 - Audio session diagnostics export for troubleshooting Windows mixer and game-session detection.
@@ -53,6 +54,7 @@ The settings window is organized by task:
 - **Output**: friendly names, icons, visibility, and default volume for playback devices.
 - **Input**: friendly names, icons, visibility, and default input volume for recording devices.
 - **Fullscreen**: controller quick switch and the volume step used by Fullscreen theme sliders or theme volume buttons.
+- **Fullscreen media**: real app icons in the media mixer and app-level grouping for browser media sessions.
 - **Game profiles**: automatic output/input switching, Spatial Sound, game session volume, and restore behavior after closing a game.
 - **Spatial sound**: experimental integration through a user-provided `SoundVolumeView.exe` or `svcl.exe`.
 - **Notifications**: informational notifications by category, including output changes, input changes, volume, mute, game profiles, and Spatial Sound.
@@ -253,7 +255,7 @@ Useful properties:
 
 `GameSessionStatusLabel` is a localized, display-ready status string for the current game session, such as no game running, waiting for a game audio session, or controlling a specific process/session.
 
-`MediaSessions` exposes active Windows playback sessions that are not the current game audio session. It is intended for background audio such as Spotify, browsers/YouTube, UniPlaySong, or any app that exposes a normal Core Audio session. If several apps are playing, a theme can show `AudioSwitcher_MediaMixer` to control all of them at once, or show `AudioSwitcher_MediaSessionList` / call `SetMediaSessionCommand` when it wants one selected session plus a separate media slider.
+`MediaSessions` exposes active Windows playback sessions that are not the current game audio session. It is intended for background audio such as Spotify, browsers/YouTube, UniPlaySong, or any app that exposes a normal Core Audio session. Browser sessions are grouped by app because Windows does not expose reliable tab names. If several apps are playing, a theme can show `AudioSwitcher_MediaMixer` to control all of them at once, or show `AudioSwitcher_MediaSessionList` / call `SetMediaSessionCommand` when it wants one selected session plus a separate media slider.
 
 `CurrentMediaSessionName`, `CurrentMediaSessionProcessName`, `CurrentMediaSessionProcessPath`, and `CurrentMediaSessionIconPath` describe the selected media/background session. Browsers are exposed by Windows as browser processes/sessions, not individual tabs, so YouTube usually appears as Chrome, Edge, Firefox, or similar.
 
@@ -409,7 +411,7 @@ Recommended bundled media/background audio controls:
 <ContentControl x:Name="AudioSwitcher_MediaWidget" />
 ```
 
-`AudioSwitcher_MediaMixer` creates one row per active background/media playback session, excluding the currently launched game's audio session. Each row has its own focusable slider and mute button, so users can control Spotify, a browser/YouTube, UniPlaySong, or another media app without first switching the selected session.
+`AudioSwitcher_MediaMixer` creates one row per active background/media app, excluding the currently launched game's audio session. Each row has its own focusable slider and mute button, so users can control Spotify, a browser/YouTube, UniPlaySong, or another media app without first switching the selected session. When real media app icons are enabled in settings, the mixer tries to show the process icon; when disabled, the mixer shows text-only rows.
 
 `AudioSwitcher_MediaSessionList` creates focusable buttons for active background/media playback sessions. `AudioSwitcher_MediaVolumeSlider` controls the selected media session volume and supports left/right keyboard or gamepad navigation with `VolumeStepPercent`. `AudioSwitcher_MediaWidget` is a compact overlay widget for the selected session.
 

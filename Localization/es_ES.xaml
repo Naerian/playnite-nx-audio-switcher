@@ -141,5 +141,10 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">Multimedia silenciado</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">Audio multimedia activado</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">No se pudo cambiar el audio multimedia</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">Audio multimedia / en segundo plano</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher agrupa las sesiones multimedia del navegador por aplicación porque Windows no expone nombres de pestañas fiables. Por ejemplo, YouTube Music y una radio en Chrome pueden aparecer como un único canal de Chrome.</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Mostrar iconos reales de aplicaciones en el mezclador multimedia</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Si se desactiva, las filas del mezclador multimedia solo muestran el nombre de la aplicación y los controles de volumen.</sys:String>
 </ResourceDictionary>
+
 

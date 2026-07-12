@@ -141,4 +141,9 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">Medya sessize alındı</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">Medya sesi etkin</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Medya sesi değiştirilemedi</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">Medya / arka plan sesi</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher, Windows güvenilir tarayıcı sekmesi adları sunmadığı için tarayıcı medya oturumlarını uygulamaya göre gruplar. Chrome’daki YouTube Music ve bir radyo sitesi tek bir Chrome kanalı olarak görünebilir.</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Medya mikserinde gerçek uygulama simgelerini göster</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Devre dışı bırakıldığında medya mikseri satırları yalnızca uygulama adını ve ses kontrollerini gösterir.</sys:String>
 </ResourceDictionary>
+

@@ -141,4 +141,9 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">メディアをミュート中</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">メディア音声を有効化</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">メディア音声の変更に失敗しました</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">メディア / バックグラウンド音声</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Windows は信頼できるブラウザーのタブ名を公開しないため、Audio Switcher はブラウザーのメディアセッションをアプリごとにまとめます。Chrome の YouTube Music とラジオサイトは 1 つの Chrome チャンネルとして表示される場合があります。</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">メディアミキサーで実際のアプリアイコンを表示</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">無効にすると、メディアミキサーの行にはアプリ名と音量コントロールのみが表示されます。</sys:String>
 </ResourceDictionary>
+

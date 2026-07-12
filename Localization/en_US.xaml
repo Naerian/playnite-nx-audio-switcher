@@ -141,6 +141,11 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">Media muted</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">Media audio enabled</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Media audio change failed</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">Media / background audio</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher groups browser media sessions by app because Windows does not expose reliable browser tab names. For example, YouTube Music and a radio site in Chrome may appear as one Chrome channel.</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Show real app icons in media mixer</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">When disabled, media mixer rows show only the application name and volume controls.</sys:String>
 </ResourceDictionary>
+
 
 

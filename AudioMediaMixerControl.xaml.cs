@@ -1,14 +1,19 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Playnite.SDK.Controls;
 
 namespace PlayniteAudioSwitcher
 {
     public partial class AudioMediaMixerControl : PluginUserControl
     {
+        private static readonly Dictionary<string, ImageSource> IconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
         private readonly AudioSwitcherPlugin plugin;
         private bool isRefreshing;
 
@@ -62,10 +67,33 @@ namespace PlayniteAudioSwitcher
                 Tag = session.Id
             };
 
+            var appIcon = plugin.Settings.ShowMediaSessionIcons ? TryGetAppIcon(session) : null;
+            if (appIcon != null)
+            {
+                row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            }
+
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             row.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            var contentColumn = appIcon != null ? 1 : 0;
+            if (appIcon != null)
+            {
+                var image = new Image
+                {
+                    Source = appIcon,
+                    Width = 24,
+                    Height = 24,
+                    Margin = new Thickness(0, 0, 10, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Focusable = false
+                };
+                Grid.SetColumn(image, 0);
+                Grid.SetRow(image, 0);
+                row.Children.Add(image);
+            }
 
             var title = new TextBlock
             {
@@ -75,7 +103,7 @@ namespace PlayniteAudioSwitcher
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            Grid.SetColumn(title, 0);
+            Grid.SetColumn(title, contentColumn);
             Grid.SetRow(title, 0);
             row.Children.Add(title);
 
@@ -91,7 +119,7 @@ namespace PlayniteAudioSwitcher
             };
             muteButton.Click += MuteButton_Click;
             muteButton.PreviewKeyDown += MuteButton_PreviewKeyDown;
-            Grid.SetColumn(muteButton, 1);
+            Grid.SetColumn(muteButton, contentColumn + 1);
             Grid.SetRow(muteButton, 0);
             row.Children.Add(muteButton);
 
@@ -107,12 +135,49 @@ namespace PlayniteAudioSwitcher
             };
             slider.ValueChanged += Slider_ValueChanged;
             slider.PreviewKeyDown += Slider_PreviewKeyDown;
-            Grid.SetColumn(slider, 0);
+            Grid.SetColumn(slider, contentColumn);
             Grid.SetColumnSpan(slider, 2);
             Grid.SetRow(slider, 1);
             row.Children.Add(slider);
 
             return row;
+        }
+
+        private static ImageSource TryGetAppIcon(AudioSessionInfo session)
+        {
+            var path = session?.ProcessPath;
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                return null;
+            }
+
+            if (IconCache.TryGetValue(path, out var cached))
+            {
+                return cached;
+            }
+
+            try
+            {
+                using (var icon = System.Drawing.Icon.ExtractAssociatedIcon(path))
+                {
+                    if (icon == null)
+                    {
+                        return null;
+                    }
+
+                    var source = Imaging.CreateBitmapSourceFromHIcon(
+                        icon.Handle,
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromWidthAndHeight(24, 24));
+                    source.Freeze();
+                    IconCache[path] = source;
+                    return source;
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

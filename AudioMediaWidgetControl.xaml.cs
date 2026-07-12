@@ -17,6 +17,7 @@ namespace PlayniteAudioSwitcher
 
         private void AudioMediaWidgetControl_Loaded(object sender, RoutedEventArgs e)
         {
+            MediaIconHost.Visibility = plugin.Settings.ShowMediaSessionIcons ? Visibility.Visible : Visibility.Collapsed;
             plugin.Theme.Refresh();
         }
     }

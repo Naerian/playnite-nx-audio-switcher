@@ -141,4 +141,9 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">媒体已静音</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">媒体音频已启用</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">媒体音频更改失败</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">媒体 / 后台音频</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">由于 Windows 不提供可靠的浏览器标签页名称，Audio Switcher 会按应用对浏览器媒体会话分组。例如 Chrome 中的 YouTube Music 和电台网站可能显示为一个 Chrome 通道。</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">在媒体混音器中显示真实应用图标</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">禁用后，媒体混音器行只显示应用名称和音量控件。</sys:String>
 </ResourceDictionary>
+

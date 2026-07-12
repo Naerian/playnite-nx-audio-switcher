@@ -1407,8 +1407,9 @@ namespace PlayniteAudioSwitcher
                     .Where(session => !excludedProcessIds.Contains(session.ProcessId))
                     .Where(session => !IsIgnoredMediaSession(session))
                     .Where(IsLikelyMediaSession)
-                    .GroupBy(session => session.Id)
-                    .Select(group => group.First())
+                    .GroupBy(GetMediaSessionGroupKey)
+                    .Select(CreateGroupedMediaSession)
+                    .Where(session => session != null)
                     .OrderByDescending(GetMediaSessionPriority)
                     .ThenBy(session => GetMediaSessionDisplayName(session))
                     .ToList();
@@ -1451,7 +1452,7 @@ namespace PlayniteAudioSwitcher
             var sessionId = GetCurrentMediaSessionId();
             return string.IsNullOrWhiteSpace(sessionId)
                 ? new AudioVolumeState { IsAvailable = false }
-                : AudioDevices.GetPlaybackAudioSessionVolume(sessionId);
+                : AudioDevices.GetPlaybackAudioSessionVolume(GetMediaSourceSessionIds(sessionId));
         }
 
         public void SetThemeSelectedMediaSession(string sessionId)
@@ -1510,7 +1511,7 @@ namespace PlayniteAudioSwitcher
 
             try
             {
-                if (!AudioDevices.SetPlaybackAudioSessionVolume(sessionId, volume))
+                if (!AudioDevices.SetPlaybackAudioSessionVolume(GetMediaSourceSessionIds(sessionId), volume))
                 {
                     logger.Info("No active media audio session found while setting volume.");
                     Theme?.Refresh();
@@ -1520,7 +1521,7 @@ namespace PlayniteAudioSwitcher
                 Theme?.Refresh();
                 if (notify)
                 {
-                    var state = AudioDevices.GetPlaybackAudioSessionVolume(sessionId);
+                    var state = AudioDevices.GetPlaybackAudioSessionVolume(GetMediaSourceSessionIds(sessionId));
                     RecordThemeChange("media-volume", $"{Loc("LOCAS_MediaSessionTitle")}: {state.VolumePercent}%", Theme?.CurrentMediaSessionVolumeIconGeometry);
                 }
             }
@@ -1542,7 +1543,10 @@ namespace PlayniteAudioSwitcher
             try
             {
                 var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
-                if (!AudioDevices.ChangePlaybackAudioSessionVolume(sessionId, step * Math.Sign(direction)))
+                var sourceSessionIds = GetMediaSourceSessionIds(sessionId);
+                var stateBefore = AudioDevices.GetPlaybackAudioSessionVolume(sourceSessionIds);
+                if (!stateBefore.IsAvailable ||
+                    !AudioDevices.SetPlaybackAudioSessionVolume(sourceSessionIds, stateBefore.Volume + step * Math.Sign(direction)))
                 {
                     logger.Info("No active media audio session found while changing volume.");
                     Theme?.Refresh();
@@ -1580,7 +1584,9 @@ namespace PlayniteAudioSwitcher
 
             try
             {
-                if (!AudioDevices.TogglePlaybackAudioSessionMute(sessionId))
+                var sourceSessionIds = GetMediaSourceSessionIds(sessionId);
+                var stateBefore = AudioDevices.GetPlaybackAudioSessionVolume(sourceSessionIds);
+                if (!stateBefore.IsAvailable || !AudioDevices.SetPlaybackAudioSessionMute(sourceSessionIds, !stateBefore.IsMuted))
                 {
                     logger.Info("No active media audio session found while toggling mute.");
                     Theme?.Refresh();
@@ -1588,7 +1594,7 @@ namespace PlayniteAudioSwitcher
                 }
 
                 Theme?.Refresh();
-                var state = AudioDevices.GetPlaybackAudioSessionVolume(sessionId);
+                var state = AudioDevices.GetPlaybackAudioSessionVolume(sourceSessionIds);
                 RecordThemeChange("media-mute", state.IsMuted ? Loc("LOCAS_MediaSessionMuted") : Loc("LOCAS_MediaSessionUnmuted"), Theme?.CurrentMediaSessionVolumeIconGeometry);
             }
             catch (Exception ex)
@@ -2168,6 +2174,80 @@ namespace PlayniteAudioSwitcher
                 default:
                     return false;
             }
+        }
+
+        private IReadOnlyList<string> GetMediaSourceSessionIds(string mediaSessionId)
+        {
+            if (string.IsNullOrWhiteSpace(mediaSessionId))
+            {
+                return new List<string>();
+            }
+
+            var session = GetMediaAudioSessions()
+                .FirstOrDefault(a => string.Equals(a.Id, mediaSessionId, StringComparison.OrdinalIgnoreCase));
+            if (session?.SourceSessionIds != null && session.SourceSessionIds.Count > 0)
+            {
+                return session.SourceSessionIds;
+            }
+
+            return new List<string> { mediaSessionId };
+        }
+
+        private static string GetMediaSessionGroupKey(AudioSessionInfo session)
+        {
+            var processName = session?.ProcessName;
+            if (!string.IsNullOrWhiteSpace(processName))
+            {
+                return $"process:{processName.ToLowerInvariant()}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(session?.ProcessPath))
+            {
+                return $"path:{session.ProcessPath.ToLowerInvariant()}";
+            }
+
+            return session?.Id ?? string.Empty;
+        }
+
+        private static AudioSessionInfo CreateGroupedMediaSession(IGrouping<string, AudioSessionInfo> group)
+        {
+            var sessions = group
+                .Where(a => a != null)
+                .OrderByDescending(a => a.IsActive)
+                .ThenBy(a => string.IsNullOrWhiteSpace(a.DisplayName) ? 1 : 0)
+                .ThenBy(a => a.ProcessName)
+                .ToList();
+            var primary = sessions.FirstOrDefault();
+            if (primary == null)
+            {
+                return null;
+            }
+
+            var levels = sessions.Select(a => a.Volume).ToList();
+            var averageVolume = levels.Count > 0 ? levels.Average() : primary.Volume;
+            var sourceIds = sessions
+                .Select(a => a.Id)
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return new AudioSessionInfo
+            {
+                Id = group.Key,
+                ProcessId = primary.ProcessId,
+                ProcessName = primary.ProcessName,
+                ProcessPath = primary.ProcessPath,
+                DisplayName = !string.IsNullOrWhiteSpace(primary.ProcessName)
+                    ? GetFriendlyProcessName(primary.ProcessName)
+                    : primary.DisplayName,
+                IconPath = sessions.Select(a => a.IconPath).FirstOrDefault(a => !string.IsNullOrWhiteSpace(a)),
+                SessionIdentifier = group.Key,
+                SourceSessionIds = sourceIds,
+                State = sessions.Any(a => a.IsActive) ? 1 : primary.State,
+                Volume = Math.Max(0f, Math.Min(1f, averageVolume)),
+                VolumePercent = (int)Math.Round(Math.Max(0f, Math.Min(1f, averageVolume)) * 100),
+                IsMuted = sessions.Count > 0 && sessions.All(a => a.IsMuted)
+            };
         }
 
         private static bool IsLikelyMediaSession(AudioSessionInfo session)

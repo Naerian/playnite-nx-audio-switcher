@@ -93,8 +93,9 @@
         Background/media audio session integration.
         MediaSessions exposes active Windows playback sessions that are not the current game session.
         This can catch Spotify, browsers/YouTube, UniPlaySong, or any app with a normal Core Audio session.
-        Browsers are exposed by process/session, not by individual tab.
+        Browsers are grouped by app because Windows does not expose reliable tab names.
         AudioSwitcher_MediaMixer shows each session with its own slider, which is best for quick overlays.
+        It can show real app icons when the user enables them in Audio Switcher settings.
         If the theme needs a custom layout, use AudioSwitcher_MediaSessionList or SetMediaSessionCommand to choose one.
         AudioSwitcher_MediaVolumeSlider controls the selected media session volume.
         AudioSwitcher_MediaWidget is the compact drop-in version for overlays.

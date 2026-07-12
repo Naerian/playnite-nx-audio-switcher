@@ -141,4 +141,9 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">Multimédia coupé</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">Audio multimédia activé</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Échec du changement audio multimédia</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">Audio multimédia / arrière-plan</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher regroupe les sessions multimédias du navigateur par application, car Windows ne fournit pas de noms d’onglets fiables. YouTube Music et une radio dans Chrome peuvent donc apparaître comme un seul canal Chrome.</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Afficher les vraies icônes d’app dans le mixeur multimédia</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Si désactivé, les lignes du mixeur multimédia affichent seulement le nom de l’application et les contrôles de volume.</sys:String>
 </ResourceDictionary>
+

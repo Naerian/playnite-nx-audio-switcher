@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.5.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-07-13
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.5.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_5_0.pext
+    Changelog:
+      - Added optional real application icons in the media mixer.
+      - Added a Fullscreen setting to hide media app icons and show text-only mixer rows.
+      - Grouped browser/media sessions by application when Windows does not expose reliable tab names.
+      - Made grouped media sliders control every Windows audio session behind that app row.
+      - Updated README, localization, and the Fullscreen theme integration example.
   - Version: 1.4.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-07-13

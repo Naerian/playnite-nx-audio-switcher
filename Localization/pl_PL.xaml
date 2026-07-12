@@ -141,4 +141,9 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">Multimedia wyciszone</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">Dźwięk multimediów włączony</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Nie udało się zmienić dźwięku multimediów</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">Dźwięk multimediów / tła</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher grupuje sesje multimediów przeglądarki według aplikacji, ponieważ Windows nie udostępnia wiarygodnych nazw kart. YouTube Music i radio w Chrome mogą więc pojawić się jako jeden kanał Chrome.</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Pokaż prawdziwe ikony aplikacji w mikserze multimediów</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Po wyłączeniu wiersze miksera multimediów pokazują tylko nazwę aplikacji i sterowanie głośnością.</sys:String>
 </ResourceDictionary>
+

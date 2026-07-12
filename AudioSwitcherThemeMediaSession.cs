@@ -14,6 +14,10 @@ namespace PlayniteAudioSwitcher
 
         public string IconPath { get; set; }
 
+        public string AppIconPath { get; set; }
+
+        public bool ShowIcon { get; set; }
+
         public string DisplayName { get; set; }
 
         public int VolumePercent { get; set; }

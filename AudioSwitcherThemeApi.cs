@@ -838,6 +838,8 @@ namespace PlayniteAudioSwitcher
                 ProcessName = session.ProcessName,
                 ProcessPath = session.ProcessPath,
                 IconPath = session.IconPath,
+                AppIconPath = session.ProcessPath,
+                ShowIcon = plugin.Settings.ShowMediaSessionIcons && !string.IsNullOrWhiteSpace(session.ProcessPath),
                 DisplayName = isCurrent ? $"✓ {plugin.GetMediaSessionDisplayName(session)}" : plugin.GetMediaSessionDisplayName(session),
                 Volume = session.Volume,
                 VolumePercent = session.VolumePercent,

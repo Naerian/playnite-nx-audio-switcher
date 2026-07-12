@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace PlayniteAudioSwitcher
 {
     public sealed class AudioSessionInfo
@@ -15,6 +17,8 @@ namespace PlayniteAudioSwitcher
         public string IconPath { get; set; }
 
         public string SessionIdentifier { get; set; }
+
+        public List<string> SourceSessionIds { get; set; } = new List<string>();
 
         public int State { get; set; }
 

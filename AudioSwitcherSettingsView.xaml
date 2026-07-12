@@ -103,6 +103,21 @@
                                        VerticalAlignment="Center"
                                        Margin="8,0,0,0" />
                         </Grid>
+
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_MediaSettingsTitle}" Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_MediaGroupingHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8" />
+
+                        <CheckBox Content="{DynamicResource LOCAS_ShowMediaSessionIcons}"
+                                  IsChecked="{Binding ShowMediaSessionIcons}"
+                                  Margin="0,0,0,8" />
+                        <TextBlock Text="{DynamicResource LOCAS_ShowMediaSessionIconsHelp}"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.85"
+                                   Margin="0,0,0,8" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

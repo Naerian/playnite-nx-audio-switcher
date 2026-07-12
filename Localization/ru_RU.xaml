@@ -141,4 +141,9 @@
     <sys:String x:Key="LOCAS_MediaSessionMuted">Медиа заглушено</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionUnmuted">Медиа-аудио включено</sys:String>
     <sys:String x:Key="LOCAS_MediaSessionVolumeFailed">Не удалось изменить медиа-аудио</sys:String>
+    <sys:String x:Key="LOCAS_MediaSettingsTitle">Медиа / фоновый звук</sys:String>
+    <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher группирует медиа-сессии браузера по приложению, потому что Windows не предоставляет надежные имена вкладок. YouTube Music и радио в Chrome могут отображаться как один канал Chrome.</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Показывать реальные значки приложений в медиа-микшере</sys:String>
+    <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Если отключено, строки медиа-микшера показывают только имя приложения и элементы управления громкостью.</sys:String>
 </ResourceDictionary>
+

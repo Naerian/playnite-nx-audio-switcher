@@ -10,7 +10,8 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <Viewbox Width="24"
+        <Viewbox x:Name="MediaIconHost"
+                 Width="24"
                  Height="24"
                  VerticalAlignment="Center">
             <Path Data="{Binding CurrentMediaSessionVolumeIconGeometry}"
