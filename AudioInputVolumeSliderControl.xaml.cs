@@ -9,6 +9,7 @@ namespace PlayniteAudioSwitcher
     public partial class AudioInputVolumeSliderControl : PluginUserControl
     {
         private readonly AudioSwitcherPlugin plugin;
+        private readonly VolumeSliderAcceleration acceleration = new VolumeSliderAcceleration();
         private bool isRefreshing;
 
         public AudioInputVolumeSliderControl(AudioSwitcherPlugin plugin)
@@ -59,7 +60,7 @@ namespace PlayniteAudioSwitcher
 
             var percent = (int)Math.Round(e.NewValue);
             VolumeLabel.Text = $"{percent}%";
-            plugin.SetInputVolume(percent / 100f, false);
+            plugin.Theme.CurrentInputVolumePercent = percent;
         }
 
         private void VolumeSlider_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -71,7 +72,7 @@ namespace PlayniteAudioSwitcher
 
             e.Handled = true;
             var direction = e.Key == Key.Left || e.Key == Key.Down ? -1 : 1;
-            var step = Math.Max(1, plugin.Settings.VolumeStepPercent);
+            var step = acceleration.GetStep(e.Key, e.IsRepeat, plugin.Settings.VolumeStepPercent);
             VolumeSlider.Value = Math.Max(0, Math.Min(100, VolumeSlider.Value + step * direction));
         }
     }

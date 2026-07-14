@@ -41,6 +41,7 @@ namespace PlayniteAudioSwitcher
         private string activeGameName;
         private HashSet<uint> activeGameAudioSessionProcessIds = new HashSet<uint>();
         private string currentMediaSessionId;
+        private readonly Dictionary<string, IReadOnlyList<string>> mediaSourceSessionIds = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -1039,8 +1040,11 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioDevice> GetThemeSelectorDevices(bool includeHidden)
         {
-            var currentDeviceId = GetCurrentDeviceId();
+            return GetThemeSelectorDevices(includeHidden, GetCurrentDeviceId());
+        }
 
+        internal IReadOnlyList<AudioDevice> GetThemeSelectorDevices(bool includeHidden, string currentDeviceId)
+        {
             return SafeGetDevices()
                 .Where(device => includeHidden || device.IsVisible)
                 .Select(device =>
@@ -1063,8 +1067,11 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioDevice> GetThemeSelectorInputDevices(bool includeHidden)
         {
-            var currentDeviceId = GetCurrentInputDeviceId();
+            return GetThemeSelectorInputDevices(includeHidden, GetCurrentInputDeviceId());
+        }
 
+        internal IReadOnlyList<AudioDevice> GetThemeSelectorInputDevices(bool includeHidden, string currentDeviceId)
+        {
             return SafeGetInputDevices()
                 .Where(device => includeHidden || device.IsVisible)
                 .Select(device =>
@@ -1342,6 +1349,46 @@ namespace PlayniteAudioSwitcher
             return string.IsNullOrWhiteSpace(data) ? null : Geometry.Parse(data);
         }
 
+        internal AudioDevice GetCurrentPlaybackDeviceForTheme()
+        {
+            return SafeGetDefaultPlaybackDevice("refreshing the theme playback state");
+        }
+
+        internal AudioDevice GetCurrentRecordingDeviceForTheme()
+        {
+            return SafeGetDefaultRecordingDevice("refreshing the theme recording state");
+        }
+
+        internal string GetDeviceDisplayNameForTheme(AudioDevice device)
+        {
+            return GetDeviceDisplayName(device);
+        }
+
+        internal string GetInputDeviceDisplayNameForTheme(AudioDevice device)
+        {
+            return GetInputDeviceDisplayName(device);
+        }
+
+        internal string GetDeviceDisplayLabelForTheme(AudioDevice device)
+        {
+            var name = GetDeviceDisplayName(device);
+            var icon = settings.GetIcon(device?.Id);
+            return FormatDeviceVisual(icon, name);
+        }
+
+        internal string GetInputDeviceDisplayLabelForTheme(AudioDevice device)
+        {
+            var name = GetInputDeviceDisplayName(device);
+            var icon = settings.GetInputIcon(device?.Id);
+            return FormatDeviceVisual(icon, name);
+        }
+
+        internal Geometry GetDeviceIconGeometryForTheme(AudioDevice device, bool input)
+        {
+            var icon = input ? settings.GetInputIcon(device?.Id) : settings.GetIcon(device?.Id);
+            return string.IsNullOrWhiteSpace(icon) ? null : GetIconGeometry(icon);
+        }
+
         public AudioVolumeState GetCurrentVolumeState()
         {
             return AudioDevices.GetDefaultPlaybackVolume();
@@ -1401,7 +1448,7 @@ namespace PlayniteAudioSwitcher
             try
             {
                 var excludedProcessIds = GetCurrentGameAudioSessionProcessIds();
-                return AudioDevices.GetPlaybackAudioSessions()
+                var sessions = AudioDevices.GetPlaybackAudioSessions()
                     .Where(session => !string.IsNullOrWhiteSpace(session.Id))
                     .Where(session => session.ProcessId != 0)
                     .Where(session => !excludedProcessIds.Contains(session.ProcessId))
@@ -1413,6 +1460,8 @@ namespace PlayniteAudioSwitcher
                     .OrderByDescending(GetMediaSessionPriority)
                     .ThenBy(session => GetMediaSessionDisplayName(session))
                     .ToList();
+                UpdateMediaSourceSessionIds(sessions);
+                return sessions;
             }
             catch (Exception ex)
             {
@@ -1424,32 +1473,41 @@ namespace PlayniteAudioSwitcher
         public string GetCurrentMediaSessionId()
         {
             var sessions = GetMediaAudioSessions();
-            if (sessions.Count == 0)
-            {
-                currentMediaSessionId = null;
-                return null;
-            }
-
-            if (string.IsNullOrWhiteSpace(currentMediaSessionId) ||
-                sessions.All(session => !string.Equals(session.Id, currentMediaSessionId, StringComparison.OrdinalIgnoreCase)))
-            {
-                currentMediaSessionId = sessions[0].Id;
-            }
-
-            return currentMediaSessionId;
+            return ResolveCurrentMediaSession(sessions)?.Id;
         }
 
         public AudioSessionInfo GetCurrentMediaSessionInfo()
         {
-            var sessionId = GetCurrentMediaSessionId();
-            return string.IsNullOrWhiteSpace(sessionId)
-                ? null
-                : GetMediaAudioSessions().FirstOrDefault(session => string.Equals(session.Id, sessionId, StringComparison.OrdinalIgnoreCase));
+            return ResolveCurrentMediaSession(GetMediaAudioSessions());
         }
 
         public AudioVolumeState GetCurrentMediaSessionVolumeState()
         {
             var sessionId = GetCurrentMediaSessionId();
+            return GetMediaSessionVolumeState(sessionId);
+        }
+
+        internal AudioSessionInfo ResolveCurrentMediaSession(IReadOnlyList<AudioSessionInfo> sessions)
+        {
+            if (sessions == null || sessions.Count == 0)
+            {
+                currentMediaSessionId = null;
+                return null;
+            }
+
+            var current = sessions.FirstOrDefault(session =>
+                string.Equals(session.Id, currentMediaSessionId, StringComparison.OrdinalIgnoreCase));
+            if (current == null)
+            {
+                current = sessions[0];
+                currentMediaSessionId = current.Id;
+            }
+
+            return current;
+        }
+
+        internal AudioVolumeState GetMediaSessionVolumeState(string sessionId)
+        {
             return string.IsNullOrWhiteSpace(sessionId)
                 ? new AudioVolumeState { IsAvailable = false }
                 : AudioDevices.GetPlaybackAudioSessionVolume(GetMediaSourceSessionIds(sessionId));
@@ -1463,7 +1521,7 @@ namespace PlayniteAudioSwitcher
             }
 
             currentMediaSessionId = sessionId;
-            Theme?.Refresh();
+            Theme?.RefreshMediaSessions();
         }
 
         public string GetMediaSessionDisplayName(AudioSessionInfo session)
@@ -1504,6 +1562,16 @@ namespace PlayniteAudioSwitcher
 
         public void SetMediaSessionVolume(string sessionId, float volume, bool notify)
         {
+            SetMediaSessionVolumeCore(sessionId, volume, notify, true);
+        }
+
+        internal void SetMediaSessionVolumeFromTheme(string sessionId, float volume)
+        {
+            SetMediaSessionVolumeCore(sessionId, volume, false, false);
+        }
+
+        private void SetMediaSessionVolumeCore(string sessionId, float volume, bool notify, bool refreshTheme)
+        {
             if (string.IsNullOrWhiteSpace(sessionId))
             {
                 return;
@@ -1514,11 +1582,19 @@ namespace PlayniteAudioSwitcher
                 if (!AudioDevices.SetPlaybackAudioSessionVolume(GetMediaSourceSessionIds(sessionId), volume))
                 {
                     logger.Info("No active media audio session found while setting volume.");
-                    Theme?.Refresh();
+                    if (refreshTheme)
+                    {
+                        Theme?.RefreshMediaSessionState(sessionId);
+                    }
+
                     return;
                 }
 
-                Theme?.Refresh();
+                if (refreshTheme)
+                {
+                    Theme?.RefreshMediaSessionState(sessionId);
+                }
+
                 if (notify)
                 {
                     var state = AudioDevices.GetPlaybackAudioSessionVolume(GetMediaSourceSessionIds(sessionId));
@@ -1549,11 +1625,11 @@ namespace PlayniteAudioSwitcher
                     !AudioDevices.SetPlaybackAudioSessionVolume(sourceSessionIds, stateBefore.Volume + step * Math.Sign(direction)))
                 {
                     logger.Info("No active media audio session found while changing volume.");
-                    Theme?.Refresh();
+                    Theme?.RefreshMediaSessionState(sessionId);
                     return;
                 }
 
-                Theme?.Refresh();
+                Theme?.RefreshMediaSessionState(sessionId);
                 var state = GetCurrentMediaSessionVolumeState();
                 RecordThemeChange("media-volume", $"{Loc("LOCAS_MediaSessionTitle")}: {state.VolumePercent}%", Theme?.CurrentMediaSessionVolumeIconGeometry);
             }
@@ -1589,11 +1665,11 @@ namespace PlayniteAudioSwitcher
                 if (!stateBefore.IsAvailable || !AudioDevices.SetPlaybackAudioSessionMute(sourceSessionIds, !stateBefore.IsMuted))
                 {
                     logger.Info("No active media audio session found while toggling mute.");
-                    Theme?.Refresh();
+                    Theme?.RefreshMediaSessionState(sessionId);
                     return;
                 }
 
-                Theme?.Refresh();
+                Theme?.RefreshMediaSessionState(sessionId);
                 var state = AudioDevices.GetPlaybackAudioSessionVolume(sourceSessionIds);
                 RecordThemeChange("media-mute", state.IsMuted ? Loc("LOCAS_MediaSessionMuted") : Loc("LOCAS_MediaSessionUnmuted"), Theme?.CurrentMediaSessionVolumeIconGeometry);
             }
@@ -1611,11 +1687,25 @@ namespace PlayniteAudioSwitcher
 
         public void SetVolume(float volume, bool notify)
         {
+            SetVolumeCore(volume, notify, true);
+        }
+
+        internal void SetVolumeFromTheme(float volume)
+        {
+            SetVolumeCore(volume, false, false);
+        }
+
+        private void SetVolumeCore(float volume, bool notify, bool refreshTheme)
+        {
             try
             {
                 AudioDevices.SetDefaultPlaybackVolume(volume);
-                Theme?.Refresh();
-                RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
+                if (refreshTheme)
+                {
+                    Theme?.RefreshOutputVolume();
+                    RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
+                }
+
                 if (notify && ShouldShowVolumeNotifications())
                 {
                     ShowVolumeInfoMessage();
@@ -1635,11 +1725,25 @@ namespace PlayniteAudioSwitcher
 
         public void SetInputVolume(float volume, bool notify)
         {
+            SetInputVolumeCore(volume, notify, true);
+        }
+
+        internal void SetInputVolumeFromTheme(float volume)
+        {
+            SetInputVolumeCore(volume, false, false);
+        }
+
+        private void SetInputVolumeCore(float volume, bool notify, bool refreshTheme)
+        {
             try
             {
                 AudioDevices.SetDefaultRecordingVolume(volume);
-                Theme?.Refresh();
-                RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
+                if (refreshTheme)
+                {
+                    Theme?.RefreshInputVolume();
+                    RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
+                }
+
                 if (notify && ShouldShowVolumeNotifications())
                 {
                     ShowInputVolumeInfoMessage();
@@ -1659,6 +1763,16 @@ namespace PlayniteAudioSwitcher
 
         public void SetGameVolume(float volume, bool notify)
         {
+            SetGameVolumeCore(volume, notify, true);
+        }
+
+        internal void SetGameVolumeFromTheme(float volume)
+        {
+            SetGameVolumeCore(volume, false, false);
+        }
+
+        private void SetGameVolumeCore(float volume, bool notify, bool refreshTheme)
+        {
             if (activeGameProcessId <= 0)
             {
                 return;
@@ -1672,12 +1786,20 @@ namespace PlayniteAudioSwitcher
                 if (!changed)
                 {
                     logger.Info($"No active game audio session found while setting volume for {activeGameName ?? "current game"}.");
-                    Theme?.Refresh();
+                    if (refreshTheme)
+                    {
+                        Theme?.RefreshGameVolumeState();
+                    }
+
                     return;
                 }
 
-                Theme?.Refresh();
-                RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
+                if (refreshTheme)
+                {
+                    Theme?.RefreshGameVolumeState();
+                    RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
+                }
+
                 if (notify && ShouldShowVolumeNotifications())
                 {
                     ShowGameVolumeInfoMessage();
@@ -1696,7 +1818,7 @@ namespace PlayniteAudioSwitcher
             {
                 var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
                 AudioDevices.ChangeDefaultPlaybackVolume(step * Math.Sign(direction));
-                Theme?.Refresh();
+                Theme?.RefreshOutputVolume();
                 RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
                 if (ShouldShowVolumeNotifications())
                 {
@@ -1716,7 +1838,7 @@ namespace PlayniteAudioSwitcher
             {
                 var step = Math.Max(1, settings.VolumeStepPercent) / 100f;
                 AudioDevices.ChangeDefaultRecordingVolume(step * Math.Sign(direction));
-                Theme?.Refresh();
+                Theme?.RefreshInputVolume();
                 RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
                 if (ShouldShowVolumeNotifications())
                 {
@@ -1754,11 +1876,11 @@ namespace PlayniteAudioSwitcher
                 if (!changed)
                 {
                     logger.Info($"No active game audio session found while changing volume for {activeGameName ?? "current game"}.");
-                    Theme?.Refresh();
+                    Theme?.RefreshGameVolumeState();
                     return;
                 }
 
-                Theme?.Refresh();
+                Theme?.RefreshGameVolumeState();
                 RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
                 if (ShouldShowVolumeNotifications())
                 {
@@ -1777,7 +1899,7 @@ namespace PlayniteAudioSwitcher
             try
             {
                 AudioDevices.ToggleDefaultPlaybackMute();
-                Theme?.Refresh();
+                Theme?.RefreshOutputVolume();
                 var state = AudioDevices.GetDefaultPlaybackVolume();
                 RecordThemeChange("mute", state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"), Theme?.CurrentOutputVolumeIconGeometry);
                 ShowMuteInfoMessage(state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"));
@@ -1794,7 +1916,7 @@ namespace PlayniteAudioSwitcher
             try
             {
                 AudioDevices.ToggleDefaultRecordingMute();
-                Theme?.Refresh();
+                Theme?.RefreshInputVolume();
                 var state = AudioDevices.GetDefaultRecordingVolume();
                 RecordThemeChange("input-mute", state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"), Theme?.CurrentInputVolumeIconGeometry);
                 ShowMuteInfoMessage(state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"));
@@ -1829,11 +1951,11 @@ namespace PlayniteAudioSwitcher
                 if (!changed)
                 {
                     logger.Info($"No active game audio session found while toggling mute for {activeGameName ?? "current game"}.");
-                    Theme?.Refresh();
+                    Theme?.RefreshGameVolumeState();
                     return;
                 }
 
-                Theme?.Refresh();
+                Theme?.RefreshGameVolumeState();
                 var currentGameState = GetCurrentGameVolumeState();
                 RecordThemeChange("game-mute", currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"), Theme?.CurrentGameVolumeIconGeometry);
                 ShowMuteInfoMessage(currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"));
@@ -1851,7 +1973,7 @@ namespace PlayniteAudioSwitcher
             if (!string.IsNullOrWhiteSpace(currentDeviceId))
             {
                 TryApplyDefaultVolume(currentDeviceId);
-                Theme?.Refresh();
+                Theme?.RefreshOutputVolume();
             }
         }
 
@@ -1861,7 +1983,7 @@ namespace PlayniteAudioSwitcher
             if (!string.IsNullOrWhiteSpace(currentDeviceId))
             {
                 TryApplyDefaultInputVolume(currentDeviceId);
-                Theme?.Refresh();
+                Theme?.RefreshInputVolume();
             }
         }
 
@@ -2183,6 +2305,11 @@ namespace PlayniteAudioSwitcher
                 return new List<string>();
             }
 
+            if (mediaSourceSessionIds.TryGetValue(mediaSessionId, out var cachedIds) && cachedIds.Count > 0)
+            {
+                return cachedIds;
+            }
+
             var session = GetMediaAudioSessions()
                 .FirstOrDefault(a => string.Equals(a.Id, mediaSessionId, StringComparison.OrdinalIgnoreCase));
             if (session?.SourceSessionIds != null && session.SourceSessionIds.Count > 0)
@@ -2191,6 +2318,22 @@ namespace PlayniteAudioSwitcher
             }
 
             return new List<string> { mediaSessionId };
+        }
+
+        private void UpdateMediaSourceSessionIds(IEnumerable<AudioSessionInfo> sessions)
+        {
+            mediaSourceSessionIds.Clear();
+            foreach (var session in sessions ?? Enumerable.Empty<AudioSessionInfo>())
+            {
+                if (string.IsNullOrWhiteSpace(session?.Id))
+                {
+                    continue;
+                }
+
+                mediaSourceSessionIds[session.Id] = session.SourceSessionIds != null && session.SourceSessionIds.Count > 0
+                    ? session.SourceSessionIds.ToList()
+                    : new List<string> { session.Id };
+            }
         }
 
         private static string GetMediaSessionGroupKey(AudioSessionInfo session)
@@ -2804,7 +2947,12 @@ namespace PlayniteAudioSwitcher
 
         private string GetDeviceDisplayName(AudioDevice device)
         {
-            return GetDeviceDisplayName(device?.Id) ?? device?.Name;
+            if (device == null)
+            {
+                return Loc("LOCAS_UnknownDevice");
+            }
+
+            return settings.GetCustomName(device.Id) ?? device.Name ?? Loc("LOCAS_UnknownDevice");
         }
 
         private string GetDeviceDisplayName(string deviceId)
@@ -2816,7 +2964,12 @@ namespace PlayniteAudioSwitcher
 
         private string GetInputDeviceDisplayName(AudioDevice device)
         {
-            return GetInputDeviceDisplayName(device?.Id) ?? device?.Name;
+            if (device == null)
+            {
+                return Loc("LOCAS_UnknownDevice");
+            }
+
+            return settings.GetInputCustomName(device.Id) ?? device.Name ?? Loc("LOCAS_UnknownDevice");
         }
 
         private string GetInputDeviceDisplayName(string deviceId)

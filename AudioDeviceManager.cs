@@ -322,17 +322,59 @@ namespace PlayniteAudioSwitcher
 
         private IReadOnlyList<ISimpleAudioVolume> GetVolumeSessionsForProcessIds(HashSet<uint> processIds)
         {
-            var sessions = new List<ISimpleAudioVolume>();
             if (processIds == null || processIds.Count == 0)
             {
-                return sessions;
+                return new List<ISimpleAudioVolume>();
             }
 
-            foreach (var session in EnumeratePlaybackSessions(processIds))
+            return EnumeratePlaybackVolumeSessions(processIds);
+        }
+
+        private IReadOnlyList<ISimpleAudioVolume> EnumeratePlaybackVolumeSessions(HashSet<uint> filterProcessIds)
+        {
+            var sessions = new List<ISimpleAudioVolume>();
+            foreach (var device in GetEndpointDevices(EDataFlow.eRender))
             {
-                if (session.Volume != null)
+                try
                 {
-                    sessions.Add(session.Volume);
+                    var interfaceId = typeof(IAudioSessionManager2).GUID;
+                    Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
+                    try
+                    {
+                        var manager = (IAudioSessionManager2)Marshal.GetObjectForIUnknown(interfacePointer);
+                        Marshal.ThrowExceptionForHR(manager.GetSessionEnumerator(out var sessionEnumerator));
+                        Marshal.ThrowExceptionForHR(sessionEnumerator.GetCount(out var count));
+
+                        for (var i = 0; i < count; i++)
+                        {
+                            Marshal.ThrowExceptionForHR(sessionEnumerator.GetSession(i, out var control));
+                            var control2 = QueryAudioSessionControl2(control);
+                            if (control2 == null)
+                            {
+                                continue;
+                            }
+
+                            Marshal.ThrowExceptionForHR(control2.GetProcessId(out var sessionProcessId));
+                            if (sessionProcessId == 0 || !filterProcessIds.Contains(sessionProcessId))
+                            {
+                                continue;
+                            }
+
+                            var volume = QuerySimpleAudioVolume(control);
+                            if (volume != null)
+                            {
+                                sessions.Add(volume);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.Release(interfacePointer);
+                    }
+                }
+                catch
+                {
+                    // Sessions can disappear while the slider is being adjusted.
                 }
             }
 

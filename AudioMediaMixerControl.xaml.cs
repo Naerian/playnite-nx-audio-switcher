@@ -15,6 +15,7 @@ namespace PlayniteAudioSwitcher
     {
         private static readonly Dictionary<string, ImageSource> IconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
         private readonly AudioSwitcherPlugin plugin;
+        private readonly Dictionary<string, VolumeSliderAcceleration> sliderAccelerations = new Dictionary<string, VolumeSliderAcceleration>(StringComparer.OrdinalIgnoreCase);
         private bool isRefreshing;
 
         public AudioMediaMixerControl(AudioSwitcherPlugin plugin)
@@ -194,7 +195,7 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            plugin.SetMediaSessionVolume(sessionId, (float)(Math.Max(0, Math.Min(100, e.NewValue)) / 100d), false);
+            plugin.Theme.QueueMediaSessionVolume(sessionId, (float)(Math.Max(0, Math.Min(100, e.NewValue)) / 100d));
             UpdateRowLabel(slider, (int)Math.Round(slider.Value));
         }
 
@@ -213,7 +214,14 @@ namespace PlayniteAudioSwitcher
             }
 
             var direction = e.Key == Key.Left || e.Key == Key.Down ? -1 : 1;
-            var step = Math.Max(1, plugin.Settings.VolumeStepPercent);
+            var sessionId = slider.Tag as string ?? string.Empty;
+            if (!sliderAccelerations.TryGetValue(sessionId, out var acceleration))
+            {
+                acceleration = new VolumeSliderAcceleration();
+                sliderAccelerations[sessionId] = acceleration;
+            }
+
+            var step = acceleration.GetStep(e.Key, e.IsRepeat, plugin.Settings.VolumeStepPercent);
             slider.Value = Math.Max(0, Math.Min(100, slider.Value + step * direction));
         }
 

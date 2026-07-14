@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.6.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-07-14
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.6.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_6_0.pext
+    Changelog:
+      - Reduced slider stutter by coalescing rapid output, input, game, and media volume changes.
+      - Added progressive gamepad acceleration while holding a slider direction.
+      - Replaced full theme refreshes with targeted volume and media session updates.
+      - Preserved theme collection items through incremental device and media session synchronization.
+      - Reduced repeated Core Audio device, game session, and grouped media session enumeration.
   - Version: 1.5.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-07-13
