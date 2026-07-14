@@ -96,7 +96,10 @@
         Browsers are grouped by app because Windows does not expose reliable tab names.
         AudioSwitcher_MediaMixer shows each session with its own slider, which is best for quick overlays.
         It can show real app icons when the user enables them in Audio Switcher settings.
-        If the theme needs a custom layout, use AudioSwitcher_MediaSessionList or SetMediaSessionCommand to choose one.
+        For a fully custom mixer, bind directly to MediaSessions. Every item has writable VolumePercent and Volume
+        properties plus SetVolumeCommand, VolumeUpCommand, VolumeDownCommand, and ToggleMuteCommand.
+        Those controls target that row only, so the theme does not need to change the selected media session first.
+        MediaSessions is updated in place to preserve gamepad focus while volume values change.
         AudioSwitcher_MediaVolumeSlider controls the selected media session volume.
         AudioSwitcher_MediaWidget is the compact drop-in version for overlays.
     -->
@@ -107,6 +110,33 @@
     <ContentControl x:Name="AudioSwitcher_MediaSessionList" />
     <ContentControl x:Name="AudioSwitcher_MediaVolumeSlider" />
     <ContentControl x:Name="AudioSwitcher_MediaWidget" />
+
+    <!-- Fully custom per-application mixer. Style the controls to match the theme. -->
+    <ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=MediaSessions}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Text="{Binding Name}" />
+                    <Slider Grid.Column="1"
+                            Minimum="0"
+                            Maximum="100"
+                            Value="{Binding VolumePercent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Grid.Column="2"
+                            Margin="12,0,0,0"
+                            Content="{Binding VolumeLabel}"
+                            Command="{Binding ToggleMuteCommand}" />
+                </Grid>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
 
     <!--
         Optional in-theme toast/status area.

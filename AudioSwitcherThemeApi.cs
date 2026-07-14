@@ -124,9 +124,9 @@ namespace PlayniteAudioSwitcher
             SetGameVolumeCommand = new RelayCommand<object>(SetGameVolume);
             RefreshMediaSessionsCommand = new RelayCommand(RefreshMediaSessions);
             SetMediaSessionCommand = new RelayCommand<object>(SetMediaSession);
-            MediaSessionVolumeUpCommand = new RelayCommand(() => ChangeMediaSessionVolume(1));
-            MediaSessionVolumeDownCommand = new RelayCommand(() => ChangeMediaSessionVolume(-1));
-            ToggleMediaSessionMuteCommand = new RelayCommand(ToggleMediaSessionMute);
+            MediaSessionVolumeUpCommand = new RelayCommand<object>(parameter => ChangeMediaSessionVolume(parameter, 1));
+            MediaSessionVolumeDownCommand = new RelayCommand<object>(parameter => ChangeMediaSessionVolume(parameter, -1));
+            ToggleMediaSessionMuteCommand = new RelayCommand<object>(ToggleMediaSessionMute);
             SetMediaSessionVolumeCommand = new RelayCommand<object>(SetMediaSessionVolume);
         }
 
@@ -848,18 +848,19 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            session.Volume = state.Volume;
-            session.VolumePercent = state.VolumePercent;
-            session.IsMuted = state.IsMuted;
-            session.VolumeLabel = state.IsAvailable
+            var label = state.IsAvailable
                 ? state.IsMuted ? plugin.Loc("LOCAS_MediaSessionMuted") : $"{state.VolumePercent}%"
                 : plugin.Loc("LOCAS_MediaSessionUnavailable");
+            session.UpdateVolumeState(state.Volume, state.IsMuted, label);
         }
 
         private AudioSwitcherThemeMediaSession CreateThemeMediaSession(AudioSessionInfo session, string currentId)
         {
             var isCurrent = string.Equals(session.Id, currentId, StringComparison.OrdinalIgnoreCase);
-            return new AudioSwitcherThemeMediaSession
+            var themeSession = new AudioSwitcherThemeMediaSession(
+                QueueMediaSessionVolume,
+                ChangeMediaSessionVolumeById,
+                ToggleMediaSessionMuteById)
             {
                 Id = session.Id,
                 Name = plugin.GetMediaSessionDisplayName(session),
@@ -869,13 +870,14 @@ namespace PlayniteAudioSwitcher
                 AppIconPath = session.ProcessPath,
                 ShowIcon = plugin.Settings.ShowMediaSessionIcons && !string.IsNullOrWhiteSpace(session.ProcessPath),
                 DisplayName = isCurrent ? $"✓ {plugin.GetMediaSessionDisplayName(session)}" : plugin.GetMediaSessionDisplayName(session),
-                Volume = session.Volume,
-                VolumePercent = session.VolumePercent,
-                IsMuted = session.IsMuted,
-                VolumeLabel = session.IsMuted ? plugin.Loc("LOCAS_MediaSessionMuted") : $"{session.VolumePercent}%",
                 IconGeometry = GetMediaSessionIconGeometry(session),
                 IsCurrent = isCurrent
             };
+            themeSession.UpdateVolumeState(
+                session.Volume,
+                session.IsMuted,
+                session.IsMuted ? plugin.Loc("LOCAS_MediaSessionMuted") : $"{session.VolumePercent}%");
+            return themeSession;
         }
 
         private static void SynchronizeCollection<T>(
@@ -938,10 +940,7 @@ namespace PlayniteAudioSwitcher
             target.AppIconPath = source.AppIconPath;
             target.ShowIcon = source.ShowIcon;
             target.DisplayName = source.DisplayName;
-            target.VolumePercent = source.VolumePercent;
-            target.Volume = source.Volume;
-            target.VolumeLabel = source.VolumeLabel;
-            target.IsMuted = source.IsMuted;
+            target.UpdateVolumeState(source.Volume, source.IsMuted, source.VolumeLabel);
             target.IconGeometry = source.IconGeometry;
             target.IsCurrent = source.IsCurrent;
         }
@@ -1316,14 +1315,45 @@ namespace PlayniteAudioSwitcher
             plugin.SetThemeSelectedMediaSession(sessionId);
         }
 
-        private void ChangeMediaSessionVolume(int direction)
+        private void ChangeMediaSessionVolume(object parameter, int direction)
         {
-            plugin.ChangeMediaSessionVolumeByStep(direction);
+            var sessionId = parameter?.ToString();
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                plugin.ChangeMediaSessionVolumeByStep(direction);
+                return;
+            }
+
+            ChangeMediaSessionVolumeById(sessionId, direction);
         }
 
-        private void ToggleMediaSessionMute()
+        private void ChangeMediaSessionVolumeById(string sessionId, int direction)
         {
-            plugin.ToggleMediaSessionMute();
+            var session = MediaSessions.FirstOrDefault(a => string.Equals(a.Id, sessionId, StringComparison.OrdinalIgnoreCase));
+            if (session == null)
+            {
+                return;
+            }
+
+            var step = Math.Max(1, plugin.Settings.VolumeStepPercent) / 100f;
+            QueueMediaSessionVolume(sessionId, session.Volume + step * Math.Sign(direction));
+        }
+
+        private void ToggleMediaSessionMute(object parameter)
+        {
+            var sessionId = parameter?.ToString();
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                plugin.ToggleMediaSessionMute();
+                return;
+            }
+
+            ToggleMediaSessionMuteById(sessionId);
+        }
+
+        private void ToggleMediaSessionMuteById(string sessionId)
+        {
+            plugin.ToggleMediaSessionMute(sessionId);
         }
 
         private void SetVolume(object parameter)
