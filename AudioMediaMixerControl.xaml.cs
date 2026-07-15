@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -16,59 +19,114 @@ namespace PlayniteAudioSwitcher
         private static readonly Dictionary<string, ImageSource> IconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
         private readonly AudioSwitcherPlugin plugin;
         private readonly Dictionary<string, VolumeSliderAcceleration> sliderAccelerations = new Dictionary<string, VolumeSliderAcceleration>(StringComparer.OrdinalIgnoreCase);
-        private bool isRefreshing;
 
         public AudioMediaMixerControl(AudioSwitcherPlugin plugin)
         {
             this.plugin = plugin;
             InitializeComponent();
             Loaded += AudioMediaMixerControl_Loaded;
+            Unloaded += AudioMediaMixerControl_Unloaded;
         }
 
         private void AudioMediaMixerControl_Loaded(object sender, RoutedEventArgs e)
         {
+            plugin.Theme.MediaSessions.CollectionChanged -= MediaSessions_CollectionChanged;
+            plugin.Theme.MediaSessions.CollectionChanged += MediaSessions_CollectionChanged;
             Refresh();
+        }
+
+        private void AudioMediaMixerControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            plugin.Theme.MediaSessions.CollectionChanged -= MediaSessions_CollectionChanged;
+        }
+
+        private void MediaSessions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SynchronizeRows();
         }
 
         public void Refresh()
         {
-            isRefreshing = true;
-            try
+            plugin.Theme.RefreshMediaSessions();
+            SynchronizeRows();
+        }
+
+        private void SynchronizeRows()
+        {
+            var sessions = plugin.Theme.MediaSessions.ToList();
+            if (sessions.Count == 0)
             {
                 MixerRowsPanel.Children.Clear();
-                var sessions = plugin.GetMediaAudioSessions();
-                if (sessions.Count == 0)
+                MixerRowsPanel.Children.Add(CreateEmptyState());
+                return;
+            }
+
+            if (MixerRowsPanel.Children.Count == 1 && !(MixerRowsPanel.Children[0] is Grid))
+            {
+                MixerRowsPanel.Children.Clear();
+            }
+
+            for (var desiredIndex = 0; desiredIndex < sessions.Count; desiredIndex++)
+            {
+                var session = sessions[desiredIndex];
+                var existingIndex = -1;
+                for (var currentIndex = desiredIndex; currentIndex < MixerRowsPanel.Children.Count; currentIndex++)
                 {
-                    MixerRowsPanel.Children.Add(new TextBlock
+                    if (MixerRowsPanel.Children[currentIndex] is FrameworkElement element &&
+                        string.Equals(element.Tag as string, session.Id, StringComparison.OrdinalIgnoreCase))
                     {
-                        Text = plugin.Loc("LOCAS_MediaSessionUnavailable"),
-                        Foreground = TryFindResource("TextBrush") as Brush,
-                        Opacity = 0.75,
-                        Margin = new Thickness(0, 4, 0, 0)
-                    });
-                    return;
+                        existingIndex = currentIndex;
+                        break;
+                    }
                 }
 
-                foreach (var session in sessions)
+                if (existingIndex < 0)
                 {
-                    MixerRowsPanel.Children.Add(CreateRow(session));
+                    MixerRowsPanel.Children.Insert(desiredIndex, CreateRow(session));
+                    continue;
+                }
+
+                var existingRow = MixerRowsPanel.Children[existingIndex] as FrameworkElement;
+                if (existingRow != null)
+                {
+                    existingRow.DataContext = session;
+                }
+
+                if (existingIndex != desiredIndex)
+                {
+                    var row = MixerRowsPanel.Children[existingIndex];
+                    MixerRowsPanel.Children.RemoveAt(existingIndex);
+                    MixerRowsPanel.Children.Insert(desiredIndex, row);
                 }
             }
-            finally
+
+            while (MixerRowsPanel.Children.Count > sessions.Count)
             {
-                isRefreshing = false;
+                MixerRowsPanel.Children.RemoveAt(MixerRowsPanel.Children.Count - 1);
             }
         }
 
-        private UIElement CreateRow(AudioSessionInfo session)
+        private TextBlock CreateEmptyState()
+        {
+            return new TextBlock
+            {
+                Text = plugin.Loc("LOCAS_MediaSessionUnavailable"),
+                Foreground = TryFindResource("TextBrush") as Brush,
+                Opacity = 0.75,
+                Margin = new Thickness(0, 4, 0, 0)
+            };
+        }
+
+        private UIElement CreateRow(AudioSwitcherThemeMediaSession session)
         {
             var row = new Grid
             {
                 Margin = new Thickness(0, 0, 0, 12),
-                Tag = session.Id
+                Tag = session.Id,
+                DataContext = session
             };
 
-            var appIcon = plugin.Settings.ShowMediaSessionIcons ? TryGetAppIcon(session) : null;
+            var appIcon = session.ShowIcon ? TryGetAppIcon(session) : null;
             if (appIcon != null)
             {
                 row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -98,28 +156,26 @@ namespace PlayniteAudioSwitcher
 
             var title = new TextBlock
             {
-                Text = plugin.GetMediaSessionDisplayName(session),
                 Foreground = TryFindResource("TextBrush") as Brush,
                 FontWeight = FontWeights.SemiBold,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center
             };
+            title.SetBinding(TextBlock.TextProperty, new Binding(nameof(AudioSwitcherThemeMediaSession.Name)));
             Grid.SetColumn(title, contentColumn);
             Grid.SetRow(title, 0);
             row.Children.Add(title);
 
             var muteButton = new Button
             {
-                Content = session.IsMuted ? plugin.Loc("LOCAS_MediaSessionMuted") : $"{session.VolumePercent}%",
-                Tag = session.Id,
                 MinWidth = 78,
                 Margin = new Thickness(10, 0, 0, 0),
                 Padding = new Thickness(8, 4, 8, 4),
                 HorizontalContentAlignment = HorizontalAlignment.Center,
                 Focusable = true
             };
-            muteButton.Click += MuteButton_Click;
-            muteButton.PreviewKeyDown += MuteButton_PreviewKeyDown;
+            muteButton.SetBinding(ContentControl.ContentProperty, new Binding(nameof(AudioSwitcherThemeMediaSession.VolumeLabel)));
+            muteButton.SetBinding(Button.CommandProperty, new Binding(nameof(AudioSwitcherThemeMediaSession.ToggleMuteCommand)));
             Grid.SetColumn(muteButton, contentColumn + 1);
             Grid.SetRow(muteButton, 0);
             row.Children.Add(muteButton);
@@ -128,13 +184,16 @@ namespace PlayniteAudioSwitcher
             {
                 Minimum = 0,
                 Maximum = 100,
-                Value = Math.Max(0, Math.Min(100, session.VolumePercent)),
                 Tag = session.Id,
                 Margin = new Thickness(0, 8, 0, 0),
                 Focusable = true,
                 IsSnapToTickEnabled = false
             };
-            slider.ValueChanged += Slider_ValueChanged;
+            slider.SetBinding(Slider.ValueProperty, new Binding(nameof(AudioSwitcherThemeMediaSession.VolumePercent))
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
             slider.PreviewKeyDown += Slider_PreviewKeyDown;
             Grid.SetColumn(slider, contentColumn);
             Grid.SetColumnSpan(slider, 2);
@@ -144,7 +203,7 @@ namespace PlayniteAudioSwitcher
             return row;
         }
 
-        private static ImageSource TryGetAppIcon(AudioSessionInfo session)
+        private static ImageSource TryGetAppIcon(AudioSwitcherThemeMediaSession session)
         {
             var path = session?.ProcessPath;
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
@@ -181,24 +240,6 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (isRefreshing || !IsLoaded)
-            {
-                return;
-            }
-
-            var slider = sender as Slider;
-            var sessionId = slider?.Tag as string;
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                return;
-            }
-
-            plugin.Theme.QueueMediaSessionVolume(sessionId, (float)(Math.Max(0, Math.Min(100, e.NewValue)) / 100d));
-            UpdateRowLabel(slider, (int)Math.Round(slider.Value));
-        }
-
         private void Slider_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Left && e.Key != Key.Right && e.Key != Key.Down && e.Key != Key.Up)
@@ -223,53 +264,6 @@ namespace PlayniteAudioSwitcher
 
             var step = acceleration.GetStep(e.Key, e.IsRepeat, plugin.Settings.VolumeStepPercent);
             slider.Value = Math.Max(0, Math.Min(100, slider.Value + step * direction));
-        }
-
-        private void MuteButton_Click(object sender, RoutedEventArgs e)
-        {
-            ToggleMute(sender as Button);
-        }
-
-        private void MuteButton_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter && e.Key != Key.Space)
-            {
-                return;
-            }
-
-            e.Handled = true;
-            ToggleMute(sender as Button);
-        }
-
-        private void ToggleMute(Button button)
-        {
-            var sessionId = button?.Tag as string;
-            if (string.IsNullOrWhiteSpace(sessionId))
-            {
-                return;
-            }
-
-            plugin.ToggleMediaSessionMute(sessionId);
-            Refresh();
-        }
-
-        private void UpdateRowLabel(Slider slider, int value)
-        {
-            var row = slider?.Parent as Grid;
-            if (row == null)
-            {
-                return;
-            }
-
-            foreach (var child in row.Children)
-            {
-                var button = child as Button;
-                if (button != null)
-                {
-                    button.Content = $"{value}%";
-                    return;
-                }
-            }
         }
     }
 }

@@ -99,7 +99,8 @@
         For a fully custom mixer, bind directly to MediaSessions. Every item has writable VolumePercent and Volume
         properties plus SetVolumeCommand, VolumeUpCommand, VolumeDownCommand, and ToggleMuteCommand.
         Those controls target that row only, so the theme does not need to change the selected media session first.
-        MediaSessions is updated in place to preserve gamepad focus while volume values change.
+        MediaSessions automatically discovers apps opened or closed after Playnite starts and updates in place to
+        preserve gamepad focus while the collection and volume values change.
         AudioSwitcher_MediaVolumeSlider controls the selected media session volume.
         AudioSwitcher_MediaWidget is the compact drop-in version for overlays.
     -->

@@ -81,7 +81,7 @@ For custom layouts, Audio Switcher exposes collections, state, writable volume p
 {PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceName}
 ```
 
-Every item in `MediaSessions` exposes writable `VolumePercent` and `Volume` properties plus `SetVolumeCommand`, `VolumeUpCommand`, `VolumeDownCommand`, and `ToggleMuteCommand`. This lets themes build a fully custom per-application mixer without first changing the globally selected media session. Session objects are updated in place to preserve controller focus.
+Every item in `MediaSessions` exposes writable `VolumePercent` and `Volume` properties plus `SetVolumeCommand`, `VolumeUpCommand`, `VolumeDownCommand`, and `ToggleMuteCommand`. This lets themes build a fully custom per-application mixer without first changing the globally selected media session. Audio Switcher discovers sessions created or removed while Playnite is running and updates existing objects in place to preserve controller focus.
 
 The repository and release package include a fully commented example at [`Examples/FullscreenThemeIntegration.xaml`](Examples/FullscreenThemeIntegration.xaml). The Wiki documents every bundled control, property, command, collection item, and controller focus requirement.
 

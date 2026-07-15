@@ -25,6 +25,7 @@ namespace PlayniteAudioSwitcher
     {
         private readonly ILogger logger;
         private readonly HashSet<ControllerInput> pressedInputs = new HashSet<ControllerInput>();
+        private readonly object mediaSourceSessionIdsLock = new object();
         private readonly Dictionary<Guid, AudioDevice> previousDevicesByGame = new Dictionary<Guid, AudioDevice>();
         private readonly Dictionary<Guid, AudioDevice> previousInputDevicesByGame = new Dictionary<Guid, AudioDevice>();
         private readonly Dictionary<Guid, HashSet<uint>> audioSessionBaselineByGame = new Dictionary<Guid, HashSet<uint>>();
@@ -42,6 +43,9 @@ namespace PlayniteAudioSwitcher
         private HashSet<uint> activeGameAudioSessionProcessIds = new HashSet<uint>();
         private string currentMediaSessionId;
         private readonly Dictionary<string, IReadOnlyList<string>> mediaSourceSessionIds = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
+        private DispatcherTimer mediaSessionDiscoveryTimer;
+        private bool isMediaSessionDiscoveryRunning;
+        private string lastMediaSessionDiscoverySignature;
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -440,6 +444,59 @@ namespace PlayniteAudioSwitcher
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            StartMediaSessionDiscovery();
+        }
+
+        private void StartMediaSessionDiscovery()
+        {
+            if (mediaSessionDiscoveryTimer != null)
+            {
+                return;
+            }
+
+            mediaSessionDiscoveryTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMilliseconds(1500)
+            };
+            mediaSessionDiscoveryTimer.Tick += MediaSessionDiscoveryTimer_Tick;
+            mediaSessionDiscoveryTimer.Start();
+        }
+
+        private async void MediaSessionDiscoveryTimer_Tick(object sender, EventArgs e)
+        {
+            if (isMediaSessionDiscoveryRunning)
+            {
+                return;
+            }
+
+            isMediaSessionDiscoveryRunning = true;
+            try
+            {
+                var knownGameSessionProcessIds = new HashSet<uint>(activeGameAudioSessionProcessIds);
+                var gameProcessId = activeGameProcessId;
+                var sessions = await Task.Run(() => GetMediaAudioSessionsForDiscovery(knownGameSessionProcessIds, gameProcessId));
+                if (Theme == null || Theme.IsMediaSessionVolumeWritePending)
+                {
+                    return;
+                }
+
+                var signature = string.Join("|", sessions.Select(a => a.Id).OrderBy(a => a, StringComparer.OrdinalIgnoreCase));
+                if (!string.Equals(lastMediaSessionDiscoverySignature, signature, StringComparison.Ordinal))
+                {
+                    lastMediaSessionDiscoverySignature = signature;
+                    logger.Debug($"Media session discovery updated: {sessions.Count} session group(s).");
+                }
+
+                Theme.RefreshMediaSessions(sessions);
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to refresh media sessions in the background.");
+            }
+            finally
+            {
+                isMediaSessionDiscoveryRunning = false;
+            }
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
@@ -1445,9 +1502,34 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioSessionInfo> GetMediaAudioSessions()
         {
+            return GetMediaAudioSessions(GetCurrentGameAudioSessionProcessIds());
+        }
+
+        private IReadOnlyList<AudioSessionInfo> GetMediaAudioSessionsForDiscovery(HashSet<uint> excludedProcessIds, int gameProcessId)
+        {
+            excludedProcessIds = excludedProcessIds ?? new HashSet<uint>();
+            if (gameProcessId > 0)
+            {
+                try
+                {
+                    foreach (var processId in AudioDevices.GetProcessTreeAudioSessionProcessIds(gameProcessId))
+                    {
+                        excludedProcessIds.Add(processId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, "Failed to exclude current game sessions during media session discovery.");
+                }
+            }
+
+            return GetMediaAudioSessions(excludedProcessIds);
+        }
+
+        private IReadOnlyList<AudioSessionInfo> GetMediaAudioSessions(HashSet<uint> excludedProcessIds)
+        {
             try
             {
-                var excludedProcessIds = GetCurrentGameAudioSessionProcessIds();
                 var sessions = AudioDevices.GetPlaybackAudioSessions()
                     .Where(session => !string.IsNullOrWhiteSpace(session.Id))
                     .Where(session => session.ProcessId != 0)
@@ -2305,9 +2387,12 @@ namespace PlayniteAudioSwitcher
                 return new List<string>();
             }
 
-            if (mediaSourceSessionIds.TryGetValue(mediaSessionId, out var cachedIds) && cachedIds.Count > 0)
+            lock (mediaSourceSessionIdsLock)
             {
-                return cachedIds;
+                if (mediaSourceSessionIds.TryGetValue(mediaSessionId, out var cachedIds) && cachedIds.Count > 0)
+                {
+                    return cachedIds.ToList();
+                }
             }
 
             var session = GetMediaAudioSessions()
@@ -2322,17 +2407,20 @@ namespace PlayniteAudioSwitcher
 
         private void UpdateMediaSourceSessionIds(IEnumerable<AudioSessionInfo> sessions)
         {
-            mediaSourceSessionIds.Clear();
-            foreach (var session in sessions ?? Enumerable.Empty<AudioSessionInfo>())
+            lock (mediaSourceSessionIdsLock)
             {
-                if (string.IsNullOrWhiteSpace(session?.Id))
+                mediaSourceSessionIds.Clear();
+                foreach (var session in sessions ?? Enumerable.Empty<AudioSessionInfo>())
                 {
-                    continue;
-                }
+                    if (string.IsNullOrWhiteSpace(session?.Id))
+                    {
+                        continue;
+                    }
 
-                mediaSourceSessionIds[session.Id] = session.SourceSessionIds != null && session.SourceSessionIds.Count > 0
-                    ? session.SourceSessionIds.ToList()
-                    : new List<string> { session.Id };
+                    mediaSourceSessionIds[session.Id] = session.SourceSessionIds != null && session.SourceSessionIds.Count > 0
+                        ? session.SourceSessionIds.ToList()
+                        : new List<string> { session.Id };
+                }
             }
         }
 

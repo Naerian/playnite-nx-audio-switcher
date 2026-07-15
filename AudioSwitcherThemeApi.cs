@@ -140,6 +140,8 @@ namespace PlayniteAudioSwitcher
 
         public ObservableCollection<AudioSwitcherThemeMediaSession> MediaSessions { get; }
 
+        internal bool IsMediaSessionVolumeWritePending => mediaVolumeWriter.HasPendingWork;
+
         public ICommand ToggleSelectorCommand { get; }
 
         public ICommand OpenSelectorCommand { get; }
@@ -778,7 +780,12 @@ namespace PlayniteAudioSwitcher
 
         internal void RefreshMediaSessions()
         {
-            var sourceSessions = plugin.GetMediaAudioSessions();
+            RefreshMediaSessions(plugin.GetMediaAudioSessions());
+        }
+
+        internal void RefreshMediaSessions(IReadOnlyList<AudioSessionInfo> sourceSessions)
+        {
+            sourceSessions = sourceSessions ?? new List<AudioSessionInfo>();
             var current = plugin.ResolveCurrentMediaSession(sourceSessions);
             var currentMediaSessionId = current?.Id;
             var sessions = sourceSessions

@@ -14,6 +14,8 @@ namespace PlayniteAudioSwitcher
         private readonly Dictionary<string, float> pendingValues = new Dictionary<string, float>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> pendingSynchronizations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        public bool HasPendingWork => pendingValues.Count > 0 || writeTimer.IsEnabled || synchronizeTimer.IsEnabled;
+
         public DeferredKeyedVolumeWriter(Action<string, float> writer, Action<string> synchronizer)
         {
             this.writer = writer ?? throw new ArgumentNullException(nameof(writer));

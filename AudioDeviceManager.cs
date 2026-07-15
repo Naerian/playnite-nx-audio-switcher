@@ -233,9 +233,7 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioSessionInfo> GetPlaybackAudioSessions()
         {
-            return EnumeratePlaybackSessions(null)
-                .Select(a => a.Info)
-                .ToList();
+            return EnumeratePlaybackSessionSnapshots();
         }
 
         public AudioVolumeState GetPlaybackAudioSessionVolume(string sessionId)
@@ -460,6 +458,98 @@ namespace PlayniteAudioSwitcher
             }
 
             return sessions;
+        }
+
+        private IReadOnlyList<AudioSessionInfo> EnumeratePlaybackSessionSnapshots()
+        {
+            var sessions = new List<AudioSessionInfo>();
+            foreach (var device in GetEndpointDevices(EDataFlow.eRender))
+            {
+                IAudioSessionManager2 manager = null;
+                IAudioSessionEnumerator sessionEnumerator = null;
+                try
+                {
+                    var interfaceId = typeof(IAudioSessionManager2).GUID;
+                    Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
+                    try
+                    {
+                        manager = (IAudioSessionManager2)Marshal.GetObjectForIUnknown(interfacePointer);
+                    }
+                    finally
+                    {
+                        Marshal.Release(interfacePointer);
+                    }
+
+                    Marshal.ThrowExceptionForHR(manager.GetSessionEnumerator(out sessionEnumerator));
+                    Marshal.ThrowExceptionForHR(sessionEnumerator.GetCount(out var count));
+                    for (var i = 0; i < count; i++)
+                    {
+                        IAudioSessionControl control = null;
+                        IAudioSessionControl2 control2 = null;
+                        ISimpleAudioVolume volume = null;
+                        try
+                        {
+                            Marshal.ThrowExceptionForHR(sessionEnumerator.GetSession(i, out control));
+                            control2 = QueryAudioSessionControl2(control);
+                            if (control2 == null)
+                            {
+                                continue;
+                            }
+
+                            Marshal.ThrowExceptionForHR(control2.GetProcessId(out var sessionProcessId));
+                            if (sessionProcessId == 0)
+                            {
+                                continue;
+                            }
+
+                            volume = QuerySimpleAudioVolume(control);
+                            if (volume != null)
+                            {
+                                sessions.Add(CreateAudioSessionInfo(control, control2, volume, sessionProcessId));
+                            }
+                        }
+                        catch
+                        {
+                            // A session can disappear while its snapshot is being read.
+                        }
+                        finally
+                        {
+                            ReleaseDistinctComObjects(volume, control2, control);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Endpoints can be disabled or removed during discovery.
+                }
+                finally
+                {
+                    ReleaseDistinctComObjects(sessionEnumerator, manager, device);
+                }
+            }
+
+            return sessions;
+        }
+
+        private static void ReleaseDistinctComObjects(params object[] objects)
+        {
+            var released = new List<object>();
+            foreach (var value in objects)
+            {
+                if (value == null || released.Any(a => ReferenceEquals(a, value)) || !Marshal.IsComObject(value))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    Marshal.ReleaseComObject(value);
+                    released.Add(value);
+                }
+                catch
+                {
+                }
+            }
         }
 
         private static AudioSessionInfo CreateAudioSessionInfo(
