@@ -145,5 +145,16 @@
     <sys:String x:Key="LOCAS_MediaGroupingHelp">Windows は信頼できるブラウザーのタブ名を公開しないため、Audio Switcher はブラウザーのメディアセッションをアプリごとにまとめます。Chrome の YouTube Music とラジオサイトは 1 つの Chrome チャンネルとして表示される場合があります。</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIcons">メディアミキサーで実際のアプリアイコンを表示</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">無効にすると、メディアミキサーの行にはアプリ名と音量コントロールのみが表示されます。</sys:String>
+    <sys:String x:Key="LOCAS_AboutTab">情報</sys:String>
+    <sys:String x:Key="LOCAS_AboutTitle">Audio Switcher について</sys:String>
+    <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher は、Windows の出力、入力、ゲーム、メディア セッションのコントロールを Playnite のデスクトップ モードとフルスクリーン モードに統合します。</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">サポート</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupportHelp">Audio Switcher が役立ち、開発を支援したい場合は、Ko-fi で Narian にコーヒーを贈ることができます。</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupport">Ko-fi で支援</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">バージョン {0} | Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">プロジェクト リンク</sys:String>
+    <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">ドキュメント</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">問題を報告</sys:String>
 </ResourceDictionary>
 

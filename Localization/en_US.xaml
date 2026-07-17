@@ -145,6 +145,17 @@
     <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher groups browser media sessions by app because Windows does not expose reliable browser tab names. For example, YouTube Music and a radio site in Chrome may appear as one Chrome channel.</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Show real app icons in media mixer</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">When disabled, media mixer rows show only the application name and volume controls.</sys:String>
+    <sys:String x:Key="LOCAS_AboutTab">About</sys:String>
+    <sys:String x:Key="LOCAS_AboutTitle">About Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher brings Windows output, input, game, and media session controls into Playnite Desktop and Fullscreen.</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">Support</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupportHelp">If you find Audio Switcher useful and want to support its development, you can buy Narian a coffee on Ko-fi.</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupport">Support on Ko-fi</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Version {0} | Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">Project links</sys:String>
+    <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Documentation</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">Report a problem</sys:String>
 </ResourceDictionary>
 
 

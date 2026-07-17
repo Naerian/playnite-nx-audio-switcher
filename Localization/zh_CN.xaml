@@ -145,5 +145,16 @@
     <sys:String x:Key="LOCAS_MediaGroupingHelp">由于 Windows 不提供可靠的浏览器标签页名称，Audio Switcher 会按应用对浏览器媒体会话分组。例如 Chrome 中的 YouTube Music 和电台网站可能显示为一个 Chrome 通道。</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIcons">在媒体混音器中显示真实应用图标</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">禁用后，媒体混音器行只显示应用名称和音量控件。</sys:String>
+    <sys:String x:Key="LOCAS_AboutTab">关于</sys:String>
+    <sys:String x:Key="LOCAS_AboutTitle">关于 Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher 将 Windows 的输出、输入、游戏和媒体会话控制集成到 Playnite 桌面模式和全屏模式中。</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">支持</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupportHelp">如果 Audio Switcher 对你有帮助，并且你希望支持其开发，可以在 Ko-fi 上请 Narian 喝杯咖啡。</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupport">在 Ko-fi 上支持</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">版本 {0} | Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">项目链接</sys:String>
+    <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">文档</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">报告问题</sys:String>
 </ResourceDictionary>
 

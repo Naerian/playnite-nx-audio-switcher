@@ -145,5 +145,16 @@
     <sys:String x:Key="LOCAS_MediaGroupingHelp">O Audio Switcher agrupa sessões de mídia do navegador por app porque o Windows não expõe nomes de abas confiáveis. YouTube Music e uma rádio no Chrome podem aparecer como um único canal do Chrome.</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Mostrar ícones reais dos apps no mixer de mídia</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Quando desativado, as linhas do mixer de mídia mostram apenas o nome do aplicativo e os controles de volume.</sys:String>
+    <sys:String x:Key="LOCAS_AboutTab">Sobre</sys:String>
+    <sys:String x:Key="LOCAS_AboutTitle">Sobre o Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_AboutDescription">O Audio Switcher integra ao Playnite Desktop e Fullscreen os controles do Windows para saída, entrada, jogos e sessões de mídia.</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">Apoio</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupportHelp">Se o Audio Switcher é útil para você e deseja apoiar o desenvolvimento, pode pagar um café para Narian no Ko-fi.</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupport">Apoiar no Ko-fi</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Versão {0} | Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">Links do projeto</sys:String>
+    <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Documentação</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">Relatar um problema</sys:String>
 </ResourceDictionary>
 

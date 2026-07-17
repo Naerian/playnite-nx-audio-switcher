@@ -18,6 +18,9 @@ namespace PlayniteAudioSwitcher
         public AudioSwitcherSettingsView()
         {
             InitializeComponent();
+            AboutVersionText.Text = string.Format(
+                TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Version {0} | Narian",
+                GetInstalledVersion());
             DataContextChanged += (_, __) => RebuildDeviceRows();
             Loaded += (_, __) =>
             {
@@ -334,11 +337,53 @@ namespace PlayniteAudioSwitcher
 
         private void OpenExternalLink(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri)
+            OpenExternalUrl(e.Uri.AbsoluteUri);
+            e.Handled = true;
+        }
+
+        private void OpenExternalButton(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string url && !string.IsNullOrWhiteSpace(url))
+            {
+                OpenExternalUrl(url);
+            }
+        }
+
+        private static void OpenExternalUrl(string url)
+        {
+            Process.Start(new ProcessStartInfo(url)
             {
                 UseShellExecute = true
             });
-            e.Handled = true;
+        }
+
+        private static string GetInstalledVersion()
+        {
+            try
+            {
+                var assemblyPath = typeof(AudioSwitcherSettingsView).Assembly.Location;
+                var manifestPath = IoPath.Combine(IoPath.GetDirectoryName(assemblyPath), "extension.yaml");
+                if (IoFile.Exists(manifestPath))
+                {
+                    foreach (var line in IoFile.ReadLines(manifestPath))
+                    {
+                        var trimmedLine = line.Trim();
+                        if (trimmedLine.StartsWith("Version:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var version = trimmedLine.Substring("Version:".Length).Trim().Trim('\'', '"');
+                            if (!string.IsNullOrWhiteSpace(version))
+                            {
+                                return version;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return typeof(AudioSwitcherSettingsView).Assembly.GetName().Version.ToString(3);
         }
 
         private static DataTemplate CreateIconTemplate()

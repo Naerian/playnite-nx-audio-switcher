@@ -299,6 +299,60 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+
+            <TabItem Header="{DynamicResource LOCAS_AboutTab}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_AboutTitle}"
+                                       Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_AboutDescription}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,6" />
+                        <TextBlock x:Name="AboutVersionText"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,18" />
+
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_ProjectLinksTitle}"
+                                       Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <WrapPanel Margin="0,0,0,2">
+                            <Button Content="{DynamicResource LOCAS_OpenGitHub}"
+                                    Tag="https://github.com/Naerian/playnite-nx-audio-switcher"
+                                    MinWidth="110"
+                                    Margin="0,0,8,8"
+                                    Click="OpenExternalButton" />
+                            <Button Content="{DynamicResource LOCAS_OpenWiki}"
+                                    Tag="https://github.com/Naerian/playnite-nx-audio-switcher/wiki"
+                                    MinWidth="110"
+                                    Margin="0,0,8,8"
+                                    Click="OpenExternalButton" />
+                            <Button Content="{DynamicResource LOCAS_ReportIssue}"
+                                    Tag="https://github.com/Naerian/playnite-nx-audio-switcher/issues/new"
+                                    MinWidth="150"
+                                    Margin="0,0,0,8"
+                                    Click="OpenExternalButton" />
+                        </WrapPanel>
+
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_SupportTitle}"
+                                       Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_KoFiSupportHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+                        <Button Content="{DynamicResource LOCAS_KoFiSupport}"
+                                Tag="https://ko-fi.com/naerian"
+                                HorizontalAlignment="Left"
+                                MinWidth="150"
+                                Padding="16,7"
+                                Click="OpenExternalButton" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

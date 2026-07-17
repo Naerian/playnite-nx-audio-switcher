@@ -145,5 +145,16 @@
     <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher группирует медиа-сессии браузера по приложению, потому что Windows не предоставляет надежные имена вкладок. YouTube Music и радио в Chrome могут отображаться как один канал Chrome.</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Показывать реальные значки приложений в медиа-микшере</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Если отключено, строки медиа-микшера показывают только имя приложения и элементы управления громкостью.</sys:String>
+    <sys:String x:Key="LOCAS_AboutTab">О расширении</sys:String>
+    <sys:String x:Key="LOCAS_AboutTitle">Об Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher добавляет в настольный и полноэкранный режимы Playnite управление выводом, вводом, играми и мультимедийными сеансами Windows.</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">Поддержка</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupportHelp">Если Audio Switcher оказался полезным и вы хотите поддержать разработку, можете угостить Narian кофе на Ko-fi.</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupport">Поддержать на Ko-fi</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Версия {0} | Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">Ссылки проекта</sys:String>
+    <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Документация</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">Сообщить о проблеме</sys:String>
 </ResourceDictionary>
 

@@ -145,5 +145,16 @@
     <sys:String x:Key="LOCAS_MediaGroupingHelp">Audio Switcher, Windows güvenilir tarayıcı sekmesi adları sunmadığı için tarayıcı medya oturumlarını uygulamaya göre gruplar. Chrome’daki YouTube Music ve bir radyo sitesi tek bir Chrome kanalı olarak görünebilir.</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIcons">Medya mikserinde gerçek uygulama simgelerini göster</sys:String>
     <sys:String x:Key="LOCAS_ShowMediaSessionIconsHelp">Devre dışı bırakıldığında medya mikseri satırları yalnızca uygulama adını ve ses kontrollerini gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_AboutTab">Hakkında</sys:String>
+    <sys:String x:Key="LOCAS_AboutTitle">Audio Switcher hakkında</sys:String>
+    <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher; Windows çıkış, giriş, oyun ve medya oturumu denetimlerini Playnite Masaüstü ve Tam Ekran modlarına getirir.</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">Destek</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupportHelp">Audio Switcher'ı yararlı buluyor ve geliştirilmesini desteklemek istiyorsanız Ko-fi üzerinden Narian'a bir kahve ısmarlayabilirsiniz.</sys:String>
+    <sys:String x:Key="LOCAS_KoFiSupport">Ko-fi üzerinden destekle</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Sürüm {0} | Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">Proje bağlantıları</sys:String>
+    <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Belgeler</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">Sorun bildir</sys:String>
 </ResourceDictionary>
 
