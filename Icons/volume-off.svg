@@ -1,3 +1,9 @@
+<!--
+tags: [music, sound, speaker, volume, off, content, entertainment, disabled, inactive, multimedia]
+category: Media
+version: "1.67"
+unicode: "f1c3"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -9,9 +15,8 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M16 9a5 5 0 0 1 .95 2.293" />
-  <path d="M19.364 5.636a9 9 0 0 1 1.889 9.96" />
-  <path d="m2 2 20 20" />
-  <path d="m7 7-.587.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298V11" />
-  <path d="M9.828 4.172A.686.686 0 0 1 11 4.657v.686" />
+  <path d="M15 8a5 5 0 0 1 1.912 4.934m-1.377 2.602a5 5 0 0 1 -.535 .464" />
+  <path d="M17.7 5a9 9 0 0 1 2.362 11.086m-1.676 2.299a9 9 0 0 1 -.686 .615" />
+  <path d="M9.069 5.054l.431 -.554a.8 .8 0 0 1 1.5 .5v2m0 4v8a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l1.294 -1.664" />
+  <path d="M3 3l18 18" />
 </svg>

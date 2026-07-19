@@ -46,7 +46,9 @@ Open:
 
 `Add-ons > Extension settings > Generic > Audio Switcher`
 
-Use the **Output** and **Input** tabs to customize device names, icons, visibility, and preferred volume. The **Fullscreen** tab contains the preferred output, optional controller shortcut, volume step, and media display options. Notification categories, maintenance tools, game profile behavior, and experimental Spatial Sound integration have their own tabs.
+Use the **Output** and **Input** tabs to customize device names, icons, visibility, and preferred volume. Each listed endpoint shows whether Windows reports it as available, disabled, disconnected, not present, or unavailable. Stale inactive endpoints are hidden unless the user customized them or a game profile still references them. The **Game profiles** tab includes a central manager for reviewing, editing, and removing every saved output, input, Spatial Sound, and game-volume assignment. The **Fullscreen** tab contains the preferred output, optional controller shortcut, volume step, and media display options. Notification categories, maintenance tools, and experimental Spatial Sound integration have their own tabs.
+
+The bundled device icon catalog uses [Tabler Icons](https://tabler.io/icons), distributed under the MIT license included in `Icons/LICENSE-TABLER.txt`.
 
 To switch devices:
 
@@ -82,6 +84,8 @@ For custom layouts, Audio Switcher exposes collections, state, writable volume p
 ```
 
 Every item in `MediaSessions` exposes writable `VolumePercent` and `Volume` properties plus `SetVolumeCommand`, `VolumeUpCommand`, `VolumeDownCommand`, and `ToggleMuteCommand`. This lets themes build a fully custom per-application mixer without first changing the globally selected media session. Audio Switcher discovers sessions created or removed while Playnite is running and updates existing objects in place to preserve controller focus.
+
+The theme API exposes `ApiVersion` and `Supports*` capability flags so themes can conditionally enable integrations. Availability properties include `HasDefaultOutputDevice`, `HasDefaultInputDevice`, `IsOutputVolumeAvailable`, `IsInputVolumeAvailable`, `HasRunningGame`, `HasActiveGameAudioSession`, `HasMediaSessions`, `HasSelectedMediaSession`, `HasAudioError`, and `LastAudioError`. `Devices` and `InputDevices` remain the visible active selectors; `KnownDevices` and `KnownInputDevices` additionally expose endpoints reported by Windows as disabled, disconnected, or unavailable. Every device item includes `State`, `StateName`, `Status`, and `IsAvailable`.
 
 The repository and release package include a fully commented example at [`Examples/FullscreenThemeIntegration.xaml`](Examples/FullscreenThemeIntegration.xaml). The Wiki documents every bundled control, property, command, collection item, and controller focus requirement.
 

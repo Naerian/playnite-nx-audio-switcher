@@ -156,5 +156,17 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">ドキュメント</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">問題を報告</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">設定済みプロファイル</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">保存済みのゲームプロファイルを確認、編集できます。新しいプロファイルはゲームの Audio Switcher コンテキストメニューから作成できます。</sys:String>
+    <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">設定済みのゲームプロファイルはありません。</sys:String>
+    <sys:String x:Key="LOCAS_RemoveProfile">削除</sys:String>
+    <sys:String x:Key="LOCAS_ProfileDoNotChange">変更しない</sys:String>
+    <sys:String x:Key="LOCAS_UnknownGame">不明なゲーム</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusFormat">状態: {0}</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusAvailable">利用可能</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisabled">無効</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisconnected">切断</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusNotPresent">存在しません</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusUnavailable">利用不可</sys:String>
 </ResourceDictionary>
 

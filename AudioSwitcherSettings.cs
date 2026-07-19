@@ -11,6 +11,7 @@ namespace PlayniteAudioSwitcher
         private AudioSwitcherSettings editingClone;
         private List<AudioDevice> availablePlaybackDevices = new List<AudioDevice>();
         private List<AudioDevice> availableRecordingDevices = new List<AudioDevice>();
+        private List<GameAudioProfileEntry> availableGameProfiles = new List<GameAudioProfileEntry>();
         private List<AudioDeviceAlias> deviceAliases = new List<AudioDeviceAlias>();
         private List<AudioDeviceAlias> inputDeviceAliases = new List<AudioDeviceAlias>();
         private string favoriteDeviceAId;
@@ -147,39 +148,66 @@ namespace PlayniteAudioSwitcher
         public List<AudioIconOption> IconOptions => new List<AudioIconOption>
         {
             new AudioIconOption { Id = string.Empty, Name = plugin?.Loc("LOCAS_NoIcon") ?? "None", Glyph = string.Empty },
-            new AudioIconOption { Id = "volume-2", Name = "Volume", Glyph = "V+", GeometryData = "M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z M16 9a5 5 0 0 1 0 6 M19.364 18.364a9 9 0 0 0 0-12.728" },
-            new AudioIconOption { Id = "volume-1", Name = "Volume low", Glyph = "V", GeometryData = "M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z M16 9a5 5 0 0 1 0 6" },
-            new AudioIconOption { Id = "volume", Name = "Volume off", Glyph = "VOL", GeometryData = "M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" },
-            new AudioIconOption { Id = "volume-off", Name = "Volume muted", Glyph = "MUTE", GeometryData = "M16 9a5 5 0 0 1 .95 2.293 M19.364 5.636a9 9 0 0 1 1.889 9.96 m2 2 20 20 m7 7-.587.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298V11 M9.828 4.172A.686.686 0 0 1 11 4.657v.686" },
-            new AudioIconOption { Id = "volume-x", Name = "Volume x", Glyph = "VX", GeometryData = "M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z M22 9 L16 15 M16 9 L22 15" },
-            new AudioIconOption { Id = "headphones", Name = "Headphones", Glyph = "HP", GeometryData = "M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" },
-            new AudioIconOption { Id = "headset", Name = "Headset", Glyph = "HS", GeometryData = "M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z M21 16v2a4 4 0 0 1-4 4h-5" },
-            new AudioIconOption { Id = "mic", Name = "Microphone", Glyph = "MIC", GeometryData = "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3 M19 10v2a7 7 0 0 1-14 0v-2 M12 19v3 M8 22h8" },
-            new AudioIconOption { Id = "mic-off", Name = "Microphone off", Glyph = "MIC-", GeometryData = "M12 19v3 M15 9.34V5a3 3 0 0 0-5.68-1.33 M16.95 16.95A7 7 0 0 1 5 12v-2 M18.89 13.23A7 7 0 0 0 19 12v-2 m2 2 20 20 M9 9v3a3 3 0 0 0 5.12 2.12" },
-            new AudioIconOption { Id = "mic-vocal", Name = "Vocal mic", Glyph = "VOC", GeometryData = "m11 7.601-5.994 8.19a1 1 0 0 0 .1 1.298l.817.818a1 1 0 0 0 1.314.087L15.09 12 M16.5 21.174C15.5 20.5 14.372 20 13 20c-2.058 0-3.928 2.356-6 2-2.072-.356-2.775-3.369-1.5-4.5 M11 7 A5 5 0 1 0 21 7 A5 5 0 1 0 11 7" },
-            new AudioIconOption { Id = "webcam", Name = "Webcam", Glyph = "CAM", GeometryData = "M4 10 A8 8 0 1 0 20 10 A8 8 0 1 0 4 10 M9 10 A3 3 0 1 0 15 10 A3 3 0 1 0 9 10 M7 22h10 M12 22v-4" },
-            new AudioIconOption { Id = "audio-lines", Name = "Audio lines", Glyph = "EQ", GeometryData = "M2 10v3 M6 6v11 M10 3v18 M14 8v7 M18 5v13 M22 10v3" },
-            new AudioIconOption { Id = "audio-waveform", Name = "Waveform", Glyph = "WAV", GeometryData = "M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2" },
-            new AudioIconOption { Id = "podcast", Name = "Podcast", Glyph = "POD", GeometryData = "M13 17a1 1 0 1 0-2 0l.5 4.5a0.5 0.5 0 0 0 1 0z M16.85 18.58a9 9 0 1 0-9.7 0 M8 14a5 5 0 1 1 8 0 M11 11 A1 1 0 1 0 13 11 A1 1 0 1 0 11 11" },
-            new AudioIconOption { Id = "radio", Name = "Radio", Glyph = "RAD", GeometryData = "M16.247 7.761a6 6 0 0 1 0 8.478 M19.075 4.933a10 10 0 0 1 0 14.134 M4.925 19.067a10 10 0 0 1 0-14.134 M7.753 16.239a6 6 0 0 1 0-8.478 M10 12 A2 2 0 1 0 14 12 A2 2 0 1 0 10 12" },
-            new AudioIconOption { Id = "radio-receiver", Name = "Radio receiver", Glyph = "REC", GeometryData = "M5 16v2 M19 16v2 M2 8 H22 V16 H2 Z M18 12h.01" },
-            new AudioIconOption { Id = "speaker", Name = "Speaker", Glyph = "SP", GeometryData = "M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2 M12 10a4 4 0 1 0 0 8a4 4 0 0 0 0-8 M12 6h.01" },
-            new AudioIconOption { Id = "monitor-speaker", Name = "Monitor speaker", Glyph = "MS", GeometryData = "M5.5 20H8 M17 9h.01 M12 4 H22 V20 H12 Z M8 6H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h4 M16 15 A1 1 0 1 0 18 15 A1 1 0 1 0 16 15" },
-            new AudioIconOption { Id = "boom-box", Name = "Boom box", Glyph = "BOX", GeometryData = "M4 9V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4 M8 8v1 M12 8v1 M16 8v1 M2 9 H22 V21 H2 Z M6 15 A2 2 0 1 0 10 15 A2 2 0 1 0 6 15 M14 15 A2 2 0 1 0 18 15 A2 2 0 1 0 14 15" },
-            new AudioIconOption { Id = "tv", Name = "TV", Glyph = "TV", GeometryData = "M17 2l-5 5l-5-5 M4 7h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2" },
-            new AudioIconOption { Id = "monitor", Name = "Monitor", Glyph = "PC", GeometryData = "M4 3h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2 M8 21h8 M12 17v4" },
-            new AudioIconOption { Id = "laptop", Name = "Laptop", Glyph = "LAP", GeometryData = "M18 5a2 2 0 0 1 2 2v8.526a2 2 0 0 0 .212.897l1.068 2.127a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45l1.068-2.127A2 2 0 0 0 4 15.526V7a2 2 0 0 1 2-2z M20.054 15.987H3.946" },
-            new AudioIconOption { Id = "pc-case", Name = "PC case", Glyph = "CASE", GeometryData = "M5 2 H19 V22 H5 Z M15 14h.01 M9 6h6 M9 10h6" },
-            new AudioIconOption { Id = "smartphone", Name = "Smartphone", Glyph = "PH", GeometryData = "M5 2 H19 V22 H5 Z M12 18h.01" },
-            new AudioIconOption { Id = "tablet", Name = "Tablet", Glyph = "TAB", GeometryData = "M4 2 H20 V22 H4 Z M12 18 L12.01 18" },
-            new AudioIconOption { Id = "gamepad-2", Name = "Gamepad", Glyph = "GP", GeometryData = "M6 11h4 M8 9v4 M15 12h.01 M18 10h.01 M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" },
-            new AudioIconOption { Id = "bluetooth", Name = "Bluetooth", Glyph = "BT", GeometryData = "M7 7l10 10l-5 5V2l5 5L7 17" },
-            new AudioIconOption { Id = "bluetooth-connected", Name = "Bluetooth connected", Glyph = "BT+", GeometryData = "m7 7 10 10-5 5V2l5 5L7 17 M18 12 L21 12 M3 12 L6 12" },
-            new AudioIconOption { Id = "bluetooth-searching", Name = "Bluetooth searching", Glyph = "BT?", GeometryData = "m7 7 10 10-5 5V2l5 5L7 17 M20.83 14.83a4 4 0 0 0 0-5.66 M18 12h.01" },
-            new AudioIconOption { Id = "usb", Name = "USB", Glyph = "USB", GeometryData = "M10 6a1 1 0 1 0 0 2a1 1 0 0 0 0-2 M4 19a1 1 0 1 0 0 2a1 1 0 0 0 0-2 M4.7 19.3L19 5 M21 3l-3 1l2 2z M9.26 7.68L5 12l2 5 M10 14l5 2l3.5-3.5 M18 12l1-1l1 1l-1 1z" },
-            new AudioIconOption { Id = "hdmi-port", Name = "HDMI", Glyph = "HDMI", GeometryData = "M22 9a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h1l2 2h12l2-2h1a1 1 0 0 0 1-1Z M7.5 12h9" },
-            new AudioIconOption { Id = "cable", Name = "Cable", Glyph = "CAB", GeometryData = "M17 19a1 1 0 0 1-1-1v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1z M17 21v-2 M19 14V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V10 M21 21v-2 M3 5V3 M4 10a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a2 2 0 0 1-2 2z M7 5V3" }
+            IconOption("volume-2", "Volume", "V+", "volume.svg"),
+            IconOption("volume-1", "Volume low", "V", "volume-2.svg"),
+            IconOption("volume", "Volume off", "VOL", "volume-4.svg"),
+            IconOption("volume-off", "Volume muted", "MUTE", "volume-off.svg"),
+            IconOption("volume-x", "Volume unavailable", "VX", "volume-3.svg"),
+            IconOption("headphones", "Headphones", "HP", "headphones.svg"),
+            IconOption("headphones-off", "Headphones unavailable", "HP-", "headphones-off.svg"),
+            IconOption("headset", "Headset", "HS", "headset.svg"),
+            IconOption("headset-off", "Headset unavailable", "HS-", "headset-off.svg"),
+            IconOption("device-airpods", "Wireless earbuds", "BUD", "device-airpods.svg"),
+            IconOption("earphone-bluetooth", "Bluetooth earphone", "BTE", "earphone-bluetooth.svg"),
+            IconOption("mic", "Microphone", "MIC", "microphone.svg"),
+            IconOption("mic-off", "Microphone off", "MIC-", "microphone-off.svg"),
+            IconOption("mic-vocal", "Vocal microphone", "VOC", "microphone-2.svg"),
+            IconOption("mic-vocal-off", "Vocal microphone off", "VOC-", "microphone-2-off.svg"),
+            IconOption("webcam", "Webcam", "CAM", "device-computer-camera.svg"),
+            IconOption("webcam-off", "Webcam unavailable", "CAM-", "device-computer-camera-off.svg"),
+            IconOption("capture", "Capture device", "CAP", "capture.svg"),
+            IconOption("audio-lines", "Audio controls", "EQ", "adjustments-horizontal.svg"),
+            IconOption("audio-waveform", "Waveform", "WAV", "wave-sine.svg"),
+            IconOption("music", "Music", "MUS", "music.svg"),
+            IconOption("podcast", "Podcast", "POD", "broadcast.svg"),
+            IconOption("radio", "Radio", "RAD", "radio.svg"),
+            IconOption("radio-receiver", "Wireless receiver", "REC", "antenna.svg"),
+            IconOption("boom-box", "Audio player", "BOX", "device-audio-tape.svg"),
+            IconOption("vinyl", "Turntable", "VIN", "vinyl.svg"),
+            IconOption("speaker", "Speaker", "SP", "device-speaker.svg"),
+            IconOption("speaker-off", "Speaker unavailable", "SP-", "device-speaker-off.svg"),
+            IconOption("monitor-speaker", "Monitor speakers", "MS", "device-imac.svg"),
+            IconOption("speakerphone", "Speakerphone", "CALL", "speakerphone.svg"),
+            IconOption("tv", "TV", "TV", "device-tv.svg"),
+            IconOption("tv-old", "Classic TV", "TV2", "device-tv-old.svg"),
+            IconOption("monitor", "Monitor", "PC", "device-desktop.svg"),
+            IconOption("laptop", "Laptop", "LAP", "device-laptop.svg"),
+            IconOption("pc-case", "PC", "CASE", "server.svg"),
+            IconOption("smartphone", "Smartphone", "PH", "device-mobile.svg"),
+            IconOption("tablet", "Tablet", "TAB", "device-tablet.svg"),
+            IconOption("projector", "Projector", "PROJ", "device-projector.svg"),
+            IconOption("car", "Car audio", "CAR", "car.svg"),
+            IconOption("gamepad-2", "Gamepad", "GP", "device-gamepad.svg"),
+            IconOption("bluetooth", "Bluetooth", "BT", "bluetooth.svg"),
+            IconOption("bluetooth-connected", "Bluetooth connected", "BT+", "bluetooth-connected.svg"),
+            IconOption("bluetooth-searching", "Bluetooth unavailable", "BT-", "bluetooth-off.svg"),
+            IconOption("usb", "USB", "USB", "usb.svg"),
+            IconOption("hdmi-port", "HDMI", "HDMI", "plug.svg"),
+            IconOption("cable", "Cable", "CAB", "plug-connected.svg"),
+            IconOption("cast", "Cast device", "CAST", "cast.svg"),
+            IconOption("video", "Video device", "VID", "video.svg")
         };
+
+        private static AudioIconOption IconOption(string id, string name, string glyph, string iconFileName)
+        {
+            return new AudioIconOption
+            {
+                Id = id,
+                Name = name,
+                Glyph = glyph,
+                IconFileName = iconFileName
+            };
+        }
 
         public bool ShowNotifications
         {
@@ -320,10 +348,58 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref availableRecordingDevices, value);
         }
 
+        [DontSerialize]
+        public List<GameAudioProfileEntry> AvailableGameProfiles
+        {
+            get => availableGameProfiles;
+            set => SetValue(ref availableGameProfiles, value ?? new List<GameAudioProfileEntry>());
+        }
+
         public void RefreshDevices()
         {
-            AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetPlaybackDevices(), false);
-            AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetRecordingDevices(), true);
+            var profileOutputIds = new HashSet<string>(AvailableGameProfiles
+                .Where(profile => !string.IsNullOrWhiteSpace(profile.DeviceId))
+                .Select(profile => profile.DeviceId));
+            var profileInputIds = new HashSet<string>(AvailableGameProfiles
+                .Where(profile => !string.IsNullOrWhiteSpace(profile.InputDeviceId))
+                .Select(profile => profile.InputDeviceId));
+            AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetAllPlaybackDevices(), false, profileOutputIds);
+            AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetAllRecordingDevices(), true, profileInputIds);
+        }
+
+        public void RefreshGameProfiles()
+        {
+            AvailableGameProfiles = plugin?.GetGameProfileEntries() ?? new List<GameAudioProfileEntry>();
+        }
+
+        public List<AudioDevice> GetProfileDeviceOptions(bool input, string selectedDeviceId)
+        {
+            var devices = (input ? AvailableRecordingDevices : AvailablePlaybackDevices)
+                .Select(CloneDevice)
+                .ToList();
+
+            if (!string.IsNullOrWhiteSpace(selectedDeviceId) &&
+                devices.All(device => !string.Equals(device.Id, selectedDeviceId, System.StringComparison.OrdinalIgnoreCase)))
+            {
+                var customName = input ? GetInputCustomName(selectedDeviceId) : GetCustomName(selectedDeviceId);
+                devices.Add(new AudioDevice
+                {
+                    Id = selectedDeviceId,
+                    Name = string.IsNullOrWhiteSpace(customName) ? plugin?.Loc("LOCAS_UnknownDevice") ?? "Unknown device" : customName,
+                    CustomName = customName,
+                    State = AudioEndpointState.Unknown,
+                    StatusDisplayName = plugin?.Loc("LOCAS_DeviceStatusUnavailable") ?? "Unavailable"
+                });
+            }
+
+            devices = devices.OrderBy(device => device.EffectiveName).ToList();
+            devices.Insert(0, new AudioDevice
+            {
+                Id = string.Empty,
+                Name = plugin?.Loc("LOCAS_ProfileDoNotChange") ?? "Do not change",
+                State = AudioEndpointState.Active
+            });
+            return devices;
         }
 
         public string GetCustomName(string deviceId)
@@ -384,6 +460,17 @@ namespace PlayniteAudioSwitcher
                 return "webcam";
             }
 
+            if (text.Contains("airpod") || text.Contains("earbud") || text.Contains("ear bud") ||
+                text.Contains("galaxy bud") || text.Contains("pixel bud"))
+            {
+                return "device-airpods";
+            }
+
+            if (text.Contains("earphone") || text.Contains("in-ear") || text.Contains("in ear"))
+            {
+                return "earphone-bluetooth";
+            }
+
             if (text.Contains("headset") || text.Contains("auricular") || text.Contains("headphone") || text.Contains("headphones"))
             {
                 return isInput ? "headset" : "headphones";
@@ -404,9 +491,20 @@ namespace PlayniteAudioSwitcher
                 return "hdmi-port";
             }
 
+            if (text.Contains("chromecast") || text.Contains("airplay") || text.Contains("cast device") ||
+                text.Contains("wireless display"))
+            {
+                return "cast";
+            }
+
             if (text.Contains("usb"))
             {
                 return "usb";
+            }
+
+            if (text.Contains("projector") || text.Contains("proyector"))
+            {
+                return "projector";
             }
 
             if (text.Contains("monitor") || text.Contains("display"))
@@ -426,7 +524,18 @@ namespace PlayniteAudioSwitcher
 
             if (text.Contains("capture") || text.Contains("captura"))
             {
-                return isInput ? "radio-receiver" : "hdmi-port";
+                return "capture";
+            }
+
+            if (text.Contains("virtual") || text.Contains("voicemeeter") || text.Contains("vb-audio") ||
+                text.Contains("virtual cable"))
+            {
+                return "audio-waveform";
+            }
+
+            if (text.Contains("car audio") || text.Contains("automotive") || text.Contains("coche"))
+            {
+                return "car";
             }
 
             if (text.Contains("phone") || text.Contains("smartphone"))
@@ -454,6 +563,7 @@ namespace PlayniteAudioSwitcher
 
         public void BeginEdit()
         {
+            RefreshGameProfiles();
             RefreshDevices();
             editingClone = Clone();
         }
@@ -491,11 +601,13 @@ namespace PlayniteAudioSwitcher
             SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
             VolumeStepPercent = editingClone.VolumeStepPercent;
+            AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
             RefreshDevices();
         }
 
         public void EndEdit()
         {
+            var playbackDeviceIds = new HashSet<string>(AvailablePlaybackDevices.Select(device => device.Id));
             DeviceAliases = AvailablePlaybackDevices
                 .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
                     !a.IsIconSuggested && !string.IsNullOrWhiteSpace(a.Icon) ||
@@ -509,8 +621,10 @@ namespace PlayniteAudioSwitcher
                     IsVisible = a.IsVisible ? (bool?)null : false,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 })
+                .Concat(DeviceAliases.Where(alias => !playbackDeviceIds.Contains(alias.DeviceId)))
                 .ToList();
 
+            var recordingDeviceIds = new HashSet<string>(AvailableRecordingDevices.Select(device => device.Id));
             InputDeviceAliases = AvailableRecordingDevices
                 .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
                     !a.IsIconSuggested && !string.IsNullOrWhiteSpace(a.Icon) ||
@@ -524,7 +638,10 @@ namespace PlayniteAudioSwitcher
                     IsVisible = a.IsVisible ? (bool?)null : false,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 })
+                .Concat(InputDeviceAliases.Where(alias => !recordingDeviceIds.Contains(alias.DeviceId)))
                 .ToList();
+
+            plugin.ReplaceGameProfiles(AvailableGameProfiles);
 
             plugin.SavePluginSettings(this);
             plugin.ReloadSettings();
@@ -583,7 +700,7 @@ namespace PlayniteAudioSwitcher
 
         private AudioSwitcherSettings Clone()
         {
-            return new AudioSwitcherSettings
+            var clone = new AudioSwitcherSettings
             {
                 FavoriteDeviceAId = FavoriteDeviceAId,
                 FavoriteDeviceAName = FavoriteDeviceAName,
@@ -626,9 +743,16 @@ namespace PlayniteAudioSwitcher
                 SpatialSoundToolPath = SpatialSoundToolPath,
                 VolumeStepPercent = VolumeStepPercent
             };
+
+            clone.AvailableGameProfiles = AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
+            return clone;
         }
 
-        private List<AudioDevice> RefreshDeviceList(List<AudioDeviceAlias> aliasesSource, System.Func<IReadOnlyList<AudioDevice>> getDevices, bool isInput)
+        private List<AudioDevice> RefreshDeviceList(
+            List<AudioDeviceAlias> aliasesSource,
+            System.Func<IReadOnlyList<AudioDevice>> getDevices,
+            bool isInput,
+            ISet<string> profileDeviceIds)
         {
             try
             {
@@ -636,8 +760,11 @@ namespace PlayniteAudioSwitcher
                     .Where(a => !string.IsNullOrWhiteSpace(a.DeviceId))
                     .GroupBy(a => a.DeviceId)
                     .ToDictionary(a => a.Key, a => a.Last());
+                var retainedInactiveIds = new HashSet<string>(aliases.Keys);
+                retainedInactiveIds.UnionWith(profileDeviceIds ?? new HashSet<string>());
 
                 return getDevices()
+                    .Where(device => device.IsAvailable || retainedInactiveIds.Contains(device.Id))
                     .OrderBy(a => a.Name)
                     .Select(device =>
                     {
@@ -656,6 +783,7 @@ namespace PlayniteAudioSwitcher
                         }
 
                         device.SettingsDisplayName = device.TechnicalDisplayName;
+                        device.StatusDisplayName = GetDeviceStatusDisplayName(device.State);
                         return device;
                     })
                     .ToList();
@@ -664,6 +792,41 @@ namespace PlayniteAudioSwitcher
             {
                 return new List<AudioDevice>();
             }
+        }
+
+        private string GetDeviceStatusDisplayName(AudioEndpointState state)
+        {
+            switch (state)
+            {
+                case AudioEndpointState.Active:
+                    return plugin?.Loc("LOCAS_DeviceStatusAvailable") ?? "Available";
+                case AudioEndpointState.Disabled:
+                    return plugin?.Loc("LOCAS_DeviceStatusDisabled") ?? "Disabled";
+                case AudioEndpointState.Unplugged:
+                    return plugin?.Loc("LOCAS_DeviceStatusDisconnected") ?? "Disconnected";
+                case AudioEndpointState.NotPresent:
+                    return plugin?.Loc("LOCAS_DeviceStatusNotPresent") ?? "Not present";
+                default:
+                    return plugin?.Loc("LOCAS_DeviceStatusUnavailable") ?? "Unavailable";
+            }
+        }
+
+        private static AudioDevice CloneDevice(AudioDevice device)
+        {
+            return new AudioDevice
+            {
+                Id = device.Id,
+                Name = device.Name,
+                IsDefault = device.IsDefault,
+                State = device.State,
+                StatusDisplayName = device.StatusDisplayName,
+                CustomName = device.CustomName,
+                Icon = device.Icon,
+                IsIconSuggested = device.IsIconSuggested,
+                IsVisible = device.IsVisible,
+                DefaultVolumePercent = device.DefaultVolumePercent,
+                SettingsDisplayName = device.SettingsDisplayName
+            };
         }
 
         private static string GetCustomName(List<AudioDeviceAlias> aliases, string deviceId)

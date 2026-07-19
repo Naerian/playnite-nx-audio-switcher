@@ -179,6 +179,73 @@ namespace PlayniteAudioSwitcher
             return new AudioSwitcherSettingsView();
         }
 
+        internal List<GameAudioProfileEntry> GetGameProfileEntries()
+        {
+            var snapshots = gameProfiles?.GetProfilesSnapshot() ?? new Dictionary<Guid, GameAudioProfile>();
+            var games = PlayniteApi.Database.Games
+                .GroupBy(game => game.Id)
+                .ToDictionary(group => group.Key, group => group.First());
+
+            return snapshots
+                .Select(item =>
+                {
+                    games.TryGetValue(item.Key, out var game);
+                    return new GameAudioProfileEntry
+                    {
+                        GameId = item.Key,
+                        GameName = !string.IsNullOrWhiteSpace(game?.Name)
+                            ? game.Name
+                            : $"{Loc("LOCAS_UnknownGame")} ({item.Key})",
+                        GameImagePath = GetGameProfileImagePath(game),
+                        DeviceId = item.Value?.DeviceId,
+                        InputDeviceId = item.Value?.InputDeviceId,
+                        SpatialSoundMode = item.Value?.SpatialSoundMode,
+                        GameVolumePercent = item.Value?.GameVolumePercent
+                    };
+                })
+                .OrderBy(item => item.GameName)
+                .ToList();
+        }
+
+        private string GetGameProfileImagePath(Game game)
+        {
+            if (game == null)
+            {
+                return null;
+            }
+
+            foreach (var databasePath in new[] { game.CoverImage, game.Icon })
+            {
+                if (string.IsNullOrWhiteSpace(databasePath))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var fullPath = PlayniteApi.Database.GetFullFilePath(databasePath);
+                    if (!string.IsNullOrWhiteSpace(fullPath) && File.Exists(fullPath))
+                    {
+                        return fullPath;
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return null;
+        }
+
+        internal void ReplaceGameProfiles(IEnumerable<GameAudioProfileEntry> entries)
+        {
+            var profiles = (entries ?? Enumerable.Empty<GameAudioProfileEntry>())
+                .Where(entry => entry != null && !entry.IsEmpty)
+                .GroupBy(entry => entry.GameId)
+                .ToDictionary(group => group.Key, group => group.Last().ToProfile());
+            gameProfiles?.ReplaceProfiles(profiles);
+        }
+
         public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
             if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Fullscreen)
@@ -532,8 +599,10 @@ namespace PlayniteAudioSwitcher
                         previousDevicesByGame[args.Game.Id] = previousDevice;
                     }
 
-                    SetConfiguredDevice(profile.DeviceId, false);
-                    appliedParts.Add(GetDeviceDisplayName(profile.DeviceId));
+                    if (SetConfiguredDevice(profile.DeviceId, false))
+                    {
+                        appliedParts.Add(GetDeviceDisplayName(profile.DeviceId));
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(profile.InputDeviceId))
@@ -544,8 +613,10 @@ namespace PlayniteAudioSwitcher
                         previousInputDevicesByGame[args.Game.Id] = previousInputDevice;
                     }
 
-                    SetConfiguredInputDevice(profile.InputDeviceId, false);
-                    appliedParts.Add(GetInputDeviceDisplayName(profile.InputDeviceId));
+                    if (SetConfiguredInputDevice(profile.InputDeviceId, false))
+                    {
+                        appliedParts.Add(GetInputDeviceDisplayName(profile.InputDeviceId));
+                    }
                 }
 
                 if (ApplySpatialSoundMode(profile.SpatialSoundMode, false))
@@ -1137,6 +1208,49 @@ namespace PlayniteAudioSwitcher
                     return device;
                 })
                 .ToList();
+        }
+
+        internal IReadOnlyList<AudioDevice> GetKnownThemeDevices(bool input)
+        {
+            try
+            {
+                var devices = input ? AudioDevices.GetAllRecordingDevices() : AudioDevices.GetAllPlaybackDevices();
+                return devices.Select(device =>
+                {
+                    device.CustomName = input ? settings.GetInputCustomName(device.Id) : settings.GetCustomName(device.Id);
+                    device.Icon = input ? settings.GetInputIcon(device.Id) : settings.GetIcon(device.Id);
+                    if (string.IsNullOrWhiteSpace(device.Icon))
+                    {
+                        device.Icon = settings.SuggestIconForDevice(device.Name, input);
+                    }
+
+                    device.IsVisible = input ? settings.IsInputDeviceVisible(device.Id) : settings.IsDeviceVisible(device.Id);
+                    device.StatusDisplayName = GetDeviceStatusLabel(device.State);
+                    return device;
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to enumerate known audio {(input ? "input" : "output")} devices.");
+                return new List<AudioDevice>();
+            }
+        }
+
+        internal string GetDeviceStatusLabel(AudioEndpointState state)
+        {
+            switch (state)
+            {
+                case AudioEndpointState.Active:
+                    return Loc("LOCAS_DeviceStatusAvailable");
+                case AudioEndpointState.Disabled:
+                    return Loc("LOCAS_DeviceStatusDisabled");
+                case AudioEndpointState.Unplugged:
+                    return Loc("LOCAS_DeviceStatusDisconnected");
+                case AudioEndpointState.NotPresent:
+                    return Loc("LOCAS_DeviceStatusNotPresent");
+                default:
+                    return Loc("LOCAS_DeviceStatusUnavailable");
+            }
         }
 
         public void SetThemeSelectedInputDevice(string deviceId)
@@ -2092,6 +2206,7 @@ namespace PlayniteAudioSwitcher
 
                         device.IsVisible = settings.IsDeviceVisible(device.Id);
                         device.DefaultVolumePercent = settings.GetDefaultVolumePercent(device.Id);
+                        device.StatusDisplayName = GetDeviceStatusLabel(device.State);
                         return device;
                     })
                     .ToList();
@@ -2154,6 +2269,7 @@ namespace PlayniteAudioSwitcher
 
                         device.IsVisible = settings.IsInputDeviceVisible(device.Id);
                         device.DefaultVolumePercent = settings.GetDefaultInputVolumePercent(device.Id);
+                        device.StatusDisplayName = GetDeviceStatusLabel(device.State);
                         return device;
                     })
                     .ToList();
@@ -2165,28 +2281,32 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private void SetConfiguredDevice(string deviceId, bool notify)
+        private bool SetConfiguredDevice(string deviceId, bool notify)
         {
             var device = SafeGetDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase));
             if (device == null)
             {
+                logger.Info($"Configured playback device is unavailable: {deviceId}. The current Windows default device will remain in use.");
                 ShowMessage(Loc("LOCAS_ConfiguredDeviceInactive"));
-                return;
+                return false;
             }
 
             SetDevice(device.Id, GetDeviceDisplayName(device), notify);
+            return true;
         }
 
-        private void SetConfiguredInputDevice(string deviceId, bool notify)
+        private bool SetConfiguredInputDevice(string deviceId, bool notify)
         {
             var device = SafeGetInputDevices().FirstOrDefault(a => string.Equals(a.Id, deviceId, StringComparison.OrdinalIgnoreCase));
             if (device == null)
             {
+                logger.Info($"Configured recording device is unavailable: {deviceId}. The current Windows default device will remain in use.");
                 ShowMessage(Loc("LOCAS_ConfiguredInputDeviceInactive"));
-                return;
+                return false;
             }
 
             SetInputDevice(device.Id, GetInputDeviceDisplayName(device), notify);
+            return true;
         }
 
         private void SetDevice(string deviceId, string deviceName)
@@ -3232,20 +3352,36 @@ namespace PlayniteAudioSwitcher
                     return "VX";
                 case "headphones":
                     return "HP";
+                case "headphones-off":
+                    return "HP-";
                 case "headset":
                     return "HS";
+                case "headset-off":
+                    return "HS-";
+                case "device-airpods":
+                    return "BUD";
+                case "earphone-bluetooth":
+                    return "BTE";
                 case "mic":
                     return "MIC";
                 case "mic-off":
                     return "MIC-";
                 case "mic-vocal":
                     return "VOC";
+                case "mic-vocal-off":
+                    return "VOC-";
                 case "webcam":
                     return "CAM";
+                case "webcam-off":
+                    return "CAM-";
+                case "capture":
+                    return "CAP";
                 case "audio-lines":
                     return "EQ";
                 case "audio-waveform":
                     return "WAV";
+                case "music":
+                    return "MUS";
                 case "podcast":
                     return "POD";
                 case "radio":
@@ -3258,8 +3394,16 @@ namespace PlayniteAudioSwitcher
                     return "MS";
                 case "boom-box":
                     return "BOX";
+                case "vinyl":
+                    return "VIN";
+                case "speaker-off":
+                    return "SP-";
+                case "speakerphone":
+                    return "CALL";
                 case "tv":
                     return "TV";
+                case "tv-old":
+                    return "TV2";
                 case "monitor":
                     return "PC";
                 case "laptop":
@@ -3270,6 +3414,10 @@ namespace PlayniteAudioSwitcher
                     return "PH";
                 case "tablet":
                     return "TAB";
+                case "projector":
+                    return "PROJ";
+                case "car":
+                    return "CAR";
                 case "gamepad-2":
                     return "GP";
                 case "bluetooth":
@@ -3284,6 +3432,10 @@ namespace PlayniteAudioSwitcher
                     return "HDMI";
                 case "cable":
                     return "CAB";
+                case "cast":
+                    return "CAST";
+                case "video":
+                    return "VID";
                 default:
                     return icon;
             }

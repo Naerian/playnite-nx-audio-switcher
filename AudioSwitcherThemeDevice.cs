@@ -16,6 +16,8 @@ namespace PlayniteAudioSwitcher
         private bool isVisible = true;
         private bool isCurrent;
         private bool isHighlighted;
+        private AudioEndpointState state = AudioEndpointState.Active;
+        private string status;
 
         public string Id
         {
@@ -58,6 +60,30 @@ namespace PlayniteAudioSwitcher
             get => isVisible;
             set => SetValue(ref isVisible, value);
         }
+
+        public AudioEndpointState State
+        {
+            get => state;
+            set
+            {
+                if (state != value)
+                {
+                    SetValue(ref state, value);
+                    OnPropertyChanged(nameof(StateName));
+                    OnPropertyChanged(nameof(IsAvailable));
+                }
+            }
+        }
+
+        public string StateName => State.ToString();
+
+        public string Status
+        {
+            get => status;
+            set => SetValue(ref status, value);
+        }
+
+        public bool IsAvailable => State == AudioEndpointState.Active;
 
         public bool IsCurrent
         {

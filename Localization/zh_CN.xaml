@@ -156,5 +156,17 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">文档</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">报告问题</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">已配置的配置文件</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">查看并编辑所有已保存的游戏配置文件。可从游戏的 Audio Switcher 右键菜单创建新配置文件。</sys:String>
+    <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">尚未配置游戏配置文件。</sys:String>
+    <sys:String x:Key="LOCAS_RemoveProfile">删除</sys:String>
+    <sys:String x:Key="LOCAS_ProfileDoNotChange">不更改</sys:String>
+    <sys:String x:Key="LOCAS_UnknownGame">未知游戏</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusFormat">状态：{0}</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusAvailable">可用</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisabled">已禁用</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisconnected">已断开连接</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusNotPresent">不存在</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusUnavailable">不可用</sys:String>
 </ResourceDictionary>
 

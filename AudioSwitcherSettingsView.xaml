@@ -140,6 +140,20 @@
                         <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
                                   IsChecked="{Binding RestoreDeviceAfterGameProfile}"
                                   Margin="0,0,0,8" />
+
+                        <Border Style="{StaticResource SectionHeaderBorder}">
+                            <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesTitle}"
+                                       Style="{StaticResource SectionHeaderText}" />
+                        </Border>
+                        <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesHelp}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12" />
+                        <TextBlock x:Name="NoGameProfilesText"
+                                   Text="{DynamicResource LOCAS_NoConfiguredGameProfiles}"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.8"
+                                   Margin="0,0,0,8" />
+                        <StackPanel x:Name="GameProfileRowsPanel" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

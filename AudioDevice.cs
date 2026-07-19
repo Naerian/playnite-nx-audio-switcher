@@ -1,5 +1,14 @@
 namespace PlayniteAudioSwitcher
 {
+    public enum AudioEndpointState
+    {
+        Unknown,
+        Active,
+        Disabled,
+        NotPresent,
+        Unplugged
+    }
+
     public sealed class AudioDevice
     {
         private string settingsDisplayName;
@@ -9,6 +18,12 @@ namespace PlayniteAudioSwitcher
         public string Name { get; set; }
 
         public bool IsDefault { get; set; }
+
+        public AudioEndpointState State { get; set; } = AudioEndpointState.Active;
+
+        public bool IsAvailable => State == AudioEndpointState.Active;
+
+        public string StatusDisplayName { get; set; }
 
         public string CustomName { get; set; }
 
@@ -23,6 +38,10 @@ namespace PlayniteAudioSwitcher
         public string EffectiveName => string.IsNullOrWhiteSpace(CustomName) ? Name : CustomName;
 
         public string EffectiveIcon => string.IsNullOrWhiteSpace(Icon) ? string.Empty : Icon;
+
+        public string ProfileDisplayName => IsAvailable || string.IsNullOrWhiteSpace(StatusDisplayName)
+            ? EffectiveName
+            : $"{EffectiveName} ({StatusDisplayName})";
 
         public string DisplayName => IsDefault ? $"★ {EffectiveName}" : EffectiveName;
 

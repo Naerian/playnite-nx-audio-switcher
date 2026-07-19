@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
 using Microsoft.Win32;
@@ -25,6 +27,7 @@ namespace PlayniteAudioSwitcher
             Loaded += (_, __) =>
             {
                 RebuildDeviceRows();
+                RebuildGameProfileRows();
                 UpdateSpatialSoundToolStatus();
             };
         }
@@ -38,6 +41,7 @@ namespace PlayniteAudioSwitcher
 
             BuildDeviceRows(DeviceRowsPanel, settings.AvailablePlaybackDevices, settings, "LOCAS_DefaultVolume");
             BuildDeviceRows(InputDeviceRowsPanel, settings.AvailableRecordingDevices, settings, "LOCAS_DefaultInputVolume");
+            RebuildGameProfileRows();
         }
 
         private void BuildDeviceRows(StackPanel panel, IEnumerable<AudioDevice> devices, AudioSwitcherSettings settings, string defaultVolumeLabelResource)
@@ -81,6 +85,16 @@ namespace PlayniteAudioSwitcher
                     TextWrapping = TextWrapping.Wrap
                 };
                 namePanel.Children.Add(deviceName);
+                var deviceStatus = new TextBlock
+                {
+                    Text = string.Format(
+                        Application.Current.TryFindResource("LOCAS_DeviceStatusFormat") as string ?? "Status: {0}",
+                        device.StatusDisplayName),
+                    FontSize = 11,
+                    Opacity = device.IsAvailable ? 0.7 : 0.95,
+                    Margin = new Thickness(0, 3, 0, 0)
+                };
+                namePanel.Children.Add(deviceStatus);
                 Grid.SetColumn(namePanel, 0);
                 grid.Children.Add(namePanel);
 
@@ -234,6 +248,205 @@ namespace PlayniteAudioSwitcher
                 row.Children.Add(separator);
 
                 return row;
+        }
+
+        private void RebuildGameProfileRows()
+        {
+            if (GameProfileRowsPanel == null || NoGameProfilesText == null || !(DataContext is AudioSwitcherSettings settings))
+            {
+                return;
+            }
+
+            GameProfileRowsPanel.Children.Clear();
+            var profiles = settings.AvailableGameProfiles.OrderBy(profile => profile.GameName).ToList();
+            NoGameProfilesText.Visibility = profiles.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            foreach (var profile in profiles)
+            {
+                GameProfileRowsPanel.Children.Add(CreateGameProfileRow(profile, settings));
+            }
+        }
+
+        private UIElement CreateGameProfileRow(GameAudioProfileEntry profile, AudioSwitcherSettings settings)
+        {
+            var container = new Border
+            {
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(2),
+                Padding = new Thickness(14, 12, 14, 14),
+                Margin = new Thickness(0, 0, 0, 16)
+            };
+            container.SetResourceReference(Border.BorderBrushProperty, "GlyphBrush");
+
+            var content = new StackPanel();
+            var titleRow = new Grid { Margin = new Thickness(0, 0, 0, 12) };
+            titleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            titleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            titleRow.Children.Add(new TextBlock
+            {
+                Text = profile.GameName,
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center
+            });
+            var removeButton = new Button
+            {
+                MinWidth = 90,
+                Margin = new Thickness(12, 0, 0, 0)
+            };
+            removeButton.SetResourceReference(ContentControl.ContentProperty, "LOCAS_RemoveProfile");
+            removeButton.Click += (_, __) =>
+            {
+                settings.AvailableGameProfiles.Remove(profile);
+                RebuildGameProfileRows();
+            };
+            Grid.SetColumn(removeButton, 1);
+            titleRow.Children.Add(removeButton);
+            content.Children.Add(titleRow);
+
+            var fields = new Grid();
+            fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(220) });
+
+            var outputBox = new ComboBox
+            {
+                ItemsSource = settings.GetProfileDeviceOptions(false, profile.DeviceId),
+                DisplayMemberPath = "ProfileDisplayName",
+                SelectedValuePath = "Id",
+                SelectedValue = profile.DeviceId ?? string.Empty
+            };
+            outputBox.SelectionChanged += (_, __) => profile.DeviceId = outputBox.SelectedValue?.ToString();
+            fields.Children.Add(CreateProfileField("LOCAS_MenuChooseOutput", outputBox, 0));
+
+            var inputBox = new ComboBox
+            {
+                ItemsSource = settings.GetProfileDeviceOptions(true, profile.InputDeviceId),
+                DisplayMemberPath = "ProfileDisplayName",
+                SelectedValuePath = "Id",
+                SelectedValue = profile.InputDeviceId ?? string.Empty
+            };
+            inputBox.SelectionChanged += (_, __) => profile.InputDeviceId = inputBox.SelectedValue?.ToString();
+            fields.Children.Add(CreateProfileField("LOCAS_MenuChooseInput", inputBox, 1));
+
+            var spatialBox = new ComboBox
+            {
+                ItemsSource = settings.SpatialSoundModeOptions,
+                DisplayMemberPath = "Name",
+                SelectedValuePath = "Id",
+                SelectedValue = profile.SpatialSoundMode ?? string.Empty
+            };
+            spatialBox.SelectionChanged += (_, __) => profile.SpatialSoundMode = spatialBox.SelectedValue?.ToString();
+            fields.Children.Add(CreateProfileField("LOCAS_SpatialSoundTitle", spatialBox, 2));
+
+            var volumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
+            volumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            volumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            volumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var volumeEnabled = new CheckBox
+            {
+                IsChecked = profile.GameVolumePercent.HasValue,
+                Margin = new Thickness(0, 0, 8, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var volumeSlider = new Slider
+            {
+                Minimum = 0,
+                Maximum = 100,
+                TickFrequency = 1,
+                IsSnapToTickEnabled = true,
+                Value = profile.GameVolumePercent ?? 50,
+                IsEnabled = profile.GameVolumePercent.HasValue,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var volumeValue = new TextBlock
+            {
+                MinWidth = 40,
+                Margin = new Thickness(8, 0, 0, 0),
+                TextAlignment = TextAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Action updateVolume = () =>
+            {
+                var enabled = volumeEnabled.IsChecked == true;
+                volumeSlider.IsEnabled = enabled;
+                profile.GameVolumePercent = enabled ? (int?)Math.Round(volumeSlider.Value) : null;
+                volumeValue.Text = enabled ? $"{profile.GameVolumePercent}%" : "-";
+            };
+            volumeEnabled.Checked += (_, __) => updateVolume();
+            volumeEnabled.Unchecked += (_, __) => updateVolume();
+            volumeSlider.ValueChanged += (_, __) => updateVolume();
+            Grid.SetColumn(volumeSlider, 1);
+            Grid.SetColumn(volumeValue, 2);
+            volumeGrid.Children.Add(volumeEnabled);
+            volumeGrid.Children.Add(volumeSlider);
+            volumeGrid.Children.Add(volumeValue);
+            updateVolume();
+            fields.Children.Add(CreateProfileField("LOCAS_GameVolumeTitle", volumeGrid, 3));
+
+            content.Children.Add(fields);
+            var layout = new Grid();
+            var imageSource = LoadGameProfileImage(profile.GameImagePath);
+            if (imageSource != null)
+            {
+                layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(82) });
+                layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                var image = new Image
+                {
+                    Source = imageSource,
+                    Width = 68,
+                    Height = 96,
+                    Stretch = Stretch.Uniform,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(0, 0, 14, 0)
+                };
+                layout.Children.Add(image);
+                Grid.SetColumn(content, 1);
+            }
+            else
+            {
+                layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            }
+
+            layout.Children.Add(content);
+            container.Child = layout;
+            return container;
+        }
+
+        private static ImageSource LoadGameProfileImage(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !IoFile.Exists(path))
+            {
+                return null;
+            }
+
+            try
+            {
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = new Uri(path, UriKind.Absolute);
+                image.EndInit();
+                image.Freeze();
+                return image;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static FrameworkElement CreateProfileField(string labelResource, FrameworkElement control, int column)
+        {
+            var panel = new StackPanel { Margin = new Thickness(0, 0, column == 3 ? 0 : 10, 0) };
+            var label = new TextBlock { FontSize = 11, Opacity = 0.8, Margin = new Thickness(0, 0, 0, 3) };
+            label.SetResourceReference(TextBlock.TextProperty, labelResource);
+            panel.Children.Add(label);
+            panel.Children.Add(control);
+            Grid.SetColumn(panel, column);
+            return panel;
         }
 
         private static void UpdateDefaultVolume(AudioDevice device, CheckBox enabled, Slider slider, TextBlock value)

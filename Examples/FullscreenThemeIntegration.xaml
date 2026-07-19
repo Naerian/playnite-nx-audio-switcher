@@ -75,6 +75,42 @@
     <ContentControl x:Name="AudioSwitcher_InputWidget" />
 
     <!--
+        Capability and availability checks for themes that support multiple Audio Switcher versions.
+        ApiVersion identifies the formal theme API contract. SupportsInputDevices confirms the feature exists,
+        while HasDefaultInputDevice and IsInputVolumeAvailable describe the current Windows audio state.
+        Equivalent output flags are HasDefaultOutputDevice and IsOutputVolumeAvailable.
+    -->
+    <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=ApiVersion}" />
+    <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=LastAudioError}">
+        <TextBlock.Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="Visibility" Value="Collapsed" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{PluginSettings Plugin=AudioSwitcher, Path=HasAudioError}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </TextBlock.Style>
+    </TextBlock>
+
+    <!--
+        KnownDevices and KnownInputDevices include active and inactive Windows endpoints.
+        Each item exposes State/StateName, localized Status, and IsAvailable. Use SetDeviceCommand only when
+        IsAvailable is true. Devices and InputDevices remain the safer active-only collections for selectors.
+    -->
+    <ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=KnownDevices}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding Status}" />
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <!--
         Current game audio session integration.
         CurrentGameName is the Playnite game name.
         CurrentGameSessionName is the matched Windows audio session/process.

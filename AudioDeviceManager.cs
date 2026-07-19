@@ -12,12 +12,22 @@ namespace PlayniteAudioSwitcher
 
         public IReadOnlyList<AudioDevice> GetPlaybackDevices()
         {
-            return GetDevices(EDataFlow.eRender);
+            return GetDevices(EDataFlow.eRender, DeviceState.Active);
         }
 
         public IReadOnlyList<AudioDevice> GetRecordingDevices()
         {
-            return GetDevices(EDataFlow.eCapture);
+            return GetDevices(EDataFlow.eCapture, DeviceState.Active);
+        }
+
+        public IReadOnlyList<AudioDevice> GetAllPlaybackDevices()
+        {
+            return GetDevices(EDataFlow.eRender, DeviceState.All);
+        }
+
+        public IReadOnlyList<AudioDevice> GetAllRecordingDevices()
+        {
+            return GetDevices(EDataFlow.eCapture, DeviceState.All);
         }
 
         public AudioDevice GetDefaultPlaybackDevice()
@@ -199,30 +209,76 @@ namespace PlayniteAudioSwitcher
             SetDefaultRecordingMute(!state.IsMuted);
         }
 
-        private IReadOnlyList<AudioDevice> GetDevices(EDataFlow dataFlow)
+        private IReadOnlyList<AudioDevice> GetDevices(EDataFlow dataFlow, DeviceState stateMask)
         {
             var devices = new List<AudioDevice>();
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            var defaultId = GetDefaultDeviceId(enumerator, dataFlow);
-
-            Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active, out var collection));
-            Marshal.ThrowExceptionForHR(collection.GetCount(out var count));
-
-            for (uint i = 0; i < count; i++)
+            IMMDeviceCollection collection = null;
+            try
             {
-                Marshal.ThrowExceptionForHR(collection.Item(i, out var device));
-                Marshal.ThrowExceptionForHR(device.GetId(out var id));
-                var name = GetDeviceName(device);
+                var defaultId = GetDefaultDeviceId(enumerator, dataFlow);
+                Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(dataFlow, stateMask, out collection));
+                Marshal.ThrowExceptionForHR(collection.GetCount(out var count));
 
-                devices.Add(new AudioDevice
+                for (uint i = 0; i < count; i++)
                 {
-                    Id = id,
-                    Name = string.IsNullOrWhiteSpace(name) ? id : name,
-                    IsDefault = string.Equals(id, defaultId, StringComparison.OrdinalIgnoreCase)
-                });
+                    IMMDevice device = null;
+                    try
+                    {
+                        Marshal.ThrowExceptionForHR(collection.Item(i, out device));
+                        Marshal.ThrowExceptionForHR(device.GetId(out var id));
+                        Marshal.ThrowExceptionForHR(device.GetState(out var state));
+                        var name = GetDeviceName(device);
+
+                        devices.Add(new AudioDevice
+                        {
+                            Id = id,
+                            Name = string.IsNullOrWhiteSpace(name) ? id : name,
+                            IsDefault = string.Equals(id, defaultId, StringComparison.OrdinalIgnoreCase),
+                            State = ToAudioEndpointState(state)
+                        });
+                    }
+                    catch
+                    {
+                        // Endpoints can disappear while Windows is enumerating them.
+                    }
+                    finally
+                    {
+                        ReleaseDistinctComObjects(device);
+                    }
+                }
+            }
+            finally
+            {
+                ReleaseDistinctComObjects(collection, enumerator);
             }
 
             return devices;
+        }
+
+        private static AudioEndpointState ToAudioEndpointState(DeviceState state)
+        {
+            if ((state & DeviceState.Active) != 0)
+            {
+                return AudioEndpointState.Active;
+            }
+
+            if ((state & DeviceState.Disabled) != 0)
+            {
+                return AudioEndpointState.Disabled;
+            }
+
+            if ((state & DeviceState.Unplugged) != 0)
+            {
+                return AudioEndpointState.Unplugged;
+            }
+
+            if ((state & DeviceState.NotPresent) != 0)
+            {
+                return AudioEndpointState.NotPresent;
+            }
+
+            return AudioEndpointState.Unknown;
         }
 
         private IReadOnlyList<ISimpleAudioVolume> GetProcessTreeVolumeSessions(int rootProcessId)
@@ -843,7 +899,8 @@ namespace PlayniteAudioSwitcher
             {
                 Id = id,
                 Name = GetDeviceName(device),
-                IsDefault = true
+                IsDefault = true,
+                State = AudioEndpointState.Active
             };
         }
 
@@ -865,7 +922,7 @@ namespace PlayniteAudioSwitcher
             var volume = GetDefaultVolumeEndpoint(dataFlow);
             if (volume == null)
             {
-                return new AudioVolumeState();
+                return new AudioVolumeState { IsAvailable = false };
             }
 
             Marshal.ThrowExceptionForHR(volume.GetMasterVolumeLevelScalar(out var level));
@@ -873,6 +930,7 @@ namespace PlayniteAudioSwitcher
 
             return new AudioVolumeState
             {
+                IsAvailable = true,
                 Volume = Clamp01(level),
                 IsMuted = isMuted
             };
@@ -986,7 +1044,11 @@ namespace PlayniteAudioSwitcher
         [Flags]
         private enum DeviceState
         {
-            Active = 0x00000001
+            Active = 0x00000001,
+            Disabled = 0x00000002,
+            NotPresent = 0x00000004,
+            Unplugged = 0x00000008,
+            All = Active | Disabled | NotPresent | Unplugged
         }
 
         private enum StorageAccessMode

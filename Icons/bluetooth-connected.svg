@@ -1,3 +1,9 @@
+<!--
+tags: [wireless, connection, connect, bluetooth, connected, hardware, technology, electronic, gadget, equipment]
+category: Devices
+version: "1.22"
+unicode: "ecea"
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -9,7 +15,7 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m7 7 10 10-5 5V2l5 5L7 17" />
-  <line x1="18" x2="21" y1="12" y2="12" />
-  <line x1="3" x2="6" y1="12" y2="12" />
+  <path d="M7 8l10 8l-5 4l0 -16l5 4l-10 8" />
+  <path d="M4 12l1 0" />
+  <path d="M18 12l1 0" />
 </svg>

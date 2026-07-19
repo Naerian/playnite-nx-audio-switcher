@@ -156,5 +156,17 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">Belgeler</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">Sorun bildir</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Yapılandırılmış profiller</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Kaydedilmiş tüm oyun profillerini inceleyin ve düzenleyin. Yeni profiller oyunun Audio Switcher bağlam menüsünden oluşturulabilir.</sys:String>
+    <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">Yapılandırılmış oyun profili yok.</sys:String>
+    <sys:String x:Key="LOCAS_RemoveProfile">Kaldır</sys:String>
+    <sys:String x:Key="LOCAS_ProfileDoNotChange">Değiştirme</sys:String>
+    <sys:String x:Key="LOCAS_UnknownGame">Bilinmeyen oyun</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusFormat">Durum: {0}</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusAvailable">Kullanılabilir</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisabled">Devre dışı</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisconnected">Bağlantısı kesilmiş</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Mevcut değil</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Kullanılamıyor</sys:String>
 </ResourceDictionary>
 

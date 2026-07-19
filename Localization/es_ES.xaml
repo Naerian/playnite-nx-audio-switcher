@@ -156,6 +156,18 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">Documentación</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">Informar de un problema</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Perfiles configurados</sys:String>
+    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Revisa y edita todos los perfiles guardados. Puedes crear perfiles nuevos desde el menú contextual Audio Switcher de cada juego.</sys:String>
+    <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">No hay perfiles de juego configurados.</sys:String>
+    <sys:String x:Key="LOCAS_RemoveProfile">Eliminar</sys:String>
+    <sys:String x:Key="LOCAS_ProfileDoNotChange">No cambiar</sys:String>
+    <sys:String x:Key="LOCAS_UnknownGame">Juego desconocido</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusFormat">Estado: {0}</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusAvailable">Disponible</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisabled">Deshabilitado</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusDisconnected">Desconectado</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusNotPresent">No presente</sys:String>
+    <sys:String x:Key="LOCAS_DeviceStatusUnavailable">No disponible</sys:String>
 </ResourceDictionary>
 
 
