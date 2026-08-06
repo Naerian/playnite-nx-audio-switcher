@@ -23,13 +23,113 @@ namespace PlayniteAudioSwitcher
             AboutVersionText.Text = string.Format(
                 TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Version {0} | Narian",
                 GetInstalledVersion());
-            DataContextChanged += (_, __) => RebuildDeviceRows();
+            DataContextChanged += (_, __) =>
+            {
+                RebuildDeviceRows();
+                UpdateOverview();
+            };
             Loaded += (_, __) =>
             {
                 RebuildDeviceRows();
                 RebuildGameProfileRows();
                 UpdateSpatialSoundToolStatus();
+                UpdateOverview();
             };
+        }
+
+        private void RefreshOverview(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is AudioSwitcherSettings settings)
+            {
+                settings.RefreshDevices();
+                RebuildDeviceRows();
+            }
+
+            UpdateSpatialSoundToolStatus();
+            UpdateOverview();
+        }
+
+        private void UpdateOverview()
+        {
+            if (OverviewOutputText == null || !(DataContext is AudioSwitcherSettings settings) || settings.Plugin == null)
+            {
+                return;
+            }
+
+            var plugin = settings.Plugin;
+            try
+            {
+                OverviewOutputText.Text = FormatDeviceOverview(
+                    plugin.GetCurrentDeviceDisplayName(),
+                    plugin.GetCurrentVolumeState());
+            }
+            catch
+            {
+                OverviewOutputText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
+            }
+
+            try
+            {
+                OverviewInputText.Text = FormatDeviceOverview(
+                    plugin.GetCurrentInputDeviceDisplayName(),
+                    plugin.GetCurrentInputVolumeState());
+            }
+            catch
+            {
+                OverviewInputText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
+            }
+
+            var manualProcessCount = settings.AvailableGameProfiles.Count(profile => !string.IsNullOrWhiteSpace(profile.AudioProcessName));
+            OverviewProfilesText.Text = string.Format(
+                ResourceText("LOCAS_OverviewProfilesFormat", "{0} configured profiles | {1} manual audio processes"),
+                settings.AvailableGameProfiles.Count,
+                manualProcessCount);
+
+            OverviewSpatialSoundText.Text = settings.SpatialSoundIntegrationEnabled
+                ? GetSpatialSoundToolStatus()
+                : ResourceText("LOCAS_SpatialOff", "Off");
+
+            try
+            {
+                var activeSessions = plugin.AudioDevices.GetPlaybackAudioSessions().Count(session => session.IsActive);
+                OverviewSessionsText.Text = string.Format(
+                    ResourceText("LOCAS_OverviewSessionsFormat", "{0} active playback sessions"),
+                    activeSessions);
+            }
+            catch
+            {
+                OverviewSessionsText.Text = string.Format(
+                    ResourceText("LOCAS_OverviewSessionsFormat", "{0} active playback sessions"),
+                    0);
+            }
+        }
+
+        private string FormatDeviceOverview(string deviceName, AudioVolumeState volumeState)
+        {
+            if (string.IsNullOrWhiteSpace(deviceName))
+            {
+                return ResourceText("LOCAS_OverviewNoDevice", "No default device");
+            }
+
+            if (volumeState == null || !volumeState.IsAvailable)
+            {
+                return deviceName;
+            }
+
+            var volumeText = string.Format(
+                ResourceText("LOCAS_OverviewVolumeFormat", "{0}% volume"),
+                volumeState.VolumePercent);
+            if (volumeState.IsMuted)
+            {
+                volumeText += $" | {ResourceText("LOCAS_Muted", "Muted")}";
+            }
+
+            return $"{deviceName}\n{volumeText}";
+        }
+
+        private string ResourceText(string key, string fallback)
+        {
+            return TryFindResource(key) as string ?? fallback;
         }
 
         private void RebuildDeviceRows()
@@ -58,18 +158,23 @@ namespace PlayniteAudioSwitcher
         {
             var border = new Border
             {
-                BorderThickness = new Thickness(0),
-                Padding = new Thickness(0, 0, 0, 12)
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(14, 12, 14, 14),
+                Margin = new Thickness(0, 0, 0, 12)
             };
+            border.SetResourceReference(Border.BackgroundProperty, "ControlBackgroundBrush");
+            border.SetResourceReference(Border.BorderBrushProperty, "GlyphBrush");
+            border.SetResourceReference(Border.CornerRadiusProperty, "ControlCornerRadius");
 
                 var grid = new Grid();
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(190) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(220) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                var namePanel = new StackPanel { Margin = new Thickness(0, 0, 14, 0) };
+                var namePanel = new StackPanel { Margin = new Thickness(0, 0, 0, 14) };
                 var windowsName = new TextBlock
                 {
                     FontSize = 11,
@@ -95,7 +200,7 @@ namespace PlayniteAudioSwitcher
                     Margin = new Thickness(0, 3, 0, 0)
                 };
                 namePanel.Children.Add(deviceStatus);
-                Grid.SetColumn(namePanel, 0);
+                Grid.SetColumnSpan(namePanel, 4);
                 grid.Children.Add(namePanel);
 
                 var visiblePanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
@@ -116,7 +221,8 @@ namespace PlayniteAudioSwitcher
                 visibleBox.Unchecked += (_, __) => device.IsVisible = false;
                 visiblePanel.Children.Add(visibleLabel);
                 visiblePanel.Children.Add(visibleBox);
-                Grid.SetColumn(visiblePanel, 1);
+                Grid.SetRow(visiblePanel, 1);
+                Grid.SetColumn(visiblePanel, 0);
                 grid.Children.Add(visiblePanel);
 
                 var iconPanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
@@ -141,7 +247,8 @@ namespace PlayniteAudioSwitcher
                 };
                 iconPanel.Children.Add(iconLabel);
                 iconPanel.Children.Add(iconBox);
-                Grid.SetColumn(iconPanel, 2);
+                Grid.SetRow(iconPanel, 1);
+                Grid.SetColumn(iconPanel, 1);
                 grid.Children.Add(iconPanel);
 
                 var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
@@ -207,7 +314,8 @@ namespace PlayniteAudioSwitcher
                 defaultVolumeGrid.Children.Add(defaultVolumeValue);
                 defaultVolumePanel.Children.Add(defaultVolumeLabel);
                 defaultVolumePanel.Children.Add(defaultVolumeGrid);
-                Grid.SetColumn(defaultVolumePanel, 3);
+                Grid.SetRow(defaultVolumePanel, 1);
+                Grid.SetColumn(defaultVolumePanel, 2);
                 grid.Children.Add(defaultVolumePanel);
 
                 var customNamePanel = new StackPanel();
@@ -225,29 +333,12 @@ namespace PlayniteAudioSwitcher
                 customNameBox.TextChanged += (_, __) => device.CustomName = customNameBox.Text;
                 customNamePanel.Children.Add(customNameLabel);
                 customNamePanel.Children.Add(customNameBox);
-                Grid.SetColumn(customNamePanel, 4);
+                Grid.SetRow(customNamePanel, 1);
+                Grid.SetColumn(customNamePanel, 3);
                 grid.Children.Add(customNamePanel);
 
                 border.Child = grid;
-                var row = new Grid { Margin = new Thickness(0, 0, 0, 12) };
-                row.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                row.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1) });
-                row.Children.Add(border);
-
-                var separator = new Line
-                {
-                    X1 = 0,
-                    X2 = 1,
-                    Stretch = Stretch.Fill,
-                    Stroke = Brushes.Gray,
-                    StrokeThickness = 1,
-                    StrokeDashArray = new DoubleCollection { 2, 3 },
-                    Opacity = 0.35
-                };
-                Grid.SetRow(separator, 1);
-                row.Children.Add(separator);
-
-                return row;
+                return border;
         }
 
         private void RebuildGameProfileRows()
@@ -271,11 +362,12 @@ namespace PlayniteAudioSwitcher
             var container = new Border
             {
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(2),
                 Padding = new Thickness(14, 12, 14, 14),
-                Margin = new Thickness(0, 0, 0, 16)
+                Margin = new Thickness(0, 0, 0, 12)
             };
+            container.SetResourceReference(Border.BackgroundProperty, "PopupBackgroundBrush");
             container.SetResourceReference(Border.BorderBrushProperty, "GlyphBrush");
+            container.SetResourceReference(Border.CornerRadiusProperty, "ControlCornerRadius");
 
             var content = new StackPanel();
             var titleRow = new Grid { Margin = new Thickness(0, 0, 0, 12) };
@@ -297,6 +389,20 @@ namespace PlayniteAudioSwitcher
             removeButton.SetResourceReference(ContentControl.ContentProperty, "LOCAS_RemoveProfile");
             removeButton.Click += (_, __) =>
             {
+                var confirmed = settings.Plugin != null
+                    ? settings.Plugin.ConfirmRemoveGameProfile(profile.GameName, false)
+                    : MessageBox.Show(
+                        string.Format(
+                            ResourceText("LOCAS_ConfirmRemoveProfilePendingMessage", "Remove the Audio Switcher profile for \"{0}\" when settings are saved? Canceling settings keeps the profile."),
+                            profile.GameName),
+                        ResourceText("LOCAS_ConfirmRemoveProfileTitle", "Remove game profile"),
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning) == MessageBoxResult.Yes;
+                if (!confirmed)
+                {
+                    return;
+                }
+
                 settings.AvailableGameProfiles.Remove(profile);
                 RebuildGameProfileRows();
             };
@@ -386,6 +492,80 @@ namespace PlayniteAudioSwitcher
             fields.Children.Add(CreateProfileField("LOCAS_GameVolumeTitle", volumeGrid, 3));
 
             content.Children.Add(fields);
+
+            var processSection = new StackPanel { Margin = new Thickness(0, 14, 0, 0) };
+            var processLabel = new TextBlock
+            {
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 0, 0, 4)
+            };
+            processLabel.SetResourceReference(TextBlock.TextProperty, "LOCAS_AudioProcessTitle");
+            processSection.Children.Add(processLabel);
+
+            var processHelp = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                Opacity = 0.78,
+                Margin = new Thickness(0, 0, 0, 8)
+            };
+            processHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_AudioProcessHelp");
+            processSection.Children.Add(processHelp);
+
+            var processGrid = new Grid();
+            processGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            processGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            processGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var processBox = new ComboBox
+            {
+                ItemsSource = settings.GetAudioProcessOptions(profile.AudioProcessName),
+                DisplayMemberPath = "DisplayName",
+                SelectedValuePath = "ProcessName",
+                SelectedValue = profile.AudioProcessName ?? string.Empty,
+                Margin = new Thickness(0, 0, 8, 0)
+            };
+            processBox.SelectionChanged += (_, __) => profile.AudioProcessName = processBox.SelectedValue?.ToString();
+            processGrid.Children.Add(processBox);
+
+            var detectProcessButton = new Button { MinWidth = 100, Margin = new Thickness(0, 0, 8, 0) };
+            detectProcessButton.SetResourceReference(ContentControl.ContentProperty, "LOCAS_AudioProcessDetect");
+            detectProcessButton.Click += (_, __) =>
+            {
+                processBox.ItemsSource = settings.GetAudioProcessOptions(profile.AudioProcessName);
+                processBox.SelectedValue = profile.AudioProcessName ?? string.Empty;
+                processBox.IsDropDownOpen = true;
+            };
+            Grid.SetColumn(detectProcessButton, 1);
+            processGrid.Children.Add(detectProcessButton);
+
+            var browseProcessButton = new Button { MinWidth = 100 };
+            browseProcessButton.SetResourceReference(ContentControl.ContentProperty, "LOCAS_Browse");
+            browseProcessButton.Click += (_, __) =>
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Title = ResourceText("LOCAS_AudioProcessBrowseTitle", "Select the game's audio executable"),
+                    Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*"
+                };
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var processName = IoPath.GetFileNameWithoutExtension(dialog.FileName);
+                if (string.IsNullOrWhiteSpace(processName))
+                {
+                    return;
+                }
+
+                profile.AudioProcessName = processName;
+                processBox.ItemsSource = settings.GetAudioProcessOptions(processName);
+                processBox.SelectedValue = processName;
+            };
+            Grid.SetColumn(browseProcessButton, 2);
+            processGrid.Children.Add(browseProcessButton);
+            processSection.Children.Add(processGrid);
+            content.Children.Add(processSection);
+
             var layout = new Grid();
             var imageSource = LoadGameProfileImage(profile.GameImagePath);
             if (imageSource != null)

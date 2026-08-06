@@ -28,14 +28,14 @@ changes to the extension.
 ## Last Known Stable State
 
 - Branch: `main`
-- Last release at the time this file was written: `v1.9.0`
-- Last release commit: `822ddab Release Audio Switcher 1.9.0`
+- Last release at the time this file was written: `v1.10.0`
+- Last release commit: see tag `v1.10.0`
 - Release URL:
-  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.9.0`
+  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.10.0`
 - Release package:
-  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_9_0.pext`
+  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_10_0.pext`
 - Public release asset SHA-256:
-  `376DD684BAA4394C5619E28324D0512F7257E889635195B62F35FC360AF6B2A5`
+  `6FD1A839FF0C623DF720522750215D40262423F664519F1DED6F27A5966B27F2`
 - Main repo state before this handoff was created: clean and synced with
   `origin/main`.
 
@@ -51,6 +51,12 @@ Current major areas:
   preferred per-device volume.
 - Per-game profiles for output device, input device, Spatial Sound, and game
   session volume.
+- Optional per-profile audio process selection for launchers, emulators, and
+  games whose Windows audio session cannot be identified automatically.
+  The recommended user flow is the game context menu under
+  `Audio Switcher > Audio process`, directly below the game-volume submenu; the settings profile manager
+  remains available for review and manual changes. Both surfaces support active
+  session detection and direct `.exe` selection while the game is closed.
 - Optional restore of previous output/input devices after a profiled game
   closes.
 - Master output volume, microphone input volume, current game volume, and
@@ -60,6 +66,8 @@ Current major areas:
 - Fullscreen theme integration controls and custom binding API.
 - Maintenance tools for backup, restore, diagnostics export, and settings
   stability.
+- Settings overview with current devices, volumes, configured profiles,
+  Spatial Sound status, and active playback-session count.
 - Notification settings split by category.
 - Experimental Spatial Sound support through a user-provided SoundVolumeView
   or svcl executable.
@@ -102,7 +110,7 @@ changes.
 Use Playnite Toolbox from the local Playnite install.
 
 ```powershell
-$version = "1.9.0"
+$version = "1.10.0"
 $outDir = ".\package-output\v$version"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 & C:\Playnite\Toolbox.exe pack .\bin\Release $outDir

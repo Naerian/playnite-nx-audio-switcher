@@ -10,360 +10,514 @@
         <Style x:Key="SectionHeaderBorder" TargetType="Border">
             <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
-            <Setter Property="Padding" Value="0,0,0,6" />
-            <Setter Property="Margin" Value="0,18,0,10" />
-        </Style>
-        <Style x:Key="FirstSectionHeaderBorder" TargetType="Border" BasedOn="{StaticResource SectionHeaderBorder}">
-            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="Padding" Value="0,0,0,9" />
+            <Setter Property="Margin" Value="0,0,0,12" />
         </Style>
         <Style x:Key="SectionHeaderText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style x:Key="HintText" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Opacity" Value="0.78" />
+        </Style>
+        <Style x:Key="PageIntroCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
+            <Setter Property="BorderThickness" Value="4,1,1,1" />
+            <Setter Property="Padding" Value="16,13" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        </Style>
+        <Style x:Key="SettingsCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,14" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+        </Style>
+        <Style x:Key="SettingsNavigationTabItem" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0,0,0,3" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="NavigationItemBorder"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="3,0,0,0"
+                                Padding="13,10">
+                            <ContentPresenter x:Name="NavigationHeader"
+                                              ContentSource="Header"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavigationItemBorder" Property="Background" Value="{DynamicResource ControlHoverBackgroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="NavigationItemBorder" Property="Background" Value="{DynamicResource ControlHoverBackgroundBrush}" />
+                                <Setter TargetName="NavigationItemBorder" Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
+                                <Setter TargetName="NavigationHeader" Property="TextElement.FontWeight" Value="SemiBold" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="NavigationItemBorder" Property="Background" Value="{DynamicResource ControlHoverBackgroundBrush}" />
+                                <Setter TargetName="NavigationItemBorder" Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="SettingsNavigationTabControl" TargetType="TabControl">
+            <Setter Property="TabStripPlacement" Value="Left" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsNavigationTabItem}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid KeyboardNavigation.TabNavigation="Local">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Background="{DynamicResource ControlBackgroundBrush}"
+                                    BorderBrush="{DynamicResource GlyphBrush}"
+                                    BorderThickness="1"
+                                    Padding="8"
+                                    CornerRadius="{DynamicResource ControlCornerRadius}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <TabPanel x:Name="HeaderPanel" IsItemsHost="True" KeyboardNavigation.TabIndex="1" />
+                                </ScrollViewer>
+                            </Border>
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              Grid.Column="2"
+                                              ContentSource="SelectedContent"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopSectionTabItem" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TopTabBorder"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                BorderThickness="0,0,0,3"
+                                Padding="16,9,16,8">
+                            <ContentPresenter x:Name="TopTabHeader"
+                                              ContentSource="Header"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TopTabBorder" Property="Background" Value="{DynamicResource ControlHoverBackgroundBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TopTabBorder" Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
+                                <Setter TargetName="TopTabBorder" Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
+                                <Setter TargetName="TopTabHeader" Property="TextElement.FontWeight" Value="SemiBold" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="TopTabBorder" Property="Background" Value="{DynamicResource ControlHoverBackgroundBrush}" />
+                                <Setter TargetName="TopTabBorder" Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopSectionTabControl" TargetType="TabControl">
+            <Setter Property="ItemContainerStyle" Value="{StaticResource TopSectionTabItem}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid KeyboardNavigation.TabNavigation="Local">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="0,0,0,1">
+                                <TabPanel x:Name="HeaderPanel" IsItemsHost="True" KeyboardNavigation.TabIndex="1" />
+                            </Border>
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              Grid.Row="1"
+                                              ContentSource="SelectedContent"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                              Margin="0,10,0,0" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
+
     <Grid Margin="12">
-        <TabControl>
-            <TabItem Header="{DynamicResource LOCAS_OutputTab}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
+        <TabControl Style="{StaticResource TopSectionTabControl}">
+            <TabItem Header="{DynamicResource LOCAS_OverviewTab}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_OutputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
+                        <Border Style="{StaticResource PageIntroCard}">
+                            <DockPanel LastChildFill="True">
+                                <Button DockPanel.Dock="Right"
+                                        Content="{DynamicResource LOCAS_OverviewRefresh}"
+                                        MinWidth="130"
+                                        Margin="16,0,0,0"
+                                        Click="RefreshOverview" />
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource LOCAS_OverviewTab}"
+                                               Style="{StaticResource SectionHeaderText}"
+                                               Margin="0,0,0,6" />
+                                    <TextBlock Text="{DynamicResource LOCAS_OverviewHelp}" Style="{StaticResource HintText}" />
+                                </StackPanel>
+                            </DockPanel>
                         </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_OutputDevicesHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-
-                        <StackPanel x:Name="DeviceRowsPanel" Margin="0,0,0,12" />
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <TabItem Header="{DynamicResource LOCAS_InputTab}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_InputDevicesHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-
-                        <StackPanel x:Name="InputDeviceRowsPanel" Margin="0,0,0,12" />
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <TabItem Header="{DynamicResource LOCAS_FullscreenTab}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
-                                  IsChecked="{Binding QuickSwitchEnabled}"
-                                  Margin="0,2,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}"
-                                  IsChecked="{Binding QuickSwitchAllDevices}"
-                                  Margin="0,0,0,8" />
-
-                        <Border Style="{StaticResource SectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_VolumeTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_VolumeHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,8" />
-
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="180" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="56" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="{DynamicResource LOCAS_VolumeStep}"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,8,0" />
-                            <Slider Grid.Column="1"
-                                    Minimum="1"
-                                    Maximum="50"
-                                    TickFrequency="1"
-                                    IsSnapToTickEnabled="True"
-                                    Value="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBlock Grid.Column="2"
-                                       Text="{Binding VolumeStepPercent, StringFormat={}{0}%}"
-                                       TextAlignment="Right"
-                                       VerticalAlignment="Center"
-                                       Margin="8,0,0,0" />
-                        </Grid>
-
-                        <Border Style="{StaticResource SectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_MediaSettingsTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_MediaGroupingHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_ShowMediaSessionIcons}"
-                                  IsChecked="{Binding ShowMediaSessionIcons}"
-                                  Margin="0,0,0,8" />
-                        <TextBlock Text="{DynamicResource LOCAS_ShowMediaSessionIconsHelp}"
-                                   TextWrapping="Wrap"
-                                   Opacity="0.85"
-                                   Margin="0,0,0,8" />
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <TabItem Header="{DynamicResource LOCAS_GameProfilesTitle}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
-                                  IsChecked="{Binding GameProfilesEnabled}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
-                                  IsChecked="{Binding RestoreDeviceAfterGameProfile}"
-                                  Margin="0,0,0,8" />
-
-                        <Border Style="{StaticResource SectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesTitle}"
-                                       Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-                        <TextBlock x:Name="NoGameProfilesText"
-                                   Text="{DynamicResource LOCAS_NoConfiguredGameProfiles}"
-                                   TextWrapping="Wrap"
-                                   Opacity="0.8"
-                                   Margin="0,0,0,8" />
-                        <StackPanel x:Name="GameProfileRowsPanel" />
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <TabItem Header="{DynamicResource LOCAS_SpatialSoundTitle}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,8" />
-
-                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundNotBundled}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,8" />
-
-                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolInfo}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,4" />
-
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0,0,0,12">
-                            <TextBlock Margin="0,0,16,0">
-                                <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_view.html"
-                                           RequestNavigate="OpenExternalLink">
-                                    SoundVolumeView
-                                </Hyperlink>
-                            </TextBlock>
-                            <TextBlock>
-                                <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_command_line.html"
-                                           RequestNavigate="OpenExternalLink">
-                                    svcl
-                                </Hyperlink>
-                            </TextBlock>
-                        </StackPanel>
-
-                        <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
-                                  IsChecked="{Binding SpatialSoundIntegrationEnabled}"
-                                  Margin="0,0,0,8" />
-
-                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}"
-                                   Margin="0,0,0,3" />
-                        <Grid Margin="0,0,0,12">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBox x:Name="SpatialSoundToolPathBox"
-                                     Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
-                                     TextChanged="SpatialSoundToolPathChanged"
-                                     Margin="0,0,8,0" />
-                            <Button Grid.Column="1"
-                                    Content="{DynamicResource LOCAS_Browse}"
-                                    MinWidth="90"
-                                    Margin="0,0,8,0"
-                                    Click="BrowseSpatialSoundToolPath" />
-                            <Button Grid.Column="2"
-                                    Content="{DynamicResource LOCAS_Test}"
-                                    MinWidth="80"
-                                    Click="TestSpatialSoundToolPath" />
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_OverviewOutput}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <TextBlock x:Name="OverviewOutputText" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_OverviewInput}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <TextBlock x:Name="OverviewInputText" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_OverviewProfiles}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <TextBlock x:Name="OverviewProfilesText" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_OverviewSpatialSound}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <TextBlock x:Name="OverviewSpatialSoundText" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_OverviewSessions}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <TextBlock x:Name="OverviewSessionsText" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
                         </Grid>
-
-                        <TextBlock x:Name="SpatialSoundToolStatus"
-                                   TextWrapping="Wrap"
-                                   Opacity="0.85"
-                                   Margin="0,-4,0,12" />
                     </StackPanel>
                 </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="{DynamicResource LOCAS_DevicesTab}">
+                <TabControl Style="{StaticResource SettingsNavigationTabControl}">
+                    <TabItem Header="{DynamicResource LOCAS_OutputTab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_OutputDevicesTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_OutputDevicesHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel x:Name="DeviceRowsPanel" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                    <TabItem Header="{DynamicResource LOCAS_InputTab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_InputDevicesHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel x:Name="InputDeviceRowsPanel" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+
+            <TabItem Header="{DynamicResource LOCAS_SettingsGeneral}">
+                <TabControl Style="{StaticResource SettingsNavigationTabControl}">
+                    <TabItem Header="{DynamicResource LOCAS_FullscreenTab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}" IsChecked="{Binding QuickSwitchEnabled}" Margin="0,0,0,10" />
+                                        <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}" IsChecked="{Binding QuickSwitchAllDevices}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_VolumeTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_VolumeHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="180" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="56" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{DynamicResource LOCAS_VolumeStep}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <Slider Grid.Column="1" Minimum="1" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    Value="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding VolumeStepPercent, StringFormat={}{0}%}"
+                                                       TextAlignment="Right" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_MediaSettingsTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_MediaGroupingHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
+                                        <CheckBox Content="{DynamicResource LOCAS_ShowMediaSessionIcons}" IsChecked="{Binding ShowMediaSessionIcons}" Margin="0,0,0,8" />
+                                        <TextBlock Text="{DynamicResource LOCAS_ShowMediaSessionIconsHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="{DynamicResource LOCAS_GameProfilesTitle}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}" IsChecked="{Binding GameProfilesEnabled}" Margin="0,0,0,10" />
+                                        <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}" IsChecked="{Binding RestoreDeviceAfterGameProfile}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
+                                        <TextBlock x:Name="NoGameProfilesText" Text="{DynamicResource LOCAS_NoConfiguredGameProfiles}"
+                                                   TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,8" />
+                                        <StackPanel x:Name="GameProfileRowsPanel" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="{DynamicResource LOCAS_SpatialSoundTitle}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundNotBundled}" Style="{StaticResource HintText}" Margin="0,0,0,8" />
+                                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolInfo}" TextWrapping="Wrap" Margin="0,0,0,6" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                            <TextBlock Margin="0,0,16,0">
+                                                <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_view.html" RequestNavigate="OpenExternalLink">SoundVolumeView</Hyperlink>
+                                            </TextBlock>
+                                            <TextBlock>
+                                                <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_command_line.html" RequestNavigate="OpenExternalLink">svcl</Hyperlink>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
+                                                  IsChecked="{Binding SpatialSoundIntegrationEnabled}" Margin="0,0,0,14" />
+                                        <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}" Margin="0,0,0,4" />
+                                        <Grid Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="SpatialSoundToolPathBox" Text="{Binding SpatialSoundToolPath, UpdateSourceTrigger=PropertyChanged}"
+                                                     TextChanged="SpatialSoundToolPathChanged" Margin="0,0,8,0" />
+                                            <Button Grid.Column="1" Content="{DynamicResource LOCAS_Browse}" MinWidth="90" Margin="0,0,8,0"
+                                                    Click="BrowseSpatialSoundToolPath" />
+                                            <Button Grid.Column="2" Content="{DynamicResource LOCAS_Test}" MinWidth="80" Click="TestSpatialSoundToolPath" />
+                                        </Grid>
+                                        <TextBlock x:Name="SpatialSoundToolStatus" TextWrapping="Wrap" Opacity="0.85" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
             </TabItem>
 
             <TabItem Header="{DynamicResource LOCAS_MaintenanceTab}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
+                <TabControl Style="{StaticResource SettingsNavigationTabControl}">
+                    <TabItem Header="{DynamicResource LOCAS_NotificationsTitle}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_NotificationsTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_NotificationsHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_NotificationCategories}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <CheckBox Content="{DynamicResource LOCAS_ShowNotification}" IsChecked="{Binding ShowNotifications}" Margin="0,0,0,14" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifyOutputDevice}" IsChecked="{Binding ShowOutputDeviceNotifications}" Margin="0,0,0,8" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifyInputDevice}" IsChecked="{Binding ShowInputDeviceNotifications}" Margin="0,0,0,8" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifyVolume}" IsChecked="{Binding ShowVolumeNotifications}" Margin="0,0,0,8" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifyMute}" IsChecked="{Binding ShowMuteNotifications}" Margin="0,0,0,8" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifyGameProfile}" IsChecked="{Binding ShowGameProfileNotifications}" Margin="0,0,0,8" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifySpatialSound}" IsChecked="{Binding ShowSpatialSoundNotifications}" Margin="0,0,0,8" />
+                                        <CheckBox Content="{DynamicResource LOCAS_NotifyDiagnostics}" IsChecked="{Binding ShowDiagnosticNotifications}" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
 
-                        <Button Content="{DynamicResource LOCAS_AudioSessionDiagnostics}"
-                                MinWidth="220"
-                                HorizontalAlignment="Left"
-                                Margin="0,0,0,18"
-                                Click="ExportAudioSessionDiagnostics" />
-
-                        <Border Style="{StaticResource SectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="{DynamicResource LOCAS_ExportSettingsBackup}"
-                                    MinWidth="180"
-                                    Margin="0,0,8,0"
-                                    Click="ExportSettingsBackup" />
-                            <Button Content="{DynamicResource LOCAS_ImportSettingsBackup}"
-                                    MinWidth="180"
-                                    Click="ImportSettingsBackup" />
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <TabItem Header="{DynamicResource LOCAS_NotificationsTitle}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_NotificationsTitle}" Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_NotificationsHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-                        <CheckBox Content="{DynamicResource LOCAS_ShowNotification}"
-                                  IsChecked="{Binding ShowNotifications}"
-                                  Margin="0,0,0,12" />
-
-                        <TextBlock Text="{DynamicResource LOCAS_NotificationCategories}"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifyOutputDevice}"
-                                  IsChecked="{Binding ShowOutputDeviceNotifications}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifyInputDevice}"
-                                  IsChecked="{Binding ShowInputDeviceNotifications}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifyVolume}"
-                                  IsChecked="{Binding ShowVolumeNotifications}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifyMute}"
-                                  IsChecked="{Binding ShowMuteNotifications}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifyGameProfile}"
-                                  IsChecked="{Binding ShowGameProfileNotifications}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifySpatialSound}"
-                                  IsChecked="{Binding ShowSpatialSoundNotifications}"
-                                  Margin="0,0,0,8" />
-
-                        <CheckBox Content="{DynamicResource LOCAS_NotifyDiagnostics}"
-                                  IsChecked="{Binding ShowDiagnosticNotifications}"
-                                  Margin="0,0,0,12" />
-                    </StackPanel>
-                </ScrollViewer>
+                    <TabItem Header="{DynamicResource LOCAS_MaintenanceTab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}" Style="{StaticResource HintText}" />
+                                </Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Style="{StaticResource SettingsCard}">
+                                        <StackPanel>
+                                            <Border Style="{StaticResource SectionHeaderBorder}">
+                                                <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsTitle}" Style="{StaticResource SectionHeaderText}" />
+                                            </Border>
+                                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}" Style="{StaticResource HintText}" Margin="0,0,0,14" />
+                                            <Button Content="{DynamicResource LOCAS_AudioSessionDiagnostics}" MinWidth="220"
+                                                    HorizontalAlignment="Left" Click="ExportAudioSessionDiagnostics" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Grid.Column="2" Style="{StaticResource SettingsCard}">
+                                        <StackPanel>
+                                            <Border Style="{StaticResource SectionHeaderBorder}">
+                                                <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupTitle}" Style="{StaticResource SectionHeaderText}" />
+                                            </Border>
+                                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}" Style="{StaticResource HintText}" Margin="0,0,0,14" />
+                                            <WrapPanel>
+                                                <Button Content="{DynamicResource LOCAS_ExportSettingsBackup}" MinWidth="180" Margin="0,0,8,8" Click="ExportSettingsBackup" />
+                                                <Button Content="{DynamicResource LOCAS_ImportSettingsBackup}" MinWidth="180" Margin="0,0,0,8" Click="ImportSettingsBackup" />
+                                            </WrapPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
             </TabItem>
 
             <TabItem Header="{DynamicResource LOCAS_AboutTab}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="8" HorizontalAlignment="Stretch">
-                        <Border Style="{StaticResource FirstSectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_AboutTitle}"
-                                       Style="{StaticResource SectionHeaderText}" />
+                        <Border Style="{StaticResource PageIntroCard}">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource LOCAS_AboutTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                <TextBlock Text="{DynamicResource LOCAS_AboutDescription}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                                <TextBlock x:Name="AboutVersionText" FontWeight="SemiBold" />
+                            </StackPanel>
                         </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_AboutDescription}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,6" />
-                        <TextBlock x:Name="AboutVersionText"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,18" />
-
-                        <Border Style="{StaticResource SectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_ProjectLinksTitle}"
-                                       Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <WrapPanel Margin="0,0,0,2">
-                            <Button Content="{DynamicResource LOCAS_OpenGitHub}"
-                                    Tag="https://github.com/Naerian/playnite-nx-audio-switcher"
-                                    MinWidth="110"
-                                    Margin="0,0,8,8"
-                                    Click="OpenExternalButton" />
-                            <Button Content="{DynamicResource LOCAS_OpenWiki}"
-                                    Tag="https://github.com/Naerian/playnite-nx-audio-switcher/wiki"
-                                    MinWidth="110"
-                                    Margin="0,0,8,8"
-                                    Click="OpenExternalButton" />
-                            <Button Content="{DynamicResource LOCAS_ReportIssue}"
-                                    Tag="https://github.com/Naerian/playnite-nx-audio-switcher/issues/new"
-                                    MinWidth="150"
-                                    Margin="0,0,0,8"
-                                    Click="OpenExternalButton" />
-                        </WrapPanel>
-
-                        <Border Style="{StaticResource SectionHeaderBorder}">
-                            <TextBlock Text="{DynamicResource LOCAS_SupportTitle}"
-                                       Style="{StaticResource SectionHeaderText}" />
-                        </Border>
-                        <TextBlock Text="{DynamicResource LOCAS_KoFiSupportHelp}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12" />
-                        <Button Content="{DynamicResource LOCAS_KoFiSupport}"
-                                Tag="https://ko-fi.com/naerian"
-                                HorizontalAlignment="Left"
-                                MinWidth="150"
-                                Padding="16,7"
-                                Click="OpenExternalButton" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_ProjectLinksTitle}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <WrapPanel>
+                                        <Button Content="{DynamicResource LOCAS_OpenGitHub}" Tag="https://github.com/Naerian/playnite-nx-audio-switcher"
+                                                MinWidth="110" Margin="0,0,8,8" Click="OpenExternalButton" />
+                                        <Button Content="{DynamicResource LOCAS_OpenWiki}" Tag="https://github.com/Naerian/playnite-nx-audio-switcher/wiki"
+                                                MinWidth="110" Margin="0,0,8,8" Click="OpenExternalButton" />
+                                        <Button Content="{DynamicResource LOCAS_ReportIssue}" Tag="https://github.com/Naerian/playnite-nx-audio-switcher/issues/new"
+                                                MinWidth="150" Margin="0,0,0,8" Click="OpenExternalButton" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Style="{StaticResource SettingsCard}">
+                                <StackPanel>
+                                    <Border Style="{StaticResource SectionHeaderBorder}">
+                                        <TextBlock Text="{DynamicResource LOCAS_SupportTitle}" Style="{StaticResource SectionHeaderText}" />
+                                    </Border>
+                                    <TextBlock Text="{DynamicResource LOCAS_KoFiSupportHelp}" Style="{StaticResource HintText}" Margin="0,0,0,14" />
+                                    <Button Content="{DynamicResource LOCAS_KoFiSupport}" Tag="https://ko-fi.com/naerian"
+                                            HorizontalAlignment="Left" MinWidth="150" Padding="16,7" Click="OpenExternalButton" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

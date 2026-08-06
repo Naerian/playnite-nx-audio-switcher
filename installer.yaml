@@ -1,5 +1,16 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.10.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-06
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.10.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_10_0.pext
+    Changelog:
+      - Redesigned the settings interface with themed top-level navigation, sidebar sections, responsive cards, and a live audio overview.
+      - Added optional per-game audio process associations for launchers, emulators, and games with ambiguous Windows mixer sessions.
+      - Added active-session detection, recommended process candidates, and direct executable selection from settings and game context menus.
+      - Added safe automatic fallback when a configured audio process is not active.
+      - Added distinct confirmation messages for immediate and settings-based game profile removal.
+      - Updated all twelve localizations and expanded the English and Spanish documentation.
   - Version: 1.9.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-07-19

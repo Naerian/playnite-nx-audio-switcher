@@ -18,9 +18,12 @@ namespace PlayniteAudioSwitcher
 
         public int? GameVolumePercent { get; set; }
 
+        public string AudioProcessName { get; set; }
+
         public bool IsEmpty => string.IsNullOrWhiteSpace(DeviceId) &&
             string.IsNullOrWhiteSpace(InputDeviceId) &&
             string.IsNullOrWhiteSpace(SpatialSoundMode) &&
+            string.IsNullOrWhiteSpace(AudioProcessName) &&
             !GameVolumePercent.HasValue;
 
         public GameAudioProfileEntry Clone()
@@ -33,7 +36,8 @@ namespace PlayniteAudioSwitcher
                 DeviceId = DeviceId,
                 InputDeviceId = InputDeviceId,
                 SpatialSoundMode = SpatialSoundMode,
-                GameVolumePercent = GameVolumePercent
+                GameVolumePercent = GameVolumePercent,
+                AudioProcessName = AudioProcessName
             };
         }
 
@@ -44,7 +48,8 @@ namespace PlayniteAudioSwitcher
                 DeviceId = DeviceId,
                 InputDeviceId = InputDeviceId,
                 SpatialSoundMode = SpatialSoundMode,
-                GameVolumePercent = GameVolumePercent
+                GameVolumePercent = GameVolumePercent,
+                AudioProcessName = AudioProcessName
             };
         }
     }

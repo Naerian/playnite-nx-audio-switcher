@@ -200,7 +200,8 @@ namespace PlayniteAudioSwitcher
                         DeviceId = item.Value?.DeviceId,
                         InputDeviceId = item.Value?.InputDeviceId,
                         SpatialSoundMode = item.Value?.SpatialSoundMode,
-                        GameVolumePercent = item.Value?.GameVolumePercent
+                        GameVolumePercent = item.Value?.GameVolumePercent,
+                        AudioProcessName = item.Value?.AudioProcessName
                     };
                 })
                 .OrderBy(item => item.GameName)
@@ -393,6 +394,7 @@ namespace PlayniteAudioSwitcher
                 }
 
                 AddGameVolumeProfileMenuItems(items, root, game, currentProfile);
+                AddGameAudioProcessMenuItems(items, root, game, currentProfile);
 
                 items.Add(new GameMenuItem
                 {
@@ -400,6 +402,11 @@ namespace PlayniteAudioSwitcher
                     Description = Loc("LOCAS_ResetGameProfile"),
                     Action = _ =>
                     {
+                        if (!ConfirmRemoveGameProfile(game.Name, true))
+                        {
+                            return;
+                        }
+
                         gameProfiles.ClearProfile(game);
                         ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_GameProfileReset")}");
                     }
@@ -666,7 +673,12 @@ namespace PlayniteAudioSwitcher
             }
 
             audioSessionBaselineByGame.TryGetValue(args.Game.Id, out var baselineProcessIds);
-            ScheduleApplyGameVolume(args.Game, args.StartedProcessId, profile.GameVolumePercent.Value, baselineProcessIds);
+            ScheduleApplyGameVolume(
+                args.Game,
+                args.StartedProcessId,
+                profile.GameVolumePercent.Value,
+                baselineProcessIds,
+                profile.AudioProcessName);
         }
 
         public override void OnGameStopped(OnGameStoppedEventArgs args)
@@ -705,7 +717,12 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private void ScheduleApplyGameVolume(Game game, int processId, int volumePercent, HashSet<uint> baselineProcessIds)
+        private void ScheduleApplyGameVolume(
+            Game game,
+            int processId,
+            int volumePercent,
+            HashSet<uint> baselineProcessIds,
+            string configuredAudioProcessName)
         {
             var gameId = game.Id;
             var gameName = game.Name;
@@ -723,7 +740,11 @@ namespace PlayniteAudioSwitcher
 
                     try
                     {
-                        var targetProcessIds = GetTargetGameAudioSessionProcessIds(game, processId, baseline);
+                        var targetProcessIds = GetTargetGameAudioSessionProcessIds(
+                            game,
+                            processId,
+                            baseline,
+                            configuredAudioProcessName);
                         if (targetProcessIds.Count > 0 && AudioDevices.SetProcessVolumes(targetProcessIds, normalizedVolume))
                         {
                             Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
@@ -747,8 +768,29 @@ namespace PlayniteAudioSwitcher
             });
         }
 
-        private HashSet<uint> GetTargetGameAudioSessionProcessIds(Game game, int processId, HashSet<uint> baselineProcessIds)
+        private HashSet<uint> GetTargetGameAudioSessionProcessIds(
+            Game game,
+            int processId,
+            HashSet<uint> baselineProcessIds,
+            string configuredAudioProcessName)
         {
+            if (!string.IsNullOrWhiteSpace(configuredAudioProcessName))
+            {
+                var normalizedProcessName = NormalizeProcessName(configuredAudioProcessName);
+                var configuredProcessIds = new HashSet<uint>(AudioDevices.GetPlaybackAudioSessions()
+                    .Where(session => string.Equals(
+                        NormalizeProcessName(session.ProcessName),
+                        normalizedProcessName,
+                        StringComparison.OrdinalIgnoreCase))
+                    .Select(session => session.ProcessId)
+                    .Where(id => id > 0));
+
+                if (configuredProcessIds.Count > 0)
+                {
+                    return configuredProcessIds;
+                }
+            }
+
             var targetProcessIds = new HashSet<uint>(AudioDevices.GetProcessTreeAudioSessionProcessIds(processId));
             if (targetProcessIds.Count > 0)
             {
@@ -780,6 +822,33 @@ namespace PlayniteAudioSwitcher
             }
 
             return targetProcessIds;
+        }
+
+        internal bool ConfirmRemoveGameProfile(string gameName, bool appliesImmediately)
+        {
+            var message = string.Format(
+                Loc(appliesImmediately
+                    ? "LOCAS_ConfirmRemoveProfileImmediateMessage"
+                    : "LOCAS_ConfirmRemoveProfilePendingMessage"),
+                string.IsNullOrWhiteSpace(gameName) ? Loc("LOCAS_UnknownGame") : gameName);
+            return PlayniteApi.Dialogs.ShowMessage(
+                message,
+                Loc("LOCAS_ConfirmRemoveProfileTitle"),
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning) == MessageBoxResult.Yes;
+        }
+
+        private static string NormalizeProcessName(string processName)
+        {
+            if (string.IsNullOrWhiteSpace(processName))
+            {
+                return string.Empty;
+            }
+
+            var trimmed = processName.Trim();
+            return trimmed.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                ? trimmed.Substring(0, trimmed.Length - 4)
+                : trimmed;
         }
 
         private HashSet<uint> GetRunningGameInstallDirectoryProcessIds(Game game)
@@ -2871,6 +2940,140 @@ namespace PlayniteAudioSwitcher
                     }
                 });
             }
+        }
+
+        private void AddGameAudioProcessMenuItems(
+            List<GameMenuItem> items,
+            string root,
+            Game game,
+            GameAudioProfile currentProfile)
+        {
+            var section = $"{root}|{Loc("LOCAS_AudioProcessTitle")}";
+            var selectedProcessName = currentProfile?.AudioProcessName;
+            items.Add(new GameMenuItem
+            {
+                MenuSection = section,
+                Description = GetCheckedMenuText(
+                    Loc("LOCAS_AudioProcessAutomatic"),
+                    string.IsNullOrWhiteSpace(selectedProcessName)),
+                Action = _ =>
+                {
+                    gameProfiles.SetAudioProcessName(game, null);
+                    ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_AudioProcessAutomatic")}");
+                }
+            });
+
+            items.Add(new GameMenuItem
+            {
+                MenuSection = section,
+                Description = Loc("LOCAS_AudioProcessChooseExecutable"),
+                Action = _ => ChooseGameAudioProcessExecutable(game)
+            });
+
+            var candidates = GetAudioProcessCandidates(game, selectedProcessName);
+            if (candidates.Count == 0)
+            {
+                items.Add(new GameMenuItem
+                {
+                    MenuSection = section,
+                    Description = Loc("LOCAS_AudioProcessNoSessions"),
+                    Action = _ => { }
+                });
+                return;
+            }
+
+            foreach (var candidate in candidates)
+            {
+                var processName = candidate.ProcessName;
+                var description = candidate.IsRecommended
+                    ? $"{Loc("LOCAS_AudioProcessRecommended")}: {candidate.DisplayName}"
+                    : candidate.DisplayName;
+                items.Add(new GameMenuItem
+                {
+                    MenuSection = section,
+                    Description = GetCheckedMenuText(
+                        description,
+                        string.Equals(selectedProcessName, processName, StringComparison.OrdinalIgnoreCase)),
+                    Action = _ =>
+                    {
+                        gameProfiles.SetAudioProcessName(game, processName);
+                        ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_AudioProcessTitle")} {processName}.exe");
+                    }
+                });
+            }
+        }
+
+        private List<AudioProcessOption> GetAudioProcessCandidates(Game game, string selectedProcessName)
+        {
+            var likelyProcessIds = new HashSet<uint>();
+            if (game != null && activeGameId == game.Id && activeGameProcessId > 0)
+            {
+                likelyProcessIds.UnionWith(AudioDevices.GetProcessTreeAudioSessionProcessIds(activeGameProcessId));
+            }
+
+            likelyProcessIds.UnionWith(GetRunningGameInstallDirectoryProcessIds(game));
+            var currentProcessId = (uint)Process.GetCurrentProcess().Id;
+            var candidates = AudioDevices.GetPlaybackAudioSessions()
+                .Where(session => session.IsActive &&
+                    session.ProcessId > 0 &&
+                    session.ProcessId != currentProcessId &&
+                    !string.IsNullOrWhiteSpace(session.ProcessName))
+                .GroupBy(session => session.ProcessName, StringComparer.OrdinalIgnoreCase)
+                .Select(group =>
+                {
+                    var session = group.OrderByDescending(item => item.IsActive).First();
+                    return new AudioProcessOption
+                    {
+                        ProcessName = session.ProcessName,
+                        DisplayName = $"{session.FriendlyName} — {session.ProcessName}.exe (PID {session.ProcessId})",
+                        IsRecommended = group.Any(item => likelyProcessIds.Contains(item.ProcessId))
+                    };
+                })
+                .OrderByDescending(option => option.IsRecommended)
+                .ThenBy(option => option.DisplayName)
+                .ToList();
+
+            if (!string.IsNullOrWhiteSpace(selectedProcessName) &&
+                candidates.All(option => !string.Equals(option.ProcessName, selectedProcessName, StringComparison.OrdinalIgnoreCase)))
+            {
+                candidates.Add(new AudioProcessOption
+                {
+                    ProcessName = selectedProcessName,
+                    DisplayName = $"{selectedProcessName}.exe"
+                });
+            }
+
+            return candidates;
+        }
+
+        private void ChooseGameAudioProcessExecutable(Game game)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = Loc("LOCAS_AudioProcessBrowseTitle"),
+                Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*"
+            };
+
+            var initialDirectory = GetGameInstallDirectories(game)
+                .FirstOrDefault(Directory.Exists);
+            if (!string.IsNullOrWhiteSpace(initialDirectory))
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var processName = Path.GetFileNameWithoutExtension(dialog.FileName);
+            if (string.IsNullOrWhiteSpace(processName))
+            {
+                return;
+            }
+
+            gameProfiles.SetAudioProcessName(game, processName);
+            ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_AudioProcessTitle")} {processName}.exe");
         }
 
         private bool ApplySpatialSoundMode(string modeId, bool notify)

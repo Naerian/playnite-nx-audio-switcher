@@ -12,10 +12,12 @@ It is designed for couch and console-like setups that regularly move between spe
 - Apply a preferred output whenever Fullscreen starts.
 - Optionally cycle through visible output devices with `Back + RB`.
 - Create per-game profiles for output, input, Spatial Sound, and game session volume.
+- Optionally bind a game volume profile to a detected audio process when automatic session detection is ambiguous.
 - Restore the previous output and input devices after a profiled game closes.
 - Control master output, microphone input, the current game, and background media sessions.
 - Group browser sessions by application and optionally show real application icons.
 - Export audio session diagnostics and back up settings and game profiles.
+- Review current devices, volumes, profiles, Spatial Sound, and active sessions from the settings overview.
 - Choose exactly which informational notifications are shown.
 - Integrate controller-friendly selectors, sliders, widgets, and a media mixer into Fullscreen themes.
 - Use Playnite localization resource dictionaries with English fallback.
@@ -55,6 +57,8 @@ To switch devices:
 - Desktop: `Main menu > Extensions > Audio Switcher`.
 - Fullscreen: `Main menu > Extensions > Audio Switcher`.
 - Per game: open the game's context menu and select `Audio Switcher`.
+
+For games that use a launcher, emulator, or separate audio process, use `Audio Switcher > Audio process` in the game's context menu, directly below **Game volume**. Choose **Choose executable...** while the game is closed, or start it and select a detected active session. Either method creates the profile when needed; **Automatic detection** removes only that manual association.
 
 ## Documentation
 

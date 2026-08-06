@@ -196,6 +196,37 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public void SetAudioProcessName(Game game, string processName)
+        {
+            if (game == null)
+            {
+                return;
+            }
+
+            lock (syncRoot)
+            {
+                if (!profiles.TryGetValue(game.Id, out var profile))
+                {
+                    profile = new GameAudioProfile();
+                }
+
+                profile.AudioProcessName = string.IsNullOrWhiteSpace(processName)
+                    ? null
+                    : processName.Trim();
+
+                if (IsEmpty(profile))
+                {
+                    profiles.Remove(game.Id);
+                }
+                else
+                {
+                    profiles[game.Id] = profile;
+                }
+
+                Save();
+            }
+        }
+
         public void ClearProfile(Game game)
         {
             if (game == null)
@@ -247,6 +278,7 @@ namespace PlayniteAudioSwitcher
                 string.IsNullOrWhiteSpace(profile.DeviceId) &&
                 string.IsNullOrWhiteSpace(profile.InputDeviceId) &&
                 string.IsNullOrWhiteSpace(profile.SpatialSoundMode) &&
+                string.IsNullOrWhiteSpace(profile.AudioProcessName) &&
                 !profile.GameVolumePercent.HasValue;
         }
 
@@ -262,7 +294,8 @@ namespace PlayniteAudioSwitcher
                 DeviceId = profile.DeviceId,
                 InputDeviceId = profile.InputDeviceId,
                 SpatialSoundMode = profile.SpatialSoundMode,
-                GameVolumePercent = profile.GameVolumePercent
+                GameVolumePercent = profile.GameVolumePercent,
+                AudioProcessName = profile.AudioProcessName
             };
         }
     }

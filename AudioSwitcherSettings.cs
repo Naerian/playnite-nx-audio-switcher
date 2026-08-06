@@ -82,6 +82,9 @@ namespace PlayniteAudioSwitcher
             RefreshDevices();
         }
 
+        [DontSerialize]
+        internal AudioSwitcherPlugin Plugin => plugin;
+
         public string FavoriteDeviceAId
         {
             get => favoriteDeviceAId;
@@ -400,6 +403,61 @@ namespace PlayniteAudioSwitcher
                 State = AudioEndpointState.Active
             });
             return devices;
+        }
+
+        public List<AudioProcessOption> GetAudioProcessOptions(string selectedProcessName)
+        {
+            var options = new List<AudioProcessOption>
+            {
+                new AudioProcessOption
+                {
+                    ProcessName = string.Empty,
+                    DisplayName = plugin?.Loc("LOCAS_AudioProcessAutomatic") ?? "Automatic detection"
+                }
+            };
+
+            if (plugin == null)
+            {
+                return options;
+            }
+
+            try
+            {
+                var currentProcessId = (uint)System.Diagnostics.Process.GetCurrentProcess().Id;
+                var sessions = plugin.AudioDevices.GetPlaybackAudioSessions()
+                    .Where(session => session.IsActive &&
+                        session.ProcessId > 0 &&
+                        session.ProcessId != currentProcessId &&
+                        !string.IsNullOrWhiteSpace(session.ProcessName))
+                    .GroupBy(session => session.ProcessName, System.StringComparer.OrdinalIgnoreCase)
+                    .Select(group => group.OrderByDescending(session => session.IsActive).First())
+                    .OrderBy(session => session.FriendlyName)
+                    .ThenBy(session => session.ProcessName);
+
+                foreach (var session in sessions)
+                {
+                    options.Add(new AudioProcessOption
+                    {
+                        ProcessName = session.ProcessName,
+                        DisplayName = $"{session.FriendlyName} — {session.ProcessName}.exe (PID {session.ProcessId})"
+                    });
+                }
+            }
+            catch
+            {
+            }
+
+            if (!string.IsNullOrWhiteSpace(selectedProcessName) &&
+                options.All(option => !string.Equals(option.ProcessName, selectedProcessName, System.StringComparison.OrdinalIgnoreCase)))
+            {
+                options.Insert(1, new AudioProcessOption
+                {
+                    ProcessName = selectedProcessName,
+                    DisplayName = $"{selectedProcessName}.exe"
+                });
+            }
+
+            return options;
         }
 
         public string GetCustomName(string deviceId)
