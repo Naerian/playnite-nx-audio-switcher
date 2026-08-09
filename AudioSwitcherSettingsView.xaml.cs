@@ -20,6 +20,7 @@ namespace PlayniteAudioSwitcher
         public AudioSwitcherSettingsView()
         {
             InitializeComponent();
+            BatteryIndicatorIconBox.ItemTemplate = CreateIconTemplate();
             AboutVersionText.Text = string.Format(
                 TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Version {0} | Narian",
                 GetInstalledVersion());
@@ -28,8 +29,14 @@ namespace PlayniteAudioSwitcher
                 RebuildDeviceRows();
                 UpdateOverview();
             };
-            Loaded += (_, __) =>
+            Loaded += async (_, __) =>
             {
+                if (DataContext is AudioSwitcherSettings settings)
+                {
+                    await settings.Plugin.RefreshDeviceBatteriesAsync();
+                    settings.RefreshDevices();
+                }
+
                 RebuildDeviceRows();
                 RebuildGameProfileRows();
                 UpdateSpatialSoundToolStatus();
@@ -37,10 +44,11 @@ namespace PlayniteAudioSwitcher
             };
         }
 
-        private void RefreshOverview(object sender, RoutedEventArgs e)
+        private async void RefreshOverview(object sender, RoutedEventArgs e)
         {
             if (DataContext is AudioSwitcherSettings settings)
             {
+                await settings.Plugin.RefreshDeviceBatteriesAsync();
                 settings.RefreshDevices();
                 RebuildDeviceRows();
             }
@@ -61,7 +69,8 @@ namespace PlayniteAudioSwitcher
             {
                 OverviewOutputText.Text = FormatDeviceOverview(
                     plugin.GetCurrentDeviceDisplayName(),
-                    plugin.GetCurrentVolumeState());
+                    plugin.GetCurrentVolumeState(),
+                    plugin.GetCurrentPlaybackDeviceForTheme()?.BatteryLabel);
             }
             catch
             {
@@ -72,7 +81,8 @@ namespace PlayniteAudioSwitcher
             {
                 OverviewInputText.Text = FormatDeviceOverview(
                     plugin.GetCurrentInputDeviceDisplayName(),
-                    plugin.GetCurrentInputVolumeState());
+                    plugin.GetCurrentInputVolumeState(),
+                    plugin.GetCurrentRecordingDeviceForTheme()?.BatteryLabel);
             }
             catch
             {
@@ -104,16 +114,19 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private string FormatDeviceOverview(string deviceName, AudioVolumeState volumeState)
+        private string FormatDeviceOverview(string deviceName, AudioVolumeState volumeState, string batteryLabel)
         {
             if (string.IsNullOrWhiteSpace(deviceName))
             {
                 return ResourceText("LOCAS_OverviewNoDevice", "No default device");
             }
 
+            var batteryText = $"{ResourceText("LOCAS_Battery", "Battery")}: " +
+                (string.IsNullOrWhiteSpace(batteryLabel) ? "\u2014" : batteryLabel);
+
             if (volumeState == null || !volumeState.IsAvailable)
             {
-                return deviceName;
+                return $"{deviceName}\n{batteryText}";
             }
 
             var volumeText = string.Format(
@@ -123,6 +136,8 @@ namespace PlayniteAudioSwitcher
             {
                 volumeText += $" | {ResourceText("LOCAS_Muted", "Muted")}";
             }
+
+            volumeText += $" | {batteryText}";
 
             return $"{deviceName}\n{volumeText}";
         }
@@ -200,6 +215,15 @@ namespace PlayniteAudioSwitcher
                     Margin = new Thickness(0, 3, 0, 0)
                 };
                 namePanel.Children.Add(deviceStatus);
+                var batteryLabel = Application.Current.TryFindResource("LOCAS_Battery") as string ?? "Battery";
+                var deviceBattery = new TextBlock
+                {
+                    Text = $"{batteryLabel}: {(device.HasBattery ? device.BatteryLabel : "\u2014")}",
+                    FontSize = 11,
+                    Opacity = 0.7,
+                    Margin = new Thickness(0, 3, 0, 0)
+                };
+                namePanel.Children.Add(deviceBattery);
                 Grid.SetColumnSpan(namePanel, 4);
                 grid.Children.Add(namePanel);
 

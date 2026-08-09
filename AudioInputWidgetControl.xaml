@@ -30,7 +30,7 @@
                        Foreground="{DynamicResource TextBrush}"
                        TextTrimming="CharacterEllipsis"
                        FontWeight="SemiBold" />
-            <TextBlock Text="{Binding CurrentInputVolumeLabel}"
+            <TextBlock Text="{Binding CurrentInputStatusLabel}"
                        Foreground="{DynamicResource TextBrush}"
                        Opacity="0.75"
                        FontSize="11"

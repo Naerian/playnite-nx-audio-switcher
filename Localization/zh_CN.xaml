@@ -34,7 +34,12 @@
     <sys:String x:Key="LOCAS_OutputDevicesHelp">配置输出设备名称、图标、可见性以及可选的默认音量。</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesTitle">输入设备</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesHelp">配置麦克风/输入设备名称、图标、可见性以及可选的默认输入音量。</sys:String>
+    <sys:String x:Key="LOCAS_PreferredOutputDevice">首选输出设备</sys:String>
+    <sys:String x:Key="LOCAS_PreferredInputDevice">首选输入设备</sys:String>
+    <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher 会在 Playnite 启动时应用此设备。游戏配置可以临时覆盖，并在游戏关闭后恢复。</sys:String>
+    <sys:String x:Key="LOCAS_KeepWindowsDefault">保留 Windows 默认设备</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows 名称</sys:String>
+    <sys:String x:Key="LOCAS_Battery">电池</sys:String>
     <sys:String x:Key="LOCAS_Icon">图标</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">默认音量</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">默认输入音量</sys:String>
@@ -191,5 +196,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">已断开连接</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">不存在</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">不可用</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorTitle">电池指示器</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">桌面模式始终显示图标，仅在有电量信息时追加数值。全屏主题可使用可配置的 BatteryWidget。</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">在桌面模式顶部栏显示</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">未报告电量时隐藏全屏小组件</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">显示方式</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">图标和百分比</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">仅图标</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">仅百分比</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIcon">图标</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“无”以使用当前设备图标。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">此选项仅影响全屏 BatteryWidget；桌面模式顶部栏图标仍保持可见。</sys:String>
 </ResourceDictionary>
 

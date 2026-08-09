@@ -34,7 +34,12 @@
     <sys:String x:Key="LOCAS_OutputDevicesHelp">Настройте имена, значки, видимость и необязательную громкость по умолчанию для устройств вывода.</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesTitle">Устройства ввода</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesHelp">Настройте имена, значки, видимость и необязательную громкость по умолчанию для микрофонов/устройств ввода.</sys:String>
+    <sys:String x:Key="LOCAS_PreferredOutputDevice">Предпочитаемое устройство вывода</sys:String>
+    <sys:String x:Key="LOCAS_PreferredInputDevice">Предпочитаемое устройство ввода</sys:String>
+    <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher применяет это устройство при запуске Playnite. Игровые профили могут временно заменить его и восстановить после закрытия игры.</sys:String>
+    <sys:String x:Key="LOCAS_KeepWindowsDefault">Сохранить устройство Windows по умолчанию</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Имя Windows</sys:String>
+    <sys:String x:Key="LOCAS_Battery">Заряд батареи</sys:String>
     <sys:String x:Key="LOCAS_Icon">Значок</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Громкость по умолчанию</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">Громкость ввода по умолчанию</sys:String>
@@ -191,5 +196,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">Отсоединено</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Отсутствует</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Недоступно</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Индикатор батареи</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">В Desktop значок всегда виден, а заряд появляется при наличии данных. Темы Fullscreen могут использовать настраиваемый BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Показывать в верхней панели Desktop</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Скрывать виджет Fullscreen, если заряд не сообщается</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Отображение</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">Значок и проценты</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Только значок</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Только проценты</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Значок</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Выберите Нет, чтобы использовать значок текущего устройства.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Это влияет только на BatteryWidget Fullscreen; значок в верхней панели Desktop остаётся видимым.</sys:String>
 </ResourceDictionary>
 

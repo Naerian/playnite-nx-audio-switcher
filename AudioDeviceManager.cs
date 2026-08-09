@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace PlayniteAudioSwitcher
 {
     public sealed class AudioDeviceManager
     {
         private const int HResultElementNotFound = unchecked((int)0x80070490);
+        private readonly object batteryCacheLock = new object();
+        private readonly AudioDeviceBatteryReader batteryReader = new AudioDeviceBatteryReader();
+        private IReadOnlyDictionary<Guid, AudioDeviceBatteryInfo> batteryByContainerId = new Dictionary<Guid, AudioDeviceBatteryInfo>();
 
         public IReadOnlyList<AudioDevice> GetPlaybackDevices()
         {
@@ -38,6 +42,49 @@ namespace PlayniteAudioSwitcher
         public AudioDevice GetDefaultRecordingDevice()
         {
             return GetDefaultDevice(EDataFlow.eCapture);
+        }
+
+        public async Task<int> RefreshDeviceBatteriesAsync()
+        {
+            var containerIds = GetDevices(EDataFlow.eAll, DeviceState.All)
+                .Where(device => device.ContainerId.HasValue)
+                .Select(device => device.ContainerId.Value)
+                .Distinct()
+                .ToList();
+            var refreshed = await batteryReader.ReadAsync(containerIds).ConfigureAwait(false);
+            lock (batteryCacheLock)
+            {
+                batteryByContainerId = refreshed;
+            }
+
+            return refreshed.Count;
+        }
+
+        public IReadOnlyList<string> GetBatteryDiagnostics()
+        {
+            var lines = new List<string>();
+            IReadOnlyDictionary<Guid, AudioDeviceBatteryInfo> snapshot;
+            lock (batteryCacheLock)
+            {
+                snapshot = batteryByContainerId.ToDictionary(item => item.Key, item => item.Value);
+            }
+
+            var devices = GetDevices(EDataFlow.eAll, DeviceState.All)
+                .Where(device => device.ContainerId.HasValue)
+                .GroupBy(device => device.ContainerId.Value)
+                .OrderBy(group => group.Key)
+                .ToList();
+            foreach (var group in devices)
+            {
+                snapshot.TryGetValue(group.Key, out var battery);
+                lines.Add($"Audio container={group.Key:B} endpoints={string.Join(" | ", group.Select(device => device.Name).Distinct())}");
+                lines.Add(battery == null
+                    ? "  Battery: unavailable"
+                    : $"  Battery: {battery.Percent}% charging={battery.IsCharging} source={battery.Source ?? "unknown"}");
+            }
+
+            lines.AddRange(batteryReader.GetDiagnostics().Select(line => "  " + line));
+            return lines;
         }
 
         public void SetDefaultPlaybackDevice(string deviceId)
@@ -230,13 +277,16 @@ namespace PlayniteAudioSwitcher
                         Marshal.ThrowExceptionForHR(device.GetState(out var state));
                         var name = GetDeviceName(device);
 
-                        devices.Add(new AudioDevice
+                        var audioDevice = new AudioDevice
                         {
                             Id = id,
                             Name = string.IsNullOrWhiteSpace(name) ? id : name,
                             IsDefault = string.Equals(id, defaultId, StringComparison.OrdinalIgnoreCase),
-                            State = ToAudioEndpointState(state)
-                        });
+                            State = ToAudioEndpointState(state),
+                            ContainerId = GetDeviceContainerId(device)
+                        };
+                        ApplyBatteryInfo(audioDevice);
+                        devices.Add(audioDevice);
                     }
                     catch
                     {
@@ -895,13 +945,16 @@ namespace PlayniteAudioSwitcher
             Marshal.ThrowExceptionForHR(result);
             Marshal.ThrowExceptionForHR(device.GetId(out var id));
 
-            return new AudioDevice
+            var audioDevice = new AudioDevice
             {
                 Id = id,
                 Name = GetDeviceName(device),
                 IsDefault = true,
-                State = AudioEndpointState.Active
+                State = AudioEndpointState.Active,
+                ContainerId = GetDeviceContainerId(device)
             };
+            ApplyBatteryInfo(audioDevice);
+            return audioDevice;
         }
 
         private void SetDefaultDevice(string deviceId)
@@ -1020,10 +1073,64 @@ namespace PlayniteAudioSwitcher
         private static string GetDeviceName(IMMDevice device)
         {
             Marshal.ThrowExceptionForHR(device.OpenPropertyStore(StorageAccessMode.Read, out var propertyStore));
-            using (var prop = new PropVariantHandle())
+            try
             {
-                Marshal.ThrowExceptionForHR(propertyStore.GetValue(PropertyKeys.DeviceFriendlyName, prop.Pointer));
-                return prop.GetString();
+                using (var prop = new PropVariantHandle())
+                {
+                    Marshal.ThrowExceptionForHR(propertyStore.GetValue(PropertyKeys.DeviceFriendlyName, prop.Pointer));
+                    return prop.GetString();
+                }
+            }
+            finally
+            {
+                ReleaseDistinctComObjects(propertyStore);
+            }
+        }
+
+        private static Guid? GetDeviceContainerId(IMMDevice device)
+        {
+            IPropertyStore propertyStore = null;
+            try
+            {
+                Marshal.ThrowExceptionForHR(device.OpenPropertyStore(StorageAccessMode.Read, out propertyStore));
+                using (var prop = new PropVariantHandle())
+                {
+                    var result = propertyStore.GetValue(PropertyKeys.DeviceContainerId, prop.Pointer);
+                    if (result < 0)
+                    {
+                        return null;
+                    }
+
+                    return prop.GetGuid();
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                ReleaseDistinctComObjects(propertyStore);
+            }
+        }
+
+        private void ApplyBatteryInfo(AudioDevice device)
+        {
+            if (device?.ContainerId == null)
+            {
+                return;
+            }
+
+            AudioDeviceBatteryInfo battery;
+            lock (batteryCacheLock)
+            {
+                batteryByContainerId.TryGetValue(device.ContainerId.Value, out battery);
+            }
+
+            if (battery != null)
+            {
+                device.BatteryPercent = battery.Percent;
+                device.IsBatteryCharging = battery.IsCharging;
             }
         }
 
@@ -1394,6 +1501,12 @@ namespace PlayniteAudioSwitcher
                 FormatId = new Guid("A45C254E-DF1C-4EFD-8020-67D146A850E0"),
                 PropertyId = 14
             };
+
+            public static PropertyKey DeviceContainerId = new PropertyKey
+            {
+                FormatId = new Guid("8C7ED206-3F8A-4827-B3AB-AE9E1FAEFC6C"),
+                PropertyId = 2
+            };
         }
 
         private sealed class PropVariantHandle : IDisposable
@@ -1418,6 +1531,18 @@ namespace PlayniteAudioSwitcher
 
                 var stringPointer = Marshal.ReadIntPtr(Pointer, 8);
                 return stringPointer == IntPtr.Zero ? string.Empty : Marshal.PtrToStringUni(stringPointer);
+            }
+
+            public Guid? GetGuid()
+            {
+                var variantType = (ushort)Marshal.ReadInt16(Pointer);
+                if (variantType != 72)
+                {
+                    return null;
+                }
+
+                var guidPointer = Marshal.ReadIntPtr(Pointer, 8);
+                return guidPointer == IntPtr.Zero ? (Guid?)null : Marshal.PtrToStructure<Guid>(guidPointer);
             }
 
             public void Dispose()

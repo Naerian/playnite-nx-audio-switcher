@@ -34,7 +34,12 @@
     <sys:String x:Key="LOCAS_OutputDevicesHelp">Configura nomi, icone, visibilità e volume predefinito opzionale dei dispositivi di uscita.</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesTitle">Dispositivi di ingresso</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesHelp">Configura nomi, icone, visibilità e volume di ingresso predefinito opzionale per microfoni/dispositivi di ingresso.</sys:String>
+    <sys:String x:Key="LOCAS_PreferredOutputDevice">Dispositivo di uscita preferito</sys:String>
+    <sys:String x:Key="LOCAS_PreferredInputDevice">Dispositivo di ingresso preferito</sys:String>
+    <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher applica questo dispositivo all'avvio di Playnite. I profili di gioco possono sostituirlo temporaneamente e ripristinarlo alla chiusura del gioco.</sys:String>
+    <sys:String x:Key="LOCAS_KeepWindowsDefault">Mantieni il predefinito di Windows</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Nome Windows</sys:String>
+    <sys:String x:Key="LOCAS_Battery">Batteria</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icona</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Volume predefinito</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">Volume ingresso predefinito</sys:String>
@@ -191,5 +196,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">Disconnesso</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Non presente</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Non disponibile</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Indicatore batteria</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">In Desktop l'icona resta sempre visibile e la batteria appare quando disponibile. I temi Fullscreen possono usare il BatteryWidget configurabile.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Mostra nella barra superiore Desktop</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Nascondi il widget Fullscreen se la batteria non è disponibile</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Visualizzazione</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">Icona e percentuale</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Solo icona</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Solo percentuale</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icona</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Seleziona Nessuna per usare l'icona del dispositivo corrente.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Riguarda solo il BatteryWidget Fullscreen; l'icona nella barra Desktop resta visibile.</sys:String>
 </ResourceDictionary>
 

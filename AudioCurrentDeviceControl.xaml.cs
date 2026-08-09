@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 using Playnite.SDK.Controls;
 
@@ -22,14 +21,7 @@ namespace PlayniteAudioSwitcher
 
         public void Refresh()
         {
-            try
-            {
-                CurrentDeviceText.Text = plugin.GetCurrentDeviceDisplayLabel();
-            }
-            catch (Exception)
-            {
-                CurrentDeviceText.Text = plugin.Loc("LOCAS_Audio");
-            }
+            plugin.Theme?.Refresh();
         }
     }
 }

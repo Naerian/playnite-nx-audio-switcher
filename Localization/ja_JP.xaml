@@ -34,7 +34,12 @@
     <sys:String x:Key="LOCAS_OutputDevicesHelp">出力デバイスの名前、アイコン、表示状態、任意の既定音量を設定します。</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesTitle">入力デバイス</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesHelp">マイク/入力デバイスの名前、アイコン、表示状態、任意の既定入力音量を設定します。</sys:String>
+    <sys:String x:Key="LOCAS_PreferredOutputDevice">優先出力デバイス</sys:String>
+    <sys:String x:Key="LOCAS_PreferredInputDevice">優先入力デバイス</sys:String>
+    <sys:String x:Key="LOCAS_PreferredDeviceHelp">Playnite の起動時に Audio Switcher がこのデバイスを適用します。ゲームプロファイルで一時的に上書きし、終了時に復元できます。</sys:String>
+    <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows の既定を維持</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows 名</sys:String>
+    <sys:String x:Key="LOCAS_Battery">バッテリー</sys:String>
     <sys:String x:Key="LOCAS_Icon">アイコン</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">既定音量</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">既定入力音量</sys:String>
@@ -191,5 +196,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">切断</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">存在しません</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">利用不可</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorTitle">バッテリー表示</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Desktopではアイコンを常に表示し、バッテリー情報がある場合だけ値を追加します。Fullscreenテーマでは設定可能なBatteryWidgetを使用できます。</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Desktopのトップバーに表示</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">バッテリー情報がない場合はFullscreenウィジェットを非表示</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">表示</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">アイコンとパーセント</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">アイコンのみ</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">パーセントのみ</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIcon">アイコン</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">現在のデバイスアイコンを使うには「なし」を選択します。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">これはFullscreenのBatteryWidgetだけに影響し、Desktopトップバーのアイコンは表示されたままです。</sys:String>
 </ResourceDictionary>
 

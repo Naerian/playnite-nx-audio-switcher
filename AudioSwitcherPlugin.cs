@@ -35,6 +35,7 @@ namespace PlayniteAudioSwitcher
         private ResourceDictionary englishFallbackResources;
         private Window activeThemeSelectorWindow;
         private AudioDeviceListControl activeThemeSelectorList;
+        private readonly HashSet<AudioInputDeviceListControl> activeInputDeviceLists = new HashSet<AudioInputDeviceListControl>();
         private Func<bool> isThemeSelectorOpen;
         private Action closeThemeSelector;
         private Guid? activeGameId;
@@ -44,8 +45,11 @@ namespace PlayniteAudioSwitcher
         private string currentMediaSessionId;
         private readonly Dictionary<string, IReadOnlyList<string>> mediaSourceSessionIds = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
         private DispatcherTimer mediaSessionDiscoveryTimer;
+        private DispatcherTimer deviceBatteryTimer;
         private bool isMediaSessionDiscoveryRunning;
+        private Task deviceBatteryRefreshTask;
         private string lastMediaSessionDiscoverySignature;
+        private TopPanelItem batteryTopPanelItem;
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -61,6 +65,7 @@ namespace PlayniteAudioSwitcher
                 HasSettings = true
             };
             Theme = new AudioSwitcherThemeApi(this);
+            Theme.PropertyChanged += (_, __) => RefreshBatteryTopPanelItem();
 
             EnsureEnglishFallbackResources();
 
@@ -84,7 +89,8 @@ namespace PlayniteAudioSwitcher
                     "MediaSessionList",
                     "MediaVolumeSlider",
                     "MediaWidget",
-                    "MediaMixer"
+                    "MediaMixer",
+                    "BatteryWidget"
                 }
             });
 
@@ -167,6 +173,7 @@ namespace PlayniteAudioSwitcher
         {
             settings = new AudioSwitcherSettings(this);
             Theme?.Refresh();
+            RefreshBatteryTopPanelItem();
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
@@ -503,12 +510,38 @@ namespace PlayniteAudioSwitcher
                 return new AudioMediaMixerControl(this);
             }
 
+            if (args.Name == "BatteryWidget")
+            {
+                return new AudioBatteryWidgetControl(this);
+            }
+
             return null;
         }
 
         public override IEnumerable<TopPanelItem> GetTopPanelItems()
         {
-            return Enumerable.Empty<TopPanelItem>();
+            if (batteryTopPanelItem == null)
+            {
+                batteryTopPanelItem = new TopPanelItem
+                {
+                    Icon = new AudioBatteryTopPanelControl(this),
+                    Activated = () => PlayniteApi.MainView.OpenPluginSettings(Id)
+                };
+            }
+
+            RefreshBatteryTopPanelItem();
+            return new[] { batteryTopPanelItem };
+        }
+
+        private void RefreshBatteryTopPanelItem()
+        {
+            if (batteryTopPanelItem == null || settings == null || Theme == null)
+            {
+                return;
+            }
+
+            batteryTopPanelItem.Visible = settings.ShowDesktopBatteryIndicator;
+            batteryTopPanelItem.Title = Theme.CurrentDeviceName;
         }
 
         public override IEnumerable<SidebarItem> GetSidebarItems()
@@ -518,7 +551,114 @@ namespace PlayniteAudioSwitcher
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            ApplyPreferredDevices();
             StartMediaSessionDiscovery();
+            StartDeviceBatteryDiscovery();
+        }
+
+        internal void ApplyPreferredDevices()
+        {
+            ApplyPreferredPlaybackDevice();
+            ApplyPreferredRecordingDevice();
+        }
+
+        private void ApplyPreferredPlaybackDevice()
+        {
+            var deviceId = settings?.PreferredOutputDeviceId;
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                return;
+            }
+
+            var device = SafeGetDevices().FirstOrDefault(candidate =>
+                candidate.IsAvailable &&
+                string.Equals(candidate.Id, deviceId, StringComparison.OrdinalIgnoreCase));
+            if (device == null)
+            {
+                logger.Info($"Preferred playback device is unavailable: {deviceId}. The current Windows default device will remain in use.");
+                return;
+            }
+
+            var currentDevice = SafeGetDefaultPlaybackDevice("checking the preferred playback device");
+            if (!string.Equals(currentDevice?.Id, device.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                SetDevice(device.Id, GetDeviceDisplayName(device), false);
+            }
+        }
+
+        private void ApplyPreferredRecordingDevice()
+        {
+            var deviceId = settings?.PreferredInputDeviceId;
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                return;
+            }
+
+            var device = SafeGetInputDevices().FirstOrDefault(candidate =>
+                candidate.IsAvailable &&
+                string.Equals(candidate.Id, deviceId, StringComparison.OrdinalIgnoreCase));
+            if (device == null)
+            {
+                logger.Info($"Preferred recording device is unavailable: {deviceId}. The current Windows default device will remain in use.");
+                return;
+            }
+
+            var currentDevice = SafeGetDefaultRecordingDevice("checking the preferred recording device");
+            if (!string.Equals(currentDevice?.Id, device.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                SetInputDevice(device.Id, GetInputDeviceDisplayName(device), false);
+            }
+        }
+
+        private void StartDeviceBatteryDiscovery()
+        {
+            if (deviceBatteryTimer != null)
+            {
+                return;
+            }
+
+            deviceBatteryTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMinutes(1)
+            };
+            deviceBatteryTimer.Tick += DeviceBatteryTimer_Tick;
+            deviceBatteryTimer.Start();
+            _ = RefreshDeviceBatteriesAsync();
+        }
+
+        private async void DeviceBatteryTimer_Tick(object sender, EventArgs e)
+        {
+            await RefreshDeviceBatteriesAsync();
+        }
+
+        internal Task RefreshDeviceBatteriesAsync()
+        {
+            if (deviceBatteryRefreshTask == null || deviceBatteryRefreshTask.IsCompleted)
+            {
+                deviceBatteryRefreshTask = RefreshDeviceBatteriesCoreAsync();
+            }
+
+            return deviceBatteryRefreshTask;
+        }
+
+        private async Task RefreshDeviceBatteriesCoreAsync()
+        {
+            try
+            {
+                var reportedDeviceCount = await AudioDevices.RefreshDeviceBatteriesAsync();
+                Theme?.Refresh();
+                RefreshBatteryTopPanelItem();
+                activeThemeSelectorList?.Refresh();
+                foreach (var inputList in activeInputDeviceLists.ToList())
+                {
+                    inputList.Refresh();
+                }
+                logger.Debug($"Audio device battery refresh completed: {reportedDeviceCount} physical device(s) reported a battery level.");
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to refresh optional audio device battery information.");
+            }
         }
 
         private void StartMediaSessionDiscovery()
@@ -1497,6 +1637,22 @@ namespace PlayniteAudioSwitcher
             closeThemeSelector = null;
         }
 
+        internal void RegisterInputDeviceList(AudioInputDeviceListControl list)
+        {
+            if (list != null)
+            {
+                activeInputDeviceLists.Add(list);
+            }
+        }
+
+        internal void ClearInputDeviceList(AudioInputDeviceListControl list)
+        {
+            if (list != null)
+            {
+                activeInputDeviceLists.Remove(list);
+            }
+        }
+
         public string GetCurrentDeviceDisplayName()
         {
             try
@@ -1513,7 +1669,8 @@ namespace PlayniteAudioSwitcher
         {
             try
             {
-                return GetDeviceLabel(AudioDevices.GetDefaultPlaybackDevice()?.Id, false);
+                var device = AudioDevices.GetDefaultPlaybackDevice();
+                return AppendBatteryLabel(GetDeviceLabel(device?.Id, false), device);
             }
             catch
             {
@@ -1537,7 +1694,8 @@ namespace PlayniteAudioSwitcher
         {
             try
             {
-                return GetInputDeviceLabel(AudioDevices.GetDefaultRecordingDevice()?.Id, false);
+                var device = AudioDevices.GetDefaultRecordingDevice();
+                return AppendBatteryLabel(GetInputDeviceLabel(device?.Id, false), device);
             }
             catch
             {
@@ -2817,6 +2975,13 @@ namespace PlayniteAudioSwitcher
                         writer.WriteLine($"Muted: {session.IsMuted}");
                         writer.WriteLine();
                     }
+
+                    writer.WriteLine("Audio device battery diagnostics");
+                    writer.WriteLine("--------------------------------");
+                    foreach (var line in AudioDevices.GetBatteryDiagnostics())
+                    {
+                        writer.WriteLine(line);
+                    }
                 }
 
                 logger.Info($"Audio session diagnostics exported to {path}.");
@@ -3440,7 +3605,7 @@ namespace PlayniteAudioSwitcher
 
         private string GetFullscreenDeviceMenuText(AudioDevice device, string currentDeviceId)
         {
-            var name = GetDeviceDisplayName(device);
+            var name = AppendBatteryLabel(GetDeviceDisplayName(device), device);
 
             if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
             {
@@ -3452,7 +3617,7 @@ namespace PlayniteAudioSwitcher
 
         private string GetFullscreenInputDeviceMenuText(AudioDevice device, string currentDeviceId)
         {
-            var name = GetInputDeviceDisplayName(device);
+            var name = AppendBatteryLabel(GetInputDeviceDisplayName(device), device);
 
             if (string.Equals(device.Id, currentDeviceId, StringComparison.OrdinalIgnoreCase))
             {
@@ -3460,6 +3625,11 @@ namespace PlayniteAudioSwitcher
             }
 
             return name;
+        }
+
+        private static string AppendBatteryLabel(string text, AudioDevice device)
+        {
+            return device?.HasBattery == true ? $"{text}  \u00b7  {device.BatteryLabel}" : text;
         }
 
         private string GetCheckedMenuText(string text, bool isChecked)

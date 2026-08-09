@@ -18,6 +18,10 @@ namespace PlayniteAudioSwitcher
         private bool isHighlighted;
         private AudioEndpointState state = AudioEndpointState.Active;
         private string status;
+        private int batteryPercent = -1;
+        private bool hasBattery;
+        private bool isBatteryCharging;
+        private string batteryLabel;
 
         public string Id
         {
@@ -84,6 +88,30 @@ namespace PlayniteAudioSwitcher
         }
 
         public bool IsAvailable => State == AudioEndpointState.Active;
+
+        public int BatteryPercent
+        {
+            get => batteryPercent;
+            set => SetValue(ref batteryPercent, value);
+        }
+
+        public bool HasBattery
+        {
+            get => hasBattery;
+            set => SetValue(ref hasBattery, value);
+        }
+
+        public bool IsBatteryCharging
+        {
+            get => isBatteryCharging;
+            set => SetValue(ref isBatteryCharging, value);
+        }
+
+        public string BatteryLabel
+        {
+            get => batteryLabel;
+            set => SetValue(ref batteryLabel, value);
+        }
 
         public bool IsCurrent
         {

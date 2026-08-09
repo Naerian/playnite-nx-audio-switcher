@@ -1,3 +1,5 @@
+using System;
+
 namespace PlayniteAudioSwitcher
 {
     public enum AudioEndpointState
@@ -14,6 +16,8 @@ namespace PlayniteAudioSwitcher
         private string settingsDisplayName;
 
         public string Id { get; set; }
+
+        public Guid? ContainerId { get; set; }
 
         public string Name { get; set; }
 
@@ -34,6 +38,16 @@ namespace PlayniteAudioSwitcher
         public bool IsVisible { get; set; } = true;
 
         public int? DefaultVolumePercent { get; set; }
+
+        public int? BatteryPercent { get; set; }
+
+        public bool IsBatteryCharging { get; set; }
+
+        public bool HasBattery => BatteryPercent.HasValue;
+
+        public string BatteryLabel => !BatteryPercent.HasValue
+            ? string.Empty
+            : IsBatteryCharging ? $"\u26a1 {BatteryPercent.Value}%" : $"{BatteryPercent.Value}%";
 
         public string EffectiveName => string.IsNullOrWhiteSpace(CustomName) ? Name : CustomName;
 

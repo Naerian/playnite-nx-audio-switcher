@@ -1,5 +1,16 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.11.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-10
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.11.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_11_0.pext
+    Changelog:
+      - Added optional preferred output and input devices that Audio Switcher applies when Playnite starts or settings are saved.
+      - Made per-game device profiles temporarily override the preferred devices and restore the previous Windows defaults when the game closes.
+      - Added safe battery discovery through Windows device properties, associated Bluetooth PnP nodes, and standard HID battery controls.
+      - Added battery information to settings, summaries, device controls, Fullscreen menus, and diagnostics without treating unavailable readings as 0%.
+      - Added an optional Desktop top-bar battery indicator and a configurable Fullscreen BatteryWidget with custom icon and display modes.
+      - Added theme API 1.2.0 battery capabilities and expanded all localizations plus the English and Spanish Wiki documentation.
   - Version: 1.10.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-06

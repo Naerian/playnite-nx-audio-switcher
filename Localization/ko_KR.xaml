@@ -34,7 +34,12 @@
     <sys:String x:Key="LOCAS_OutputDevicesHelp">출력 장치 이름, 아이콘, 표시 여부 및 선택적 기본 볼륨을 설정합니다.</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesTitle">입력 장치</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesHelp">마이크/입력 장치 이름, 아이콘, 표시 여부 및 선택적 기본 입력 볼륨을 설정합니다.</sys:String>
+    <sys:String x:Key="LOCAS_PreferredOutputDevice">선호 출력 장치</sys:String>
+    <sys:String x:Key="LOCAS_PreferredInputDevice">선호 입력 장치</sys:String>
+    <sys:String x:Key="LOCAS_PreferredDeviceHelp">Playnite 시작 시 Audio Switcher가 이 장치를 적용합니다. 게임 프로필이 일시적으로 재정의하고 게임 종료 시 복원할 수 있습니다.</sys:String>
+    <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows 기본값 유지</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows 이름</sys:String>
+    <sys:String x:Key="LOCAS_Battery">배터리</sys:String>
     <sys:String x:Key="LOCAS_Icon">아이콘</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">기본 볼륨</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">기본 입력 볼륨</sys:String>
@@ -191,5 +196,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">연결 끊김</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">없음</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">사용 불가</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorTitle">배터리 표시기</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Desktop에서는 아이콘을 항상 표시하고 배터리 정보가 있을 때만 값을 추가합니다. Fullscreen 테마는 설정 가능한 BatteryWidget을 사용할 수 있습니다.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Desktop 상단 표시줄에 표시</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">배터리 정보가 없으면 Fullscreen 위젯 숨기기</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">표시</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">아이콘 및 백분율</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">아이콘만</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">백분율만</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIcon">아이콘</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">현재 장치 아이콘을 사용하려면 없음을 선택하세요.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Fullscreen BatteryWidget에만 적용되며 Desktop 상단 표시줄 아이콘은 계속 표시됩니다.</sys:String>
 </ResourceDictionary>
 

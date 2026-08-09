@@ -28,14 +28,14 @@ changes to the extension.
 ## Last Known Stable State
 
 - Branch: `main`
-- Last release at the time this file was written: `v1.10.0`
-- Last release commit: see tag `v1.10.0`
+- Last release at the time this file was written: `v1.11.0`
+- Last release commit: see tag `v1.11.0`
 - Release URL:
-  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.10.0`
+  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.11.0`
 - Release package:
-  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_10_0.pext`
+  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_11_0.pext`
 - Public release asset SHA-256:
-  `6FD1A839FF0C623DF720522750215D40262423F664519F1DED6F27A5966B27F2`
+  `FB94E86D75D7272970F63AFB54EF2230474ED18A15BAF85B53A4C84088983B85`
 - Main repo state before this handoff was created: clean and synced with
   `origin/main`.
 
@@ -47,8 +47,12 @@ context menus, and Fullscreen themes.
 Current major areas:
 
 - Default output and input device switching.
+- Optional preferred output and input devices applied at Playnite startup; game
+  profiles can temporarily override them and restore the prior devices.
 - Custom device names, Tabler-based icons, visibility, endpoint state, and
   preferred per-device volume.
+- Optional device battery and charging-state reporting through generic Windows properties, associated Bluetooth PnP devnodes, and read-only standard HID controls,
+  refreshed once per minute and available to Fullscreen themes through API 1.2.0.
 - Per-game profiles for output device, input device, Spatial Sound, and game
   session volume.
 - Optional per-profile audio process selection for launchers, emulators, and
@@ -68,6 +72,8 @@ Current major areas:
   stability.
 - Settings overview with current devices, volumes, configured profiles,
   Spatial Sound status, and active playback-session count.
+- Optional Desktop top-bar battery icon that remains visible without a battery
+  value and opens the plugin settings when activated.
 - Notification settings split by category.
 - Experimental Spatial Sound support through a user-provided SoundVolumeView
   or svcl executable.
@@ -110,7 +116,7 @@ changes.
 Use Playnite Toolbox from the local Playnite install.
 
 ```powershell
-$version = "1.10.0"
+$version = "1.11.0"
 $outDir = ".\package-output\v$version"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 & C:\Playnite\Toolbox.exe pack .\bin\Release $outDir
@@ -247,6 +253,7 @@ Other useful controls include:
 
 ```xml
 <ContentControl x:Name="AudioSwitcher_OutputWidget" />
+<ContentControl x:Name="AudioSwitcher_BatteryWidget" />
 <ContentControl x:Name="AudioSwitcher_InputWidget" />
 <ContentControl x:Name="AudioSwitcher_GameVolumeWidget" />
 <ContentControl x:Name="AudioSwitcher_MediaSessionList" />

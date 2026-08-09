@@ -11,6 +11,8 @@ namespace PlayniteAudioSwitcher
         private AudioSwitcherSettings editingClone;
         private List<AudioDevice> availablePlaybackDevices = new List<AudioDevice>();
         private List<AudioDevice> availableRecordingDevices = new List<AudioDevice>();
+        private List<AudioDevice> preferredPlaybackDeviceOptions = new List<AudioDevice>();
+        private List<AudioDevice> preferredRecordingDeviceOptions = new List<AudioDevice>();
         private List<GameAudioProfileEntry> availableGameProfiles = new List<GameAudioProfileEntry>();
         private List<AudioDeviceAlias> deviceAliases = new List<AudioDeviceAlias>();
         private List<AudioDeviceAlias> inputDeviceAliases = new List<AudioDeviceAlias>();
@@ -19,6 +21,8 @@ namespace PlayniteAudioSwitcher
         private string favoriteDeviceBId;
         private string favoriteDeviceBName = "Favorito B";
         private string fullscreenPreferredDeviceId;
+        private string preferredOutputDeviceId;
+        private string preferredInputDeviceId;
         private string deviceDisplayMode = "TextAndIcon";
         private bool showNotifications = true;
         private bool showOutputDeviceNotifications = true;
@@ -39,6 +43,10 @@ namespace PlayniteAudioSwitcher
         private string spatialSoundToolPath;
         private string currentSpatialSoundMode;
         private int volumeStepPercent = 5;
+        private bool showDesktopBatteryIndicator;
+        private bool hideBatteryIndicatorWhenUnavailable = true;
+        private string batteryIndicatorDisplayMode = "IconAndPercentage";
+        private string batteryIndicatorIcon = string.Empty;
 
         public AudioSwitcherSettings()
         {
@@ -57,6 +65,10 @@ namespace PlayniteAudioSwitcher
                 DeviceAliases = savedSettings.DeviceAliases ?? new List<AudioDeviceAlias>();
                 InputDeviceAliases = savedSettings.InputDeviceAliases ?? new List<AudioDeviceAlias>();
                 FullscreenPreferredDeviceId = savedSettings.FullscreenPreferredDeviceId;
+                PreferredOutputDeviceId = savedSettings.PreferredOutputDeviceId != null
+                    ? savedSettings.PreferredOutputDeviceId
+                    : savedSettings.ApplyFullscreenPreferredOnStartup ? savedSettings.FullscreenPreferredDeviceId : null;
+                PreferredInputDeviceId = savedSettings.PreferredInputDeviceId;
                 DeviceDisplayMode = string.IsNullOrWhiteSpace(savedSettings.DeviceDisplayMode) ? "TextAndIcon" : savedSettings.DeviceDisplayMode;
                 ShowNotifications = savedSettings.ShowNotifications;
                 FullscreenOnlyFavorites = savedSettings.FullscreenOnlyFavorites;
@@ -76,6 +88,12 @@ namespace PlayniteAudioSwitcher
                 ShowSpatialSoundNotifications = savedSettings.ShowSpatialSoundNotifications;
                 ShowDiagnosticNotifications = savedSettings.ShowDiagnosticNotifications;
                 VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
+                ShowDesktopBatteryIndicator = savedSettings.ShowDesktopBatteryIndicator;
+                HideBatteryIndicatorWhenUnavailable = savedSettings.HideBatteryIndicatorWhenUnavailable;
+                BatteryIndicatorDisplayMode = string.IsNullOrWhiteSpace(savedSettings.BatteryIndicatorDisplayMode)
+                    ? "IconAndPercentage"
+                    : savedSettings.BatteryIndicatorDisplayMode;
+                BatteryIndicatorIcon = savedSettings.BatteryIndicatorIcon ?? string.Empty;
             }
 
             MigrateFavoritesToAliases();
@@ -125,6 +143,18 @@ namespace PlayniteAudioSwitcher
         {
             get => fullscreenPreferredDeviceId;
             set => SetValue(ref fullscreenPreferredDeviceId, value);
+        }
+
+        public string PreferredOutputDeviceId
+        {
+            get => preferredOutputDeviceId;
+            set => SetValue(ref preferredOutputDeviceId, value);
+        }
+
+        public string PreferredInputDeviceId
+        {
+            get => preferredInputDeviceId;
+            set => SetValue(ref preferredInputDeviceId, value);
         }
 
         public string DeviceDisplayMode
@@ -352,6 +382,20 @@ namespace PlayniteAudioSwitcher
         }
 
         [DontSerialize]
+        public List<AudioDevice> PreferredPlaybackDeviceOptions
+        {
+            get => preferredPlaybackDeviceOptions;
+            private set => SetValue(ref preferredPlaybackDeviceOptions, value);
+        }
+
+        [DontSerialize]
+        public List<AudioDevice> PreferredRecordingDeviceOptions
+        {
+            get => preferredRecordingDeviceOptions;
+            private set => SetValue(ref preferredRecordingDeviceOptions, value);
+        }
+
+        [DontSerialize]
         public List<GameAudioProfileEntry> AvailableGameProfiles
         {
             get => availableGameProfiles;
@@ -368,6 +412,37 @@ namespace PlayniteAudioSwitcher
                 .Select(profile => profile.InputDeviceId));
             AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetAllPlaybackDevices(), false, profileOutputIds);
             AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetAllRecordingDevices(), true, profileInputIds);
+            PreferredPlaybackDeviceOptions = CreatePreferredDeviceOptions(AvailablePlaybackDevices, PreferredOutputDeviceId);
+            PreferredRecordingDeviceOptions = CreatePreferredDeviceOptions(AvailableRecordingDevices, PreferredInputDeviceId);
+        }
+
+        private List<AudioDevice> CreatePreferredDeviceOptions(IEnumerable<AudioDevice> source, string selectedDeviceId)
+        {
+            var devices = (source ?? Enumerable.Empty<AudioDevice>())
+                .Where(device => device.IsAvailable || string.Equals(device.Id, selectedDeviceId, System.StringComparison.OrdinalIgnoreCase))
+                .Select(CloneDevice)
+                .OrderBy(device => device.EffectiveName)
+                .ToList();
+
+            if (!string.IsNullOrWhiteSpace(selectedDeviceId) &&
+                devices.All(device => !string.Equals(device.Id, selectedDeviceId, System.StringComparison.OrdinalIgnoreCase)))
+            {
+                devices.Add(new AudioDevice
+                {
+                    Id = selectedDeviceId,
+                    Name = plugin?.Loc("LOCAS_UnknownDevice") ?? "Unknown device",
+                    State = AudioEndpointState.Unknown,
+                    StatusDisplayName = plugin?.Loc("LOCAS_DeviceStatusUnavailable") ?? "Unavailable"
+                });
+            }
+
+            devices.Insert(0, new AudioDevice
+            {
+                Id = string.Empty,
+                Name = plugin?.Loc("LOCAS_KeepWindowsDefault") ?? "Keep the Windows default",
+                State = AudioEndpointState.Active
+            });
+            return devices;
         }
 
         public void RefreshGameProfiles()
@@ -403,6 +478,30 @@ namespace PlayniteAudioSwitcher
                 State = AudioEndpointState.Active
             });
             return devices;
+        }
+
+        public bool ShowDesktopBatteryIndicator
+        {
+            get => showDesktopBatteryIndicator;
+            set => SetValue(ref showDesktopBatteryIndicator, value);
+        }
+
+        public bool HideBatteryIndicatorWhenUnavailable
+        {
+            get => hideBatteryIndicatorWhenUnavailable;
+            set => SetValue(ref hideBatteryIndicatorWhenUnavailable, value);
+        }
+
+        public string BatteryIndicatorDisplayMode
+        {
+            get => batteryIndicatorDisplayMode;
+            set => SetValue(ref batteryIndicatorDisplayMode, value);
+        }
+
+        public string BatteryIndicatorIcon
+        {
+            get => batteryIndicatorIcon;
+            set => SetValue(ref batteryIndicatorIcon, value);
         }
 
         public List<AudioProcessOption> GetAudioProcessOptions(string selectedProcessName)
@@ -640,6 +739,8 @@ namespace PlayniteAudioSwitcher
             DeviceAliases = editingClone.DeviceAliases;
             InputDeviceAliases = editingClone.InputDeviceAliases;
             FullscreenPreferredDeviceId = editingClone.FullscreenPreferredDeviceId;
+            PreferredOutputDeviceId = editingClone.PreferredOutputDeviceId;
+            PreferredInputDeviceId = editingClone.PreferredInputDeviceId;
             DeviceDisplayMode = editingClone.DeviceDisplayMode;
             ShowNotifications = editingClone.ShowNotifications;
             ShowOutputDeviceNotifications = editingClone.ShowOutputDeviceNotifications;
@@ -659,6 +760,10 @@ namespace PlayniteAudioSwitcher
             SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
             VolumeStepPercent = editingClone.VolumeStepPercent;
+            ShowDesktopBatteryIndicator = editingClone.ShowDesktopBatteryIndicator;
+            HideBatteryIndicatorWhenUnavailable = editingClone.HideBatteryIndicatorWhenUnavailable;
+            BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
+            BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
             AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
             RefreshDevices();
         }
@@ -703,6 +808,7 @@ namespace PlayniteAudioSwitcher
 
             plugin.SavePluginSettings(this);
             plugin.ReloadSettings();
+            plugin.ApplyPreferredDevices();
             plugin.ApplyDefaultVolumeForCurrentDevice();
             plugin.ApplyDefaultInputVolumeForCurrentDevice();
         }
@@ -781,6 +887,8 @@ namespace PlayniteAudioSwitcher
                     DefaultVolumePercent = a.DefaultVolumePercent
                 }).ToList(),
                 FullscreenPreferredDeviceId = FullscreenPreferredDeviceId,
+                PreferredOutputDeviceId = PreferredOutputDeviceId,
+                PreferredInputDeviceId = PreferredInputDeviceId,
                 DeviceDisplayMode = DeviceDisplayMode,
                 ShowNotifications = ShowNotifications,
                 ShowOutputDeviceNotifications = ShowOutputDeviceNotifications,
@@ -799,7 +907,11 @@ namespace PlayniteAudioSwitcher
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,
                 SpatialSoundIntegrationEnabled = SpatialSoundIntegrationEnabled,
                 SpatialSoundToolPath = SpatialSoundToolPath,
-                VolumeStepPercent = VolumeStepPercent
+                VolumeStepPercent = VolumeStepPercent,
+                ShowDesktopBatteryIndicator = ShowDesktopBatteryIndicator,
+                HideBatteryIndicatorWhenUnavailable = HideBatteryIndicatorWhenUnavailable,
+                BatteryIndicatorDisplayMode = BatteryIndicatorDisplayMode,
+                BatteryIndicatorIcon = BatteryIndicatorIcon
             };
 
             clone.AvailableGameProfiles = AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
@@ -874,6 +986,7 @@ namespace PlayniteAudioSwitcher
             return new AudioDevice
             {
                 Id = device.Id,
+                ContainerId = device.ContainerId,
                 Name = device.Name,
                 IsDefault = device.IsDefault,
                 State = device.State,
@@ -883,6 +996,8 @@ namespace PlayniteAudioSwitcher
                 IsIconSuggested = device.IsIconSuggested,
                 IsVisible = device.IsVisible,
                 DefaultVolumePercent = device.DefaultVolumePercent,
+                BatteryPercent = device.BatteryPercent,
+                IsBatteryCharging = device.IsBatteryCharging,
                 SettingsDisplayName = device.SettingsDisplayName
             };
         }

@@ -250,6 +250,18 @@
                                         <TextBlock Text="{DynamicResource LOCAS_OutputDevicesHelp}" Style="{StaticResource HintText}" />
                                     </StackPanel>
                                 </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_PreferredOutputDevice}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
+                                        <ComboBox ItemsSource="{Binding PreferredPlaybackDeviceOptions}"
+                                                  DisplayMemberPath="SettingsDisplayName"
+                                                  SelectedValuePath="Id"
+                                                  SelectedValue="{Binding PreferredOutputDeviceId}" />
+                                    </StackPanel>
+                                </Border>
                                 <StackPanel x:Name="DeviceRowsPanel" />
                             </StackPanel>
                         </ScrollViewer>
@@ -261,6 +273,18 @@
                                     <StackPanel>
                                         <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
                                         <TextBlock Text="{DynamicResource LOCAS_InputDevicesHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_PreferredInputDevice}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
+                                        <ComboBox ItemsSource="{Binding PreferredRecordingDeviceOptions}"
+                                                  DisplayMemberPath="SettingsDisplayName"
+                                                  SelectedValuePath="Id"
+                                                  SelectedValue="{Binding PreferredInputDeviceId}" />
                                     </StackPanel>
                                 </Border>
                                 <StackPanel x:Name="InputDeviceRowsPanel" />
@@ -288,6 +312,48 @@
                                         </Border>
                                         <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}" IsChecked="{Binding QuickSwitchEnabled}" Margin="0,0,0,10" />
                                         <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}" IsChecked="{Binding QuickSwitchAllDevices}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
+                                        <CheckBox Content="{DynamicResource LOCAS_ShowDesktopBatteryIndicator}" IsChecked="{Binding ShowDesktopBatteryIndicator}" Margin="0,0,0,10" />
+                                        <CheckBox Content="{DynamicResource LOCAS_HideBatteryWhenUnavailable}" IsChecked="{Binding HideBatteryIndicatorWhenUnavailable}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorHiddenHelp}"
+                                                   Margin="24,0,0,12">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding HideBatteryIndicatorWhenUnavailable}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorDisplay}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <ComboBox Grid.Column="1" SelectedValue="{Binding BatteryIndicatorDisplayMode}" SelectedValuePath="Tag">
+                                                <ComboBoxItem Tag="IconAndPercentage" Content="{DynamicResource LOCAS_BatteryDisplayIconAndPercentage}" />
+                                                <ComboBoxItem Tag="IconOnly" Content="{DynamicResource LOCAS_BatteryDisplayIconOnly}" />
+                                                <ComboBoxItem Tag="PercentageOnly" Content="{DynamicResource LOCAS_BatteryDisplayPercentageOnly}" />
+                                            </ComboBox>
+                                        </Grid>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIcon}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <ComboBox x:Name="BatteryIndicatorIconBox"
+                                                      Grid.Column="1"
+                                                      ItemsSource="{Binding IconOptions}"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding BatteryIndicatorIcon}" />
+                                        </Grid>
+                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIconHelp}" Style="{StaticResource HintText}" Margin="180,6,0,0" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource SettingsCard}">

@@ -5,5 +5,10 @@
     <Button x:Name="SwitchButton"
             Click="SwitchButton_Click"
             MinWidth="120"
-            Padding="12,6" />
+            Padding="12,6">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding CurrentDeviceLabel}" />
+            <TextBlock Margin="8,0,0,0" Text="{Binding CurrentDeviceBatteryLabel}" />
+        </StackPanel>
+    </Button>
 </playnite:PluginUserControl>

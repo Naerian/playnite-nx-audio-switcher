@@ -34,7 +34,12 @@
     <sys:String x:Key="LOCAS_OutputDevicesHelp">Çıkış aygıtı adlarını, simgelerini, görünürlüğünü ve isteğe bağlı varsayılan ses düzeyini yapılandırın.</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesTitle">Giriş aygıtları</sys:String>
     <sys:String x:Key="LOCAS_InputDevicesHelp">Mikrofon/giriş aygıtı adlarını, simgelerini, görünürlüğünü ve isteğe bağlı varsayılan giriş ses düzeyini yapılandırın.</sys:String>
+    <sys:String x:Key="LOCAS_PreferredOutputDevice">Tercih edilen çıkış aygıtı</sys:String>
+    <sys:String x:Key="LOCAS_PreferredInputDevice">Tercih edilen giriş aygıtı</sys:String>
+    <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher bu aygıtı Playnite başladığında uygular. Oyun profilleri geçici olarak geçersiz kılabilir ve oyun kapanınca geri yükleyebilir.</sys:String>
+    <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows varsayılanını koru</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Windows adı</sys:String>
+    <sys:String x:Key="LOCAS_Battery">Pil</sys:String>
     <sys:String x:Key="LOCAS_Icon">Simge</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Varsayılan ses düzeyi</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">Varsayılan giriş ses düzeyi</sys:String>
@@ -191,5 +196,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">Bağlantısı kesilmiş</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Mevcut değil</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Kullanılamıyor</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Pil göstergesi</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Desktop'ta simge her zaman görünür kalır ve pil bilgisi varsa eklenir. Fullscreen temaları yapılandırılabilir BatteryWidget'ı kullanabilir.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Desktop üst çubuğunda göster</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Pil bildirilmediğinde Fullscreen bileşenini gizle</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Görünüm</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">Simge ve yüzde</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Yalnızca simge</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Yalnızca yüzde</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Simge</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Geçerli aygıt simgesini kullanmak için Yok'u seçin.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Bu yalnızca Fullscreen BatteryWidget'ını etkiler; Desktop üst çubuğu simgesi görünür kalır.</sys:String>
 </ResourceDictionary>
 

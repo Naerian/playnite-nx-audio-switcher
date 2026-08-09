@@ -18,11 +18,26 @@ namespace PlayniteAudioSwitcher
         private string currentDeviceName;
         private string currentDeviceLabel;
         private Geometry currentDeviceIconGeometry;
+        private int currentDeviceBatteryPercent = -1;
+        private bool hasCurrentDeviceBattery;
+        private bool isCurrentDeviceBatteryCharging;
+        private string currentDeviceBatteryLabel;
+        private string currentOutputStatusLabel;
+        private Geometry batteryIndicatorIconGeometry;
+        private string batteryIndicatorLabel;
+        private bool showBatteryIndicatorIcon;
+        private bool showBatteryIndicatorPercentage;
+        private bool shouldShowBatteryIndicator;
         private bool hasDevices;
         private string currentInputDeviceId;
         private string currentInputDeviceName;
         private string currentInputDeviceLabel;
         private Geometry currentInputDeviceIconGeometry;
+        private int currentInputDeviceBatteryPercent = -1;
+        private bool hasCurrentInputDeviceBattery;
+        private bool isCurrentInputDeviceBatteryCharging;
+        private string currentInputDeviceBatteryLabel;
+        private string currentInputStatusLabel;
         private bool hasInputDevices;
         private float currentVolume;
         private int currentVolumePercent;
@@ -153,7 +168,7 @@ namespace PlayniteAudioSwitcher
 
         public ObservableCollection<AudioSwitcherThemeMediaSession> MediaSessions { get; }
 
-        public string ApiVersion => "1.1.0";
+        public string ApiVersion => "1.2.0";
 
         public bool SupportsOutputDevices => true;
 
@@ -174,6 +189,8 @@ namespace PlayniteAudioSwitcher
         public bool SupportsKnownDevices => true;
 
         public bool SupportsAvailabilityStates => true;
+
+        public bool SupportsDeviceBattery => true;
 
         internal bool IsMediaSessionVolumeWritePending => mediaVolumeWriter.HasPendingWork;
 
@@ -265,6 +282,66 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref currentDeviceIconGeometry, value);
         }
 
+        public int CurrentDeviceBatteryPercent
+        {
+            get => currentDeviceBatteryPercent;
+            private set => SetValue(ref currentDeviceBatteryPercent, value);
+        }
+
+        public bool HasCurrentDeviceBattery
+        {
+            get => hasCurrentDeviceBattery;
+            private set => SetValue(ref hasCurrentDeviceBattery, value);
+        }
+
+        public bool IsCurrentDeviceBatteryCharging
+        {
+            get => isCurrentDeviceBatteryCharging;
+            private set => SetValue(ref isCurrentDeviceBatteryCharging, value);
+        }
+
+        public string CurrentDeviceBatteryLabel
+        {
+            get => currentDeviceBatteryLabel;
+            private set => SetValue(ref currentDeviceBatteryLabel, value);
+        }
+
+        public string CurrentOutputStatusLabel
+        {
+            get => currentOutputStatusLabel;
+            private set => SetValue(ref currentOutputStatusLabel, value);
+        }
+
+        public Geometry BatteryIndicatorIconGeometry
+        {
+            get => batteryIndicatorIconGeometry;
+            private set => SetValue(ref batteryIndicatorIconGeometry, value);
+        }
+
+        public string BatteryIndicatorLabel
+        {
+            get => batteryIndicatorLabel;
+            private set => SetValue(ref batteryIndicatorLabel, value);
+        }
+
+        public bool ShowBatteryIndicatorIcon
+        {
+            get => showBatteryIndicatorIcon;
+            private set => SetValue(ref showBatteryIndicatorIcon, value);
+        }
+
+        public bool ShowBatteryIndicatorPercentage
+        {
+            get => showBatteryIndicatorPercentage;
+            private set => SetValue(ref showBatteryIndicatorPercentage, value);
+        }
+
+        public bool ShouldShowBatteryIndicator
+        {
+            get => shouldShowBatteryIndicator;
+            private set => SetValue(ref shouldShowBatteryIndicator, value);
+        }
+
         public bool HasDevices
         {
             get => hasDevices;
@@ -293,6 +370,36 @@ namespace PlayniteAudioSwitcher
         {
             get => currentInputDeviceIconGeometry;
             private set => SetValue(ref currentInputDeviceIconGeometry, value);
+        }
+
+        public int CurrentInputDeviceBatteryPercent
+        {
+            get => currentInputDeviceBatteryPercent;
+            private set => SetValue(ref currentInputDeviceBatteryPercent, value);
+        }
+
+        public bool HasCurrentInputDeviceBattery
+        {
+            get => hasCurrentInputDeviceBattery;
+            private set => SetValue(ref hasCurrentInputDeviceBattery, value);
+        }
+
+        public bool IsCurrentInputDeviceBatteryCharging
+        {
+            get => isCurrentInputDeviceBatteryCharging;
+            private set => SetValue(ref isCurrentInputDeviceBatteryCharging, value);
+        }
+
+        public string CurrentInputDeviceBatteryLabel
+        {
+            get => currentInputDeviceBatteryLabel;
+            private set => SetValue(ref currentInputDeviceBatteryLabel, value);
+        }
+
+        public string CurrentInputStatusLabel
+        {
+            get => currentInputStatusLabel;
+            private set => SetValue(ref currentInputStatusLabel, value);
         }
 
         public bool HasInputDevices
@@ -731,6 +838,8 @@ namespace PlayniteAudioSwitcher
             CurrentDeviceName = currentOutput != null ? plugin.GetDeviceDisplayNameForTheme(currentOutput) : plugin.Loc("LOCAS_Audio");
             CurrentDeviceLabel = currentOutput != null ? plugin.GetDeviceDisplayLabelForTheme(currentOutput) : plugin.Loc("LOCAS_Audio");
             CurrentDeviceIconGeometry = plugin.GetDeviceIconGeometryForTheme(currentOutput, false) ?? plugin.GetIconGeometry("volume-2");
+            SetCurrentDeviceBattery(currentOutput);
+            RefreshBatteryIndicator();
             RefreshVolume();
 
             var currentInput = plugin.GetCurrentRecordingDeviceForTheme();
@@ -739,6 +848,7 @@ namespace PlayniteAudioSwitcher
             CurrentInputDeviceName = currentInput != null ? plugin.GetInputDeviceDisplayNameForTheme(currentInput) : plugin.Loc("LOCAS_AudioInput");
             CurrentInputDeviceLabel = currentInput != null ? plugin.GetInputDeviceDisplayLabelForTheme(currentInput) : plugin.Loc("LOCAS_AudioInput");
             CurrentInputDeviceIconGeometry = plugin.GetDeviceIconGeometryForTheme(currentInput, true) ?? plugin.GetIconGeometry("mic");
+            SetCurrentInputDeviceBattery(currentInput);
             RefreshInputVolume();
             CurrentGameName = plugin.GetCurrentGameName();
             RefreshGameVolume();
@@ -783,6 +893,57 @@ namespace PlayniteAudioSwitcher
             LastChangeAt = DateTime.Now;
         }
 
+        private void SetCurrentDeviceBattery(AudioDevice device)
+        {
+            HasCurrentDeviceBattery = device?.HasBattery == true;
+            CurrentDeviceBatteryPercent = device?.BatteryPercent ?? -1;
+            IsCurrentDeviceBatteryCharging = device?.IsBatteryCharging == true;
+            CurrentDeviceBatteryLabel = device?.BatteryLabel ?? string.Empty;
+            UpdateCurrentOutputStatusLabel();
+        }
+
+        private void RefreshBatteryIndicator()
+        {
+            var indicatorIcon = plugin.Settings?.BatteryIndicatorIcon;
+            BatteryIndicatorIconGeometry = string.IsNullOrWhiteSpace(indicatorIcon)
+                ? CurrentDeviceIconGeometry
+                : plugin.GetIconGeometry(indicatorIcon) ?? CurrentDeviceIconGeometry;
+            BatteryIndicatorLabel = HasCurrentDeviceBattery ? CurrentDeviceBatteryLabel : "—";
+            var mode = plugin.Settings?.BatteryIndicatorDisplayMode ?? "IconAndPercentage";
+            ShowBatteryIndicatorIcon = !string.Equals(mode, "PercentageOnly", StringComparison.OrdinalIgnoreCase);
+            ShowBatteryIndicatorPercentage = !string.Equals(mode, "IconOnly", StringComparison.OrdinalIgnoreCase);
+            ShouldShowBatteryIndicator = HasCurrentDeviceBattery || plugin.Settings?.HideBatteryIndicatorWhenUnavailable != true;
+        }
+
+        private void SetCurrentInputDeviceBattery(AudioDevice device)
+        {
+            HasCurrentInputDeviceBattery = device?.HasBattery == true;
+            CurrentInputDeviceBatteryPercent = device?.BatteryPercent ?? -1;
+            IsCurrentInputDeviceBatteryCharging = device?.IsBatteryCharging == true;
+            CurrentInputDeviceBatteryLabel = device?.BatteryLabel ?? string.Empty;
+            UpdateCurrentInputStatusLabel();
+        }
+
+        private void UpdateCurrentOutputStatusLabel()
+        {
+            CurrentOutputStatusLabel = CombineStatusLabels(CurrentVolumeLabel, CurrentDeviceBatteryLabel);
+        }
+
+        private void UpdateCurrentInputStatusLabel()
+        {
+            CurrentInputStatusLabel = CombineStatusLabels(CurrentInputVolumeLabel, CurrentInputDeviceBatteryLabel);
+        }
+
+        private static string CombineStatusLabels(string primary, string battery)
+        {
+            if (string.IsNullOrWhiteSpace(battery))
+            {
+                return primary ?? string.Empty;
+            }
+
+            return string.IsNullOrWhiteSpace(primary) ? battery : $"{primary}  \u00b7  {battery}";
+        }
+
         private AudioSwitcherThemeDevice CreateThemeDevice(AudioDevice device, string currentId)
         {
             return new AudioSwitcherThemeDevice
@@ -796,7 +957,11 @@ namespace PlayniteAudioSwitcher
                 IsVisible = device.IsVisible,
                 IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase),
                 State = device.State,
-                Status = device.StatusDisplayName
+                Status = device.StatusDisplayName,
+                BatteryPercent = device.BatteryPercent ?? -1,
+                HasBattery = device.HasBattery,
+                IsBatteryCharging = device.IsBatteryCharging,
+                BatteryLabel = device.BatteryLabel
             };
         }
 
@@ -813,7 +978,11 @@ namespace PlayniteAudioSwitcher
                 IsVisible = device.IsVisible,
                 IsCurrent = string.Equals(device.Id, currentId, StringComparison.OrdinalIgnoreCase),
                 State = device.State,
-                Status = device.StatusDisplayName
+                Status = device.StatusDisplayName,
+                BatteryPercent = device.BatteryPercent ?? -1,
+                HasBattery = device.HasBattery,
+                IsBatteryCharging = device.IsBatteryCharging,
+                BatteryLabel = device.BatteryLabel
             };
         }
 
@@ -1055,6 +1224,10 @@ namespace PlayniteAudioSwitcher
             target.IsCurrent = source.IsCurrent;
             target.State = source.State;
             target.Status = source.Status;
+            target.BatteryPercent = source.BatteryPercent;
+            target.HasBattery = source.HasBattery;
+            target.IsBatteryCharging = source.IsBatteryCharging;
+            target.BatteryLabel = source.BatteryLabel;
         }
 
         private static void UpdateThemeMediaSession(AudioSwitcherThemeMediaSession target, AudioSwitcherThemeMediaSession source)
@@ -1264,6 +1437,7 @@ namespace PlayniteAudioSwitcher
                 IsOutputMuted = muted;
                 IsOutputVolumeAvailable = isAvailable;
                 CurrentVolumeLabel = label ?? (muted ? plugin.Loc("LOCAS_Muted") : $"{volumePercent}%");
+                UpdateCurrentOutputStatusLabel();
                 CurrentOutputVolumeIconGeometry = GetVolumeIconGeometry(muted, volumePercent, false);
             }
             finally
@@ -1296,6 +1470,7 @@ namespace PlayniteAudioSwitcher
                 IsInputMuted = muted;
                 IsInputVolumeAvailable = isAvailable;
                 CurrentInputVolumeLabel = label ?? (muted ? plugin.Loc("LOCAS_InputMuted") : $"{volumePercent}%");
+                UpdateCurrentInputStatusLabel();
                 CurrentInputVolumeIconGeometry = GetVolumeIconGeometry(muted, volumePercent, true);
             }
             finally

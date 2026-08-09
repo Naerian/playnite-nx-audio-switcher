@@ -19,6 +19,7 @@
         Minimal custom output button.
         ToggleSelectorCommand opens/closes the selector state exposed by the plugin.
         CurrentDeviceIconGeometry and CurrentDeviceName reflect the active output device.
+        CurrentDeviceBatteryLabel is empty when Windows does not report a battery.
     -->
     <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=ToggleSelectorCommand}">
         <StackPanel Orientation="Horizontal">
@@ -29,6 +30,8 @@
                   Data="{PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceIconGeometry}" />
             <TextBlock Margin="8,0,0,0"
                        Text="{PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceName}" />
+            <TextBlock Margin="8,0,0,0"
+                       Text="{PluginSettings Plugin=AudioSwitcher, Path=CurrentDeviceBatteryLabel}" />
         </StackPanel>
     </Button>
 
@@ -63,6 +66,8 @@
     <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=CurrentVolumeLabel}" />
     <ContentControl x:Name="AudioSwitcher_VolumeSlider" />
     <ContentControl x:Name="AudioSwitcher_OutputWidget" />
+    <!-- Uses the battery display, icon and unavailable-state options configured in Audio Switcher. -->
+    <ContentControl x:Name="AudioSwitcher_BatteryWidget" />
 
     <!--
         Input/microphone integration.
@@ -79,6 +84,7 @@
         ApiVersion identifies the formal theme API contract. SupportsInputDevices confirms the feature exists,
         while HasDefaultInputDevice and IsInputVolumeAvailable describe the current Windows audio state.
         Equivalent output flags are HasDefaultOutputDevice and IsOutputVolumeAvailable.
+        SupportsDeviceBattery was added in API 1.2.0. Battery values are optional per device.
     -->
     <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=ApiVersion}" />
     <TextBlock Text="{PluginSettings Plugin=AudioSwitcher, Path=LastAudioError}">
@@ -96,7 +102,8 @@
 
     <!--
         KnownDevices and KnownInputDevices include active and inactive Windows endpoints.
-        Each item exposes State/StateName, localized Status, and IsAvailable. Use SetDeviceCommand only when
+        Each item exposes State/StateName, localized Status, IsAvailable, HasBattery, BatteryPercent,
+        IsBatteryCharging, and BatteryLabel. Use SetDeviceCommand only when
         IsAvailable is true. Devices and InputDevices remain the safer active-only collections for selectors.
     -->
     <ItemsControl ItemsSource="{PluginSettings Plugin=AudioSwitcher, Path=KnownDevices}">
@@ -105,6 +112,7 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Name}" />
                     <TextBlock Margin="8,0,0,0" Text="{Binding Status}" />
+                    <TextBlock Margin="8,0,0,0" Text="{Binding BatteryLabel}" />
                 </StackPanel>
             </DataTemplate>
         </ItemsControl.ItemTemplate>

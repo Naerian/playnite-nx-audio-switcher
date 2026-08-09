@@ -19,11 +19,18 @@ namespace PlayniteAudioSwitcher
             this.plugin = plugin;
             InitializeComponent();
             Loaded += AudioInputDeviceListControl_Loaded;
+            Unloaded += AudioInputDeviceListControl_Unloaded;
         }
 
         private void AudioInputDeviceListControl_Loaded(object sender, RoutedEventArgs e)
         {
             Refresh();
+            plugin.RegisterInputDeviceList(this);
+        }
+
+        private void AudioInputDeviceListControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            plugin.ClearInputDeviceList(this);
         }
 
         public void Refresh()
