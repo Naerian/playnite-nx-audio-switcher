@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Icon only</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Percentage only</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icon</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choosing "Device icon" uses the icon selected for the active device. If that device has no icon, nothing is shown.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choosing "Device icon" uses the icon assigned or suggested for the active device. If none is available, the default speaker icon is shown.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">This only affects the Fullscreen BatteryWidget; the Desktop top-bar icon remains visible.</sys:String>
 </ResourceDictionary>
 

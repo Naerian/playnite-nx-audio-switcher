@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Icône seule</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Pourcentage seul</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icône</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choisir « Icône du périphérique » utilise l’icône sélectionnée pour le périphérique actif. Si ce périphérique n’a pas d’icône, rien n’est affiché.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choisir « Icône du périphérique » utilise l’icône attribuée ou suggérée pour le périphérique actif. Si aucune n’est disponible, l’icône de haut-parleur par défaut est affichée.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Cela affecte uniquement le BatteryWidget Fullscreen ; l'icône de la barre Desktop reste visible.</sys:String>
 </ResourceDictionary>
 

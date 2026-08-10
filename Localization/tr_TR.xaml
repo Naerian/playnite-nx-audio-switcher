@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Yalnızca simge</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Yalnızca yüzde</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Simge</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“Aygıt simgesi” seçildiğinde etkin aygıt için belirlenen simge kullanılır. Aygıtın simgesi yoksa hiçbir şey gösterilmez.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“Aygıt simgesi” seçildiğinde etkin aygıt için atanmış veya önerilen simge kullanılır. Kullanılabilir bir simge yoksa varsayılan hoparlör simgesi gösterilir.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Bu yalnızca Fullscreen BatteryWidget'ını etkiler; Desktop üst çubuğu simgesi görünür kalır.</sys:String>
 </ResourceDictionary>
 

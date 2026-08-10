@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Somente ícone</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Somente porcentagem</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Ícone</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Ao escolher “Ícone do dispositivo”, será usado o ícone selecionado para o dispositivo ativo. Se o dispositivo não tiver ícone, nada será exibido.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Ao escolher “Ícone do dispositivo”, será usado o ícone atribuído ou sugerido para o dispositivo ativo. Se nenhum estiver disponível, será exibido o ícone de alto-falante padrão.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Isso afeta apenas o BatteryWidget Fullscreen; o ícone da barra do Desktop permanece visível.</sys:String>
 </ResourceDictionary>
 

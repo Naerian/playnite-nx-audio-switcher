@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Только значок</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Только проценты</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Значок</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">При выборе «Значок устройства» используется значок, назначенный активному устройству. Если у устройства нет значка, ничего не отображается.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">При выборе «Значок устройства» используется назначенный или предложенный значок активного устройства. Если значок недоступен, отображается стандартный значок динамика.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Это влияет только на BatteryWidget Fullscreen; значок в верхней панели Desktop остаётся видимым.</sys:String>
 </ResourceDictionary>
 

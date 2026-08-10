@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">アイコンのみ</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">パーセントのみ</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">アイコン</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">「デバイス アイコン」を選ぶと、現在のデバイスに設定されたアイコンを使用します。アイコンが設定されていない場合は何も表示されません。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">「デバイス アイコン」を選ぶと、現在のデバイスに割り当てられた、または提案されたアイコンを使用します。利用できない場合は既定のスピーカー アイコンを表示します。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">これはFullscreenのBatteryWidgetだけに影響し、Desktopトップバーのアイコンは表示されたままです。</sys:String>
 </ResourceDictionary>
 

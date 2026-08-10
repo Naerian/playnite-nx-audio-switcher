@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Nur Symbol</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Nur Prozent</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Symbol</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Bei Auswahl von „Gerätesymbol“ wird das für das aktive Gerät gewählte Symbol verwendet. Hat das Gerät kein Symbol, wird nichts angezeigt.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Bei Auswahl von „Gerätesymbol“ wird das zugewiesene oder vorgeschlagene Symbol des aktiven Geräts verwendet. Ist keines verfügbar, wird das standardmäßige Lautsprechersymbol angezeigt.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Dies betrifft nur das Fullscreen-BatteryWidget; das Symbol in der Desktop-Kopfleiste bleibt sichtbar.</sys:String>
 </ResourceDictionary>
 

@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">仅图标</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">仅百分比</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">图标</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“设备图标”后，将使用为当前设备指定的图标。如果该设备没有图标，则不显示任何内容。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“设备图标”后，将使用为当前设备指定或建议的图标。如果没有可用图标，则显示默认扬声器图标。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">此选项仅影响全屏 BatteryWidget；桌面模式顶部栏图标仍保持可见。</sys:String>
 </ResourceDictionary>
 

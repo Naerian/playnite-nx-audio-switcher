@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">아이콘만</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">백분율만</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">아이콘</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“장치 아이콘”을 선택하면 활성 장치에 지정된 아이콘을 사용합니다. 해당 장치에 아이콘이 없으면 아무것도 표시되지 않습니다.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“장치 아이콘”을 선택하면 활성 장치에 지정되었거나 추천된 아이콘을 사용합니다. 사용할 수 있는 아이콘이 없으면 기본 스피커 아이콘을 표시합니다.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Fullscreen BatteryWidget에만 적용되며 Desktop 상단 표시줄 아이콘은 계속 표시됩니다.</sys:String>
 </ResourceDictionary>
 

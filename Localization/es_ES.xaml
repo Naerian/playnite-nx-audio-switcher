@@ -212,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Solo icono</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Solo porcentaje</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icono</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Al escoger "Icono del dispositivo" se establecerá el icono que se haya escogido para dicho dispositivo. Si no tiene icono, no se mostrará nada.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Al escoger "Icono del dispositivo" se utilizará el icono asignado o sugerido para el dispositivo activo. Si no hay ninguno disponible, se mostrará el icono de altavoz predeterminado.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Esta opción solo afecta al widget de la vista en pantalla completa de Playnite; el icono de la barra superior de Playnite en la vista de escritorio permanece visible.</sys:String>
 </ResourceDictionary>
 

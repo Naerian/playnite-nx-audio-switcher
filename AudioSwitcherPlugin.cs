@@ -1718,12 +1718,11 @@ namespace PlayniteAudioSwitcher
             try
             {
                 var current = AudioDevices.GetDefaultPlaybackDevice();
-                var icon = settings.GetIcon(current?.Id);
-                return string.IsNullOrWhiteSpace(icon) ? null : GetIconGeometry(icon);
+                return GetDeviceIconGeometryForTheme(current, false) ?? GetIconGeometry("volume-2");
             }
             catch
             {
-                return null;
+                return GetIconGeometry("volume-2");
             }
         }
 
@@ -1783,7 +1782,17 @@ namespace PlayniteAudioSwitcher
 
         internal Geometry GetDeviceIconGeometryForTheme(AudioDevice device, bool input)
         {
+            if (device == null)
+            {
+                return null;
+            }
+
             var icon = input ? settings.GetInputIcon(device?.Id) : settings.GetIcon(device?.Id);
+            if (string.IsNullOrWhiteSpace(icon))
+            {
+                icon = settings.SuggestIconForDevice(device.Name, input);
+            }
+
             return string.IsNullOrWhiteSpace(icon) ? null : GetIconGeometry(icon);
         }
 
