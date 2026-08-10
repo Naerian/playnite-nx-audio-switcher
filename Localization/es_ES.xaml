@@ -38,11 +38,13 @@
     <sys:String x:Key="LOCAS_PreferredInputDevice">Dispositivo de entrada preferido</sys:String>
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher aplica este dispositivo al iniciar Playnite. Los perfiles por juego pueden sustituirlo temporalmente y restaurarlo al cerrar el juego.</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Mantener el predeterminado de Windows</sys:String>
-    <sys:String x:Key="LOCAS_WindowsName">Nombre de Windows</sys:String>
+    <sys:String x:Key="LOCAS_SystemDevices">Dispositivos del sistema</sys:String>
+    <sys:String x:Key="LOCAS_WindowsName">Dispositivo</sys:String>
+    <sys:String x:Key="LOCAS_Status">Estado</sys:String>
     <sys:String x:Key="LOCAS_Battery">Batería</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icono</sys:String>
-    <sys:String x:Key="LOCAS_DefaultVolume">Volumen predeterminado</sys:String>
-    <sys:String x:Key="LOCAS_DefaultInputVolume">Volumen de entrada predeterminado</sys:String>
+    <sys:String x:Key="LOCAS_DefaultVolume">Volumen personalizado</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Volumen personalizado</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Nombre en Playnite</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Visualización en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Texto</sys:String>
@@ -99,6 +101,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Se necesitan al menos dos dispositivos de audio activos para alternar.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Elige el dispositivo de salida que Windows usará como audio predeterminado.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">Sin icono</sys:String>
+    <sys:String x:Key="LOCAS_DeviceIcon">Icono del dispositivo</sys:String>
     <sys:String x:Key="LOCAS_Visible">Visible</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Dispositivo de audio</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Por defecto</sys:String>
@@ -173,6 +176,10 @@
     <sys:String x:Key="LOCAS_AboutTab">Acerca de</sys:String>
     <sys:String x:Key="LOCAS_AboutTitle">Acerca de Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher integra en Playnite Desktop y Fullscreen los controles de salida, entrada, juegos y sesiones multimedia de Windows.</sys:String>
+    <sys:String x:Key="LOCAS_AboutPurposeTitle">Qué hace Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_AboutDevices">Cambia los dispositivos de reproducción y grabación de Windows desde Playnite, elige salidas y entradas preferidas opcionales, personaliza nombres, iconos y visibilidad, y aplica un volumen personalizado cuando se activa un dispositivo.</sys:String>
+    <sys:String x:Key="LOCAS_AboutProfiles">Crea perfiles por juego para salida, entrada, sonido espacial y volumen de la sesión del juego. Los perfiles pueden apuntar a un proceso de audio concreto, sustituir temporalmente las preferencias globales y restaurar los dispositivos anteriores al cerrar el juego.</sys:String>
+    <sys:String x:Key="LOCAS_AboutIntegration">Supervisa la batería de dispositivos compatibles y utiliza integraciones para Desktop, Fullscreen y temas adaptadas al mando para seleccionar dispositivos y controlar el volumen y las sesiones multimedia. La disponibilidad de la batería depende de los datos que Windows o el hardware expongan de forma segura.</sys:String>
     <sys:String x:Key="LOCAS_SupportTitle">Soporte</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">Si Audio Switcher te resulta útil y quieres apoyar su desarrollo, puedes invitar a Narian a un café en Ko-fi.</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">Apoyar en Ko-fi</sys:String>
@@ -197,16 +204,16 @@
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">No presente</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">No disponible</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Indicador de batería</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">En Desktop el icono permanece siempre visible y añade la batería cuando está disponible. Los temas Fullscreen pueden usar el BatteryWidget configurable.</sys:String>
-    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Mostrar en la barra superior de Desktop</sys:String>
-    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Ocultar el widget Fullscreen si no se informa de batería</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">En la vista de escritorio de Playnite el icono permanece siempre visible y añade la batería cuando está disponible. Los temas Fullscreen pueden usar el BatteryWidget configurable.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Mostrar en la barra superior de Playnite en la vista de escritorio</sys:String>
+    <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Ocultar el widget de la vista en pantalla completa de Playnite, si se usa, si no se informa de batería por parte del dispositivo activo</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Visualización</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentage">Icono y porcentaje</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Solo icono</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Solo porcentaje</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icono</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Selecciona Ninguno para usar el icono personalizado del dispositivo actual.</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Solo afecta al BatteryWidget de Fullscreen; el icono de la barra superior de Desktop permanece visible.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Al escoger "Icono del dispositivo" se establecerá el icono que se haya escogido para dicho dispositivo. Si no tiene icono, no se mostrará nada.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Esta opción solo afecta al widget de la vista en pantalla completa de Playnite; el icono de la barra superior de Playnite en la vista de escritorio permanece visible.</sys:String>
 </ResourceDictionary>
 
 

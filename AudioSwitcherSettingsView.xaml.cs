@@ -57,6 +57,19 @@ namespace PlayniteAudioSwitcher
             UpdateOverview();
         }
 
+        private async void RefreshBatteryStatus(object sender, RoutedEventArgs e)
+        {
+            if (!(DataContext is AudioSwitcherSettings settings))
+            {
+                return;
+            }
+
+            await settings.Plugin.RefreshDeviceBatteriesAsync();
+            settings.RefreshDevices();
+            RebuildDeviceRows();
+            UpdateOverview();
+        }
+
         private void UpdateOverview()
         {
             if (OverviewOutputText == null || !(DataContext is AudioSwitcherSettings settings) || settings.Plugin == null)
@@ -67,26 +80,36 @@ namespace PlayniteAudioSwitcher
             var plugin = settings.Plugin;
             try
             {
-                OverviewOutputText.Text = FormatDeviceOverview(
+                UpdateDeviceOverview(
                     plugin.GetCurrentDeviceDisplayName(),
                     plugin.GetCurrentVolumeState(),
-                    plugin.GetCurrentPlaybackDeviceForTheme()?.BatteryLabel);
+                    plugin.GetCurrentPlaybackDeviceForTheme(),
+                    OverviewOutputText,
+                    OverviewOutputVolumeText,
+                    OverviewOutputBatteryText);
             }
             catch
             {
                 OverviewOutputText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
+                OverviewOutputVolumeText.Visibility = Visibility.Collapsed;
+                OverviewOutputBatteryText.Visibility = Visibility.Collapsed;
             }
 
             try
             {
-                OverviewInputText.Text = FormatDeviceOverview(
+                UpdateDeviceOverview(
                     plugin.GetCurrentInputDeviceDisplayName(),
                     plugin.GetCurrentInputVolumeState(),
-                    plugin.GetCurrentRecordingDeviceForTheme()?.BatteryLabel);
+                    plugin.GetCurrentRecordingDeviceForTheme(),
+                    OverviewInputText,
+                    OverviewInputVolumeText,
+                    OverviewInputBatteryText);
             }
             catch
             {
                 OverviewInputText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
+                OverviewInputVolumeText.Visibility = Visibility.Collapsed;
+                OverviewInputBatteryText.Visibility = Visibility.Collapsed;
             }
 
             var manualProcessCount = settings.AvailableGameProfiles.Count(profile => !string.IsNullOrWhiteSpace(profile.AudioProcessName));
@@ -114,32 +137,47 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private string FormatDeviceOverview(string deviceName, AudioVolumeState volumeState, string batteryLabel)
+        private void UpdateDeviceOverview(
+            string deviceName,
+            AudioVolumeState volumeState,
+            AudioDevice device,
+            TextBlock deviceText,
+            TextBlock volumeText,
+            TextBlock batteryText)
         {
             if (string.IsNullOrWhiteSpace(deviceName))
             {
-                return ResourceText("LOCAS_OverviewNoDevice", "No default device");
+                deviceText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
+                volumeText.Visibility = Visibility.Collapsed;
+                batteryText.Visibility = Visibility.Collapsed;
+                return;
             }
 
-            var batteryText = $"{ResourceText("LOCAS_Battery", "Battery")}: " +
-                (string.IsNullOrWhiteSpace(batteryLabel) ? "\u2014" : batteryLabel);
+            deviceText.Text = deviceName;
 
             if (volumeState == null || !volumeState.IsAvailable)
             {
-                return $"{deviceName}\n{batteryText}";
+                volumeText.Visibility = Visibility.Collapsed;
             }
-
-            var volumeText = string.Format(
-                ResourceText("LOCAS_OverviewVolumeFormat", "{0}% volume"),
-                volumeState.VolumePercent);
-            if (volumeState.IsMuted)
+            else
             {
-                volumeText += $" | {ResourceText("LOCAS_Muted", "Muted")}";
+                volumeText.Visibility = Visibility.Visible;
+                volumeText.Text = string.Format(
+                    ResourceText("LOCAS_OverviewVolumeFormat", "{0}% volume"),
+                    volumeState.VolumePercent);
+                if (volumeState.IsMuted)
+                {
+                    volumeText.Text += $" | {ResourceText("LOCAS_Muted", "Muted")}";
+                }
             }
 
-            volumeText += $" | {batteryText}";
-
-            return $"{deviceName}\n{volumeText}";
+            batteryText.Visibility = Visibility.Visible;
+            batteryText.Text = $"{ResourceText("LOCAS_Battery", "Battery")}: " +
+                (device?.HasBattery == true ? device.BatteryLabel : "\u2014");
+            batteryText.SetResourceReference(
+                TextBlock.ForegroundProperty,
+                GetBatteryBrushResource(device));
+            batteryText.Opacity = device?.HasBattery == true ? 1 : 0.68;
         }
 
         private string ResourceText(string key, string fallback)
@@ -163,23 +201,30 @@ namespace PlayniteAudioSwitcher
         {
             panel.Children.Clear();
 
-            foreach (var device in devices)
+            var deviceList = (devices ?? Enumerable.Empty<AudioDevice>()).ToList();
+            for (var index = 0; index < deviceList.Count; index++)
             {
-                panel.Children.Add(CreateDeviceRow(device, settings, defaultVolumeLabelResource));
+                panel.Children.Add(CreateDeviceRow(
+                    deviceList[index],
+                    settings,
+                    defaultVolumeLabelResource,
+                    index == deviceList.Count - 1));
             }
         }
 
-        private static UIElement CreateDeviceRow(AudioDevice device, AudioSwitcherSettings settings, string defaultVolumeLabelResource)
+        private static UIElement CreateDeviceRow(
+            AudioDevice device,
+            AudioSwitcherSettings settings,
+            string defaultVolumeLabelResource,
+            bool isLast)
         {
             var border = new Border
             {
-                BorderThickness = new Thickness(1),
-                Padding = new Thickness(14, 12, 14, 14),
-                Margin = new Thickness(0, 0, 0, 12)
+                BorderThickness = isLast ? new Thickness(0) : new Thickness(0, 0, 0, 1),
+                Padding = new Thickness(0, 2, 0, isLast ? 0 : 14),
+                Margin = new Thickness(0, 0, 0, isLast ? 0 : 14)
             };
-            border.SetResourceReference(Border.BackgroundProperty, "ControlBackgroundBrush");
             border.SetResourceReference(Border.BorderBrushProperty, "GlyphBrush");
-            border.SetResourceReference(Border.CornerRadiusProperty, "ControlCornerRadius");
 
                 var grid = new Grid();
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -188,42 +233,27 @@ namespace PlayniteAudioSwitcher
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(190) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
                 var namePanel = new StackPanel { Margin = new Thickness(0, 0, 0, 14) };
-                var windowsName = new TextBlock
-                {
-                    FontSize = 11,
-                    Opacity = 0.7,
-                    Margin = new Thickness(0, 0, 0, 3)
-                };
-                windowsName.SetResourceReference(TextBlock.TextProperty, "LOCAS_WindowsName");
-                namePanel.Children.Add(windowsName);
-                var deviceName = new TextBlock
-                {
-                    Text = device.SettingsDisplayName,
-                    FontWeight = FontWeights.SemiBold,
-                    TextWrapping = TextWrapping.Wrap
-                };
-                namePanel.Children.Add(deviceName);
-                var deviceStatus = new TextBlock
-                {
-                    Text = string.Format(
-                        Application.Current.TryFindResource("LOCAS_DeviceStatusFormat") as string ?? "Status: {0}",
-                        device.StatusDisplayName),
-                    FontSize = 11,
-                    Opacity = device.IsAvailable ? 0.7 : 0.95,
-                    Margin = new Thickness(0, 3, 0, 0)
-                };
-                namePanel.Children.Add(deviceStatus);
-                var batteryLabel = Application.Current.TryFindResource("LOCAS_Battery") as string ?? "Battery";
-                var deviceBattery = new TextBlock
-                {
-                    Text = $"{batteryLabel}: {(device.HasBattery ? device.BatteryLabel : "\u2014")}",
-                    FontSize = 11,
-                    Opacity = 0.7,
-                    Margin = new Thickness(0, 3, 0, 0)
-                };
-                namePanel.Children.Add(deviceBattery);
+                namePanel.Children.Add(CreateDeviceInfoLine(
+                    "LOCAS_WindowsName",
+                    "Device",
+                    device.SettingsDisplayName,
+                    new Thickness(0, 0, 0, 4)));
+                namePanel.Children.Add(CreateDeviceInfoLine(
+                    "LOCAS_Status",
+                    "Status",
+                    device.StatusDisplayName,
+                    new Thickness(0, 0, 0, 4)));
+                var batteryLine = CreateDeviceInfoLine(
+                    "LOCAS_Battery",
+                    "Battery",
+                    device.HasBattery ? device.BatteryLabel : "\u2014",
+                    new Thickness(0));
+                batteryLine.SetResourceReference(
+                    TextBlock.ForegroundProperty,
+                    GetBatteryBrushResource(device));
+                batteryLine.Opacity = device.HasBattery ? 1 : 0.68;
+                namePanel.Children.Add(batteryLine);
                 Grid.SetColumnSpan(namePanel, 4);
                 grid.Children.Add(namePanel);
 
@@ -363,6 +393,41 @@ namespace PlayniteAudioSwitcher
 
                 border.Child = grid;
                 return border;
+        }
+
+        private static TextBlock CreateDeviceInfoLine(
+            string labelResource,
+            string fallbackLabel,
+            string value,
+            Thickness margin)
+        {
+            var label = Application.Current.TryFindResource(labelResource) as string ?? fallbackLabel;
+            var text = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                Margin = margin
+            };
+            text.Inlines.Add(new System.Windows.Documents.Run($"{label}: ")
+            {
+                FontWeight = FontWeights.Bold
+            });
+            text.Inlines.Add(new System.Windows.Documents.Run(value ?? "\u2014"));
+            return text;
+        }
+
+        private static string GetBatteryBrushResource(AudioDevice device)
+        {
+            if (device?.HasBattery != true)
+            {
+                return "GlyphBrush";
+            }
+
+            if (device.IsBatteryCharging || device.BatteryPercent > 50)
+            {
+                return "PositiveRatingBrush";
+            }
+
+            return device.BatteryPercent > 20 ? "MixedRatingBrush" : "NegativeRatingBrush";
         }
 
         private void RebuildGameProfileRows()

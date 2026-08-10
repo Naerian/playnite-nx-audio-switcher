@@ -906,11 +906,12 @@ namespace PlayniteAudioSwitcher
         {
             var indicatorIcon = plugin.Settings?.BatteryIndicatorIcon;
             BatteryIndicatorIconGeometry = string.IsNullOrWhiteSpace(indicatorIcon)
-                ? CurrentDeviceIconGeometry
-                : plugin.GetIconGeometry(indicatorIcon) ?? CurrentDeviceIconGeometry;
+                ? plugin.GetCurrentDeviceIconGeometry()
+                : plugin.GetIconGeometry(indicatorIcon);
             BatteryIndicatorLabel = HasCurrentDeviceBattery ? CurrentDeviceBatteryLabel : "—";
             var mode = plugin.Settings?.BatteryIndicatorDisplayMode ?? "IconAndPercentage";
-            ShowBatteryIndicatorIcon = !string.Equals(mode, "PercentageOnly", StringComparison.OrdinalIgnoreCase);
+            ShowBatteryIndicatorIcon = BatteryIndicatorIconGeometry != null &&
+                !string.Equals(mode, "PercentageOnly", StringComparison.OrdinalIgnoreCase);
             ShowBatteryIndicatorPercentage = !string.Equals(mode, "IconOnly", StringComparison.OrdinalIgnoreCase);
             ShouldShowBatteryIndicator = HasCurrentDeviceBattery || plugin.Settings?.HideBatteryIndicatorWhenUnavailable != true;
         }

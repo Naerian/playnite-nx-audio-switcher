@@ -1,5 +1,16 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.12.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-10
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.12.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_12_0.pext
+    Changelog:
+      - Refined the settings interface with Metadata AI-style overview cards, clearer system device panels, and a dedicated Battery section.
+      - Promoted notifications to a top-level tab and added a concise feature overview to the About page.
+      - Added color-coded battery information to device lists and overview cards, plus a manual battery refresh action.
+      - Improved Desktop battery indicator theme compatibility and added an explicit Device icon mode that hides the icon when the active device has none assigned.
+      - Fixed preferred output and input selections being cleared during device refreshes and removed the redundant default-device marker from technical names.
+      - Updated all twelve localizations and expanded the English and Spanish Wiki documentation.
   - Version: 1.11.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-10

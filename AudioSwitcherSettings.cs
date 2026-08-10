@@ -231,6 +231,21 @@ namespace PlayniteAudioSwitcher
             IconOption("video", "Video device", "VID", "video.svg")
         };
 
+        [DontSerialize]
+        public List<AudioIconOption> BatteryIconOptions
+        {
+            get
+            {
+                var options = IconOptions;
+                if (options.Count > 0)
+                {
+                    options[0].Name = plugin?.Loc("LOCAS_DeviceIcon") ?? "Device icon";
+                }
+
+                return options;
+            }
+        }
+
         private static AudioIconOption IconOption(string id, string name, string glyph, string iconFileName)
         {
             return new AudioIconOption
@@ -404,6 +419,11 @@ namespace PlayniteAudioSwitcher
 
         public void RefreshDevices()
         {
+            // Replacing a ComboBox ItemsSource can briefly clear SelectedValue and push
+            // that transient value back through a two-way binding. Keep the persisted
+            // IDs locally so a background device/battery refresh cannot erase them.
+            var selectedOutputDeviceId = PreferredOutputDeviceId;
+            var selectedInputDeviceId = PreferredInputDeviceId;
             var profileOutputIds = new HashSet<string>(AvailableGameProfiles
                 .Where(profile => !string.IsNullOrWhiteSpace(profile.DeviceId))
                 .Select(profile => profile.DeviceId));
@@ -412,8 +432,10 @@ namespace PlayniteAudioSwitcher
                 .Select(profile => profile.InputDeviceId));
             AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetAllPlaybackDevices(), false, profileOutputIds);
             AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetAllRecordingDevices(), true, profileInputIds);
-            PreferredPlaybackDeviceOptions = CreatePreferredDeviceOptions(AvailablePlaybackDevices, PreferredOutputDeviceId);
-            PreferredRecordingDeviceOptions = CreatePreferredDeviceOptions(AvailableRecordingDevices, PreferredInputDeviceId);
+            PreferredPlaybackDeviceOptions = CreatePreferredDeviceOptions(AvailablePlaybackDevices, selectedOutputDeviceId);
+            PreferredRecordingDeviceOptions = CreatePreferredDeviceOptions(AvailableRecordingDevices, selectedInputDeviceId);
+            PreferredOutputDeviceId = selectedOutputDeviceId;
+            PreferredInputDeviceId = selectedInputDeviceId;
         }
 
         private List<AudioDevice> CreatePreferredDeviceOptions(IEnumerable<AudioDevice> source, string selectedDeviceId)

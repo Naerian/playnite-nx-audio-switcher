@@ -38,11 +38,13 @@
     <sys:String x:Key="LOCAS_PreferredInputDevice">優先入力デバイス</sys:String>
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Playnite の起動時に Audio Switcher がこのデバイスを適用します。ゲームプロファイルで一時的に上書きし、終了時に復元できます。</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows の既定を維持</sys:String>
-    <sys:String x:Key="LOCAS_WindowsName">Windows 名</sys:String>
+    <sys:String x:Key="LOCAS_SystemDevices">システム デバイス</sys:String>
+    <sys:String x:Key="LOCAS_WindowsName">デバイス</sys:String>
+    <sys:String x:Key="LOCAS_Status">状態</sys:String>
     <sys:String x:Key="LOCAS_Battery">バッテリー</sys:String>
     <sys:String x:Key="LOCAS_Icon">アイコン</sys:String>
-    <sys:String x:Key="LOCAS_DefaultVolume">既定音量</sys:String>
-    <sys:String x:Key="LOCAS_DefaultInputVolume">既定入力音量</sys:String>
+    <sys:String x:Key="LOCAS_DefaultVolume">カスタム音量</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">カスタム音量</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Playnite 名</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">フルスクリーン表示</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">テキスト</sys:String>
@@ -99,6 +101,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">切り替えには少なくとも 2 つのアクティブなオーディオデバイスが必要です。</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Windows が既定のオーディオ出力として使用する出力デバイスを選択します。</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">アイコンなし</sys:String>
+    <sys:String x:Key="LOCAS_DeviceIcon">デバイス アイコン</sys:String>
     <sys:String x:Key="LOCAS_Visible">表示</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">オーディオデバイス</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">既定</sys:String>
@@ -173,6 +176,10 @@
     <sys:String x:Key="LOCAS_AboutTab">情報</sys:String>
     <sys:String x:Key="LOCAS_AboutTitle">Audio Switcher について</sys:String>
     <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher は、Windows の出力、入力、ゲーム、メディア セッションのコントロールを Playnite のデスクトップ モードとフルスクリーン モードに統合します。</sys:String>
+    <sys:String x:Key="LOCAS_AboutPurposeTitle">Audio Switcher の機能</sys:String>
+    <sys:String x:Key="LOCAS_AboutDevices">Playnite から Windows の再生デバイスと録音デバイスを切り替え、任意の優先出力と入力を選択し、名前、アイコン、表示状態をカスタマイズして、デバイスが有効になったときにカスタム音量を適用できます。</sys:String>
+    <sys:String x:Key="LOCAS_AboutProfiles">出力、入力、空間サウンド、ゲーム セッション音量のゲーム別プロファイルを作成できます。特定のオーディオ プロセスを対象にし、グローバル設定を一時的に上書きして、ゲーム終了時に以前のデバイスへ戻せます。</sys:String>
+    <sys:String x:Key="LOCAS_AboutIntegration">対応デバイスのバッテリーを監視し、デバイス選択、音量、メディア セッション向けのコントローラー対応 Desktop、Fullscreen、テーマ統合を利用できます。バッテリー情報は Windows またはハードウェアが安全に公開するデータに依存します。</sys:String>
     <sys:String x:Key="LOCAS_SupportTitle">サポート</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">Audio Switcher が役立ち、開発を支援したい場合は、Ko-fi で Narian にコーヒーを贈ることができます。</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">Ko-fi で支援</sys:String>
@@ -205,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">アイコンのみ</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">パーセントのみ</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">アイコン</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">現在のデバイスアイコンを使うには「なし」を選択します。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">「デバイス アイコン」を選ぶと、現在のデバイスに設定されたアイコンを使用します。アイコンが設定されていない場合は何も表示されません。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">これはFullscreenのBatteryWidgetだけに影響し、Desktopトップバーのアイコンは表示されたままです。</sys:String>
 </ResourceDictionary>
 

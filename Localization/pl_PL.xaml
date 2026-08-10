@@ -38,11 +38,13 @@
     <sys:String x:Key="LOCAS_PreferredInputDevice">Preferowane urządzenie wejściowe</sys:String>
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher zastosuje to urządzenie przy uruchomieniu Playnite. Profile gier mogą je tymczasowo zastąpić i przywrócić po zamknięciu gry.</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Zachowaj domyślne ustawienie Windows</sys:String>
-    <sys:String x:Key="LOCAS_WindowsName">Nazwa Windows</sys:String>
+    <sys:String x:Key="LOCAS_SystemDevices">Urządzenia systemowe</sys:String>
+    <sys:String x:Key="LOCAS_WindowsName">Urządzenie</sys:String>
+    <sys:String x:Key="LOCAS_Status">Stan</sys:String>
     <sys:String x:Key="LOCAS_Battery">Bateria</sys:String>
     <sys:String x:Key="LOCAS_Icon">Ikona</sys:String>
-    <sys:String x:Key="LOCAS_DefaultVolume">Domyślna głośność</sys:String>
-    <sys:String x:Key="LOCAS_DefaultInputVolume">Domyślna głośność wejścia</sys:String>
+    <sys:String x:Key="LOCAS_DefaultVolume">Niestandardowa głośność</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Niestandardowa głośność</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Nazwa Playnite</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Wyświetlanie pełnoekranowe</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Tekst</sys:String>
@@ -99,6 +101,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Do przełączania wymagane są co najmniej dwa aktywne urządzenia audio.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Wybierz urządzenie wyjściowe, którego Windows użyje jako domyślnego wyjścia audio.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">Brak ikony</sys:String>
+    <sys:String x:Key="LOCAS_DeviceIcon">Ikona urządzenia</sys:String>
     <sys:String x:Key="LOCAS_Visible">Widoczne</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Urządzenie audio</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Domyślne</sys:String>
@@ -173,6 +176,10 @@
     <sys:String x:Key="LOCAS_AboutTab">O rozszerzeniu</sys:String>
     <sys:String x:Key="LOCAS_AboutTitle">O Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher udostępnia sterowanie wyjściem, wejściem, grami i sesjami multimedialnymi systemu Windows w trybach Desktop i Fullscreen Playnite.</sys:String>
+    <sys:String x:Key="LOCAS_AboutPurposeTitle">Co robi Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_AboutDevices">Przełączaj urządzenia odtwarzania i nagrywania Windows z poziomu Playnite, wybieraj opcjonalne preferowane wyjścia i wejścia, dostosowuj nazwy, ikony i widoczność oraz stosuj niestandardową głośność po aktywowaniu urządzenia.</sys:String>
+    <sys:String x:Key="LOCAS_AboutProfiles">Twórz profile dla gier obejmujące wyjście, wejście, dźwięk przestrzenny i głośność sesji gry. Profile mogą wskazywać konkretny proces audio, tymczasowo zastępować preferencje globalne i przywracać poprzednie urządzenia po zamknięciu gry.</sys:String>
+    <sys:String x:Key="LOCAS_AboutIntegration">Monitoruj baterie zgodnych urządzeń i korzystaj z integracji Desktop, Fullscreen oraz motywów dostosowanych do kontrolera w celu wyboru urządzeń i sterowania głośnością oraz sesjami multimediów. Dostępność baterii zależy od danych bezpiecznie udostępnianych przez Windows lub sprzęt.</sys:String>
     <sys:String x:Key="LOCAS_SupportTitle">Wsparcie</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">Jeśli Audio Switcher jest dla Ciebie przydatny i chcesz wesprzeć jego rozwój, możesz postawić Narianowi kawę na Ko-fi.</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">Wesprzyj na Ko-fi</sys:String>
@@ -205,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Tylko ikona</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Tylko procent</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Ikona</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Wybierz Brak, aby użyć ikony bieżącego urządzenia.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Wybranie „Ikona urządzenia” używa ikony przypisanej do aktywnego urządzenia. Jeśli urządzenie nie ma ikony, nic nie zostanie wyświetlone.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Dotyczy to tylko BatteryWidget Fullscreen; ikona na górnym pasku Desktop pozostaje widoczna.</sys:String>
 </ResourceDictionary>
 

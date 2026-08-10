@@ -38,11 +38,13 @@
     <sys:String x:Key="LOCAS_PreferredInputDevice">首选输入设备</sys:String>
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher 会在 Playnite 启动时应用此设备。游戏配置可以临时覆盖，并在游戏关闭后恢复。</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">保留 Windows 默认设备</sys:String>
-    <sys:String x:Key="LOCAS_WindowsName">Windows 名称</sys:String>
+    <sys:String x:Key="LOCAS_SystemDevices">系统设备</sys:String>
+    <sys:String x:Key="LOCAS_WindowsName">设备</sys:String>
+    <sys:String x:Key="LOCAS_Status">状态</sys:String>
     <sys:String x:Key="LOCAS_Battery">电池</sys:String>
     <sys:String x:Key="LOCAS_Icon">图标</sys:String>
-    <sys:String x:Key="LOCAS_DefaultVolume">默认音量</sys:String>
-    <sys:String x:Key="LOCAS_DefaultInputVolume">默认输入音量</sys:String>
+    <sys:String x:Key="LOCAS_DefaultVolume">自定义音量</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">自定义音量</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Playnite 名称</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">全屏显示</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">文本</sys:String>
@@ -99,6 +101,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">至少需要两个活动音频设备才能切换。</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">选择 Windows 将用作默认音频输出的输出设备。</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">无图标</sys:String>
+    <sys:String x:Key="LOCAS_DeviceIcon">设备图标</sys:String>
     <sys:String x:Key="LOCAS_Visible">可见</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">音频设备</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">默认</sys:String>
@@ -173,6 +176,10 @@
     <sys:String x:Key="LOCAS_AboutTab">关于</sys:String>
     <sys:String x:Key="LOCAS_AboutTitle">关于 Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher 将 Windows 的输出、输入、游戏和媒体会话控制集成到 Playnite 桌面模式和全屏模式中。</sys:String>
+    <sys:String x:Key="LOCAS_AboutPurposeTitle">Audio Switcher 的功能</sys:String>
+    <sys:String x:Key="LOCAS_AboutDevices">从 Playnite 切换 Windows 播放和录音设备，选择可选的首选输出和输入，自定义名称、图标和可见性，并在设备激活时应用自定义音量。</sys:String>
+    <sys:String x:Key="LOCAS_AboutProfiles">为输出、输入、空间音效和游戏会话音量创建按游戏配置。配置可以指定特定音频进程、临时覆盖全局首选项，并在游戏关闭后恢复之前的设备。</sys:String>
+    <sys:String x:Key="LOCAS_AboutIntegration">监控兼容设备的电池，并使用适合控制器操作的 Desktop、Fullscreen 和主题集成来选择设备以及控制音量和媒体会话。电池信息取决于 Windows 或硬件安全公开的数据。</sys:String>
     <sys:String x:Key="LOCAS_SupportTitle">支持</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">如果 Audio Switcher 对你有帮助，并且你希望支持其开发，可以在 Ko-fi 上请 Narian 喝杯咖啡。</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">在 Ko-fi 上支持</sys:String>
@@ -205,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">仅图标</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">仅百分比</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">图标</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“无”以使用当前设备图标。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“设备图标”后，将使用为当前设备指定的图标。如果该设备没有图标，则不显示任何内容。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">此选项仅影响全屏 BatteryWidget；桌面模式顶部栏图标仍保持可见。</sys:String>
 </ResourceDictionary>
 

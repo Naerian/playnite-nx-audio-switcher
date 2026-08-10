@@ -59,7 +59,7 @@ namespace PlayniteAudioSwitcher
 
         public string DisplayName => IsDefault ? $"★ {EffectiveName}" : EffectiveName;
 
-        public string TechnicalDisplayName => IsDefault ? $"★ {Name}" : Name;
+        public string TechnicalDisplayName => Name;
 
         public string SettingsDisplayName
         {

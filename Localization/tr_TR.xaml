@@ -38,11 +38,13 @@
     <sys:String x:Key="LOCAS_PreferredInputDevice">Tercih edilen giriş aygıtı</sys:String>
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher bu aygıtı Playnite başladığında uygular. Oyun profilleri geçici olarak geçersiz kılabilir ve oyun kapanınca geri yükleyebilir.</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows varsayılanını koru</sys:String>
-    <sys:String x:Key="LOCAS_WindowsName">Windows adı</sys:String>
+    <sys:String x:Key="LOCAS_SystemDevices">Sistem aygıtları</sys:String>
+    <sys:String x:Key="LOCAS_WindowsName">Aygıt</sys:String>
+    <sys:String x:Key="LOCAS_Status">Durum</sys:String>
     <sys:String x:Key="LOCAS_Battery">Pil</sys:String>
     <sys:String x:Key="LOCAS_Icon">Simge</sys:String>
-    <sys:String x:Key="LOCAS_DefaultVolume">Varsayılan ses düzeyi</sys:String>
-    <sys:String x:Key="LOCAS_DefaultInputVolume">Varsayılan giriş ses düzeyi</sys:String>
+    <sys:String x:Key="LOCAS_DefaultVolume">Özel ses düzeyi</sys:String>
+    <sys:String x:Key="LOCAS_DefaultInputVolume">Özel ses düzeyi</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Playnite adı</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Tam ekran görünümü</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Metin</sys:String>
@@ -99,6 +101,7 @@
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Geçiş yapmak için en az iki etkin ses aygıtı gerekir.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Windows'un varsayılan ses çıkışı olarak kullanacağı çıkış aygıtını seçin.</sys:String>
     <sys:String x:Key="LOCAS_NoIcon">Simge yok</sys:String>
+    <sys:String x:Key="LOCAS_DeviceIcon">Aygıt simgesi</sys:String>
     <sys:String x:Key="LOCAS_Visible">Görünür</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Ses aygıtı</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Varsayılan</sys:String>
@@ -173,6 +176,10 @@
     <sys:String x:Key="LOCAS_AboutTab">Hakkında</sys:String>
     <sys:String x:Key="LOCAS_AboutTitle">Audio Switcher hakkında</sys:String>
     <sys:String x:Key="LOCAS_AboutDescription">Audio Switcher; Windows çıkış, giriş, oyun ve medya oturumu denetimlerini Playnite Masaüstü ve Tam Ekran modlarına getirir.</sys:String>
+    <sys:String x:Key="LOCAS_AboutPurposeTitle">Audio Switcher ne yapar</sys:String>
+    <sys:String x:Key="LOCAS_AboutDevices">Windows oynatma ve kayıt aygıtlarını Playnite içinden değiştirin, isteğe bağlı tercih edilen çıkış ve girişleri seçin, adları, simgeleri ve görünürlüğü özelleştirin ve bir aygıt etkinleştiğinde özel ses düzeyi uygulayın.</sys:String>
+    <sys:String x:Key="LOCAS_AboutProfiles">Çıkış, giriş, uzamsal ses ve oyun oturumu ses düzeyi için oyun başına profiller oluşturun. Profiller belirli bir ses işlemini hedefleyebilir, genel tercihleri geçici olarak geçersiz kılabilir ve oyun kapandığında önceki aygıtları geri yükleyebilir.</sys:String>
+    <sys:String x:Key="LOCAS_AboutIntegration">Uyumlu aygıtların pilini izleyin ve aygıt seçimi, ses düzeyi ve medya oturumları için kontrolcü dostu Desktop, Fullscreen ve tema entegrasyonlarını kullanın. Pil kullanılabilirliği Windows veya donanımın güvenli biçimde sunduğu verilere bağlıdır.</sys:String>
     <sys:String x:Key="LOCAS_SupportTitle">Destek</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">Audio Switcher'ı yararlı buluyor ve geliştirilmesini desteklemek istiyorsanız Ko-fi üzerinden Narian'a bir kahve ısmarlayabilirsiniz.</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">Ko-fi üzerinden destekle</sys:String>
@@ -205,7 +212,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnly">Yalnızca simge</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Yalnızca yüzde</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Simge</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Geçerli aygıt simgesini kullanmak için Yok'u seçin.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“Aygıt simgesi” seçildiğinde etkin aygıt için belirlenen simge kullanılır. Aygıtın simgesi yoksa hiçbir şey gösterilmez.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Bu yalnızca Fullscreen BatteryWidget'ını etkiler; Desktop üst çubuğu simgesi görünür kalır.</sys:String>
 </ResourceDictionary>
 
