@@ -20,9 +20,8 @@ namespace PlayniteAudioSwitcher
         private string favoriteDeviceAName = "Favorito A";
         private string favoriteDeviceBId;
         private string favoriteDeviceBName = "Favorito B";
-        private string fullscreenPreferredDeviceId;
-        private string preferredOutputDeviceId;
-        private string preferredInputDeviceId;
+        private string preferredOutputDeviceId = string.Empty;
+        private string preferredInputDeviceId = string.Empty;
         private string deviceDisplayMode = "TextAndIcon";
         private bool showNotifications = true;
         private bool showOutputDeviceNotifications = true;
@@ -35,7 +34,6 @@ namespace PlayniteAudioSwitcher
         private bool fullscreenOnlyFavorites = true;
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
-        private bool applyFullscreenPreferredOnStartup = true;
         private bool showMediaSessionIcons = true;
         private bool gameProfilesEnabled = true;
         private bool restoreDeviceAfterGameProfile = true;
@@ -64,17 +62,13 @@ namespace PlayniteAudioSwitcher
                 FavoriteDeviceBName = savedSettings.FavoriteDeviceBName;
                 DeviceAliases = savedSettings.DeviceAliases ?? new List<AudioDeviceAlias>();
                 InputDeviceAliases = savedSettings.InputDeviceAliases ?? new List<AudioDeviceAlias>();
-                FullscreenPreferredDeviceId = savedSettings.FullscreenPreferredDeviceId;
-                PreferredOutputDeviceId = savedSettings.PreferredOutputDeviceId != null
-                    ? savedSettings.PreferredOutputDeviceId
-                    : savedSettings.ApplyFullscreenPreferredOnStartup ? savedSettings.FullscreenPreferredDeviceId : null;
+                PreferredOutputDeviceId = savedSettings.PreferredOutputDeviceId;
                 PreferredInputDeviceId = savedSettings.PreferredInputDeviceId;
                 DeviceDisplayMode = string.IsNullOrWhiteSpace(savedSettings.DeviceDisplayMode) ? "TextAndIcon" : savedSettings.DeviceDisplayMode;
                 ShowNotifications = savedSettings.ShowNotifications;
                 FullscreenOnlyFavorites = savedSettings.FullscreenOnlyFavorites;
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
                 QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
-                ApplyFullscreenPreferredOnStartup = savedSettings.ApplyFullscreenPreferredOnStartup;
                 ShowMediaSessionIcons = savedSettings.ShowMediaSessionIcons;
                 GameProfilesEnabled = savedSettings.GameProfilesEnabled;
                 RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
@@ -139,22 +133,21 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref inputDeviceAliases, value ?? new List<AudioDeviceAlias>());
         }
 
-        public string FullscreenPreferredDeviceId
-        {
-            get => fullscreenPreferredDeviceId;
-            set => SetValue(ref fullscreenPreferredDeviceId, value);
-        }
-
         public string PreferredOutputDeviceId
         {
             get => preferredOutputDeviceId;
-            set => SetValue(ref preferredOutputDeviceId, value);
+            set => SetValue(ref preferredOutputDeviceId, NormalizePreferredDeviceId(value));
         }
 
         public string PreferredInputDeviceId
         {
             get => preferredInputDeviceId;
-            set => SetValue(ref preferredInputDeviceId, value);
+            set => SetValue(ref preferredInputDeviceId, NormalizePreferredDeviceId(value));
+        }
+
+        private static string NormalizePreferredDeviceId(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? string.Empty : value;
         }
 
         public string DeviceDisplayMode
@@ -321,12 +314,6 @@ namespace PlayniteAudioSwitcher
         {
             get => quickSwitchAllDevices;
             set => SetValue(ref quickSwitchAllDevices, value);
-        }
-
-        public bool ApplyFullscreenPreferredOnStartup
-        {
-            get => applyFullscreenPreferredOnStartup;
-            set => SetValue(ref applyFullscreenPreferredOnStartup, value);
         }
 
         public bool ShowMediaSessionIcons
@@ -760,7 +747,6 @@ namespace PlayniteAudioSwitcher
             FavoriteDeviceBName = editingClone.FavoriteDeviceBName;
             DeviceAliases = editingClone.DeviceAliases;
             InputDeviceAliases = editingClone.InputDeviceAliases;
-            FullscreenPreferredDeviceId = editingClone.FullscreenPreferredDeviceId;
             PreferredOutputDeviceId = editingClone.PreferredOutputDeviceId;
             PreferredInputDeviceId = editingClone.PreferredInputDeviceId;
             DeviceDisplayMode = editingClone.DeviceDisplayMode;
@@ -775,7 +761,6 @@ namespace PlayniteAudioSwitcher
             FullscreenOnlyFavorites = editingClone.FullscreenOnlyFavorites;
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
             QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
-            ApplyFullscreenPreferredOnStartup = editingClone.ApplyFullscreenPreferredOnStartup;
             ShowMediaSessionIcons = editingClone.ShowMediaSessionIcons;
             GameProfilesEnabled = editingClone.GameProfilesEnabled;
             RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
@@ -908,7 +893,6 @@ namespace PlayniteAudioSwitcher
                     IsVisible = a.IsVisible,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 }).ToList(),
-                FullscreenPreferredDeviceId = FullscreenPreferredDeviceId,
                 PreferredOutputDeviceId = PreferredOutputDeviceId,
                 PreferredInputDeviceId = PreferredInputDeviceId,
                 DeviceDisplayMode = DeviceDisplayMode,
@@ -923,7 +907,6 @@ namespace PlayniteAudioSwitcher
                 FullscreenOnlyFavorites = FullscreenOnlyFavorites,
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,
-                ApplyFullscreenPreferredOnStartup = ApplyFullscreenPreferredOnStartup,
                 ShowMediaSessionIcons = ShowMediaSessionIcons,
                 GameProfilesEnabled = GameProfilesEnabled,
                 RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,

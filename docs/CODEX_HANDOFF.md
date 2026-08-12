@@ -28,10 +28,10 @@ changes to the extension.
 ## Last Known Stable State
 
 - Branch: `main`
-- Last release at the time this file was written: `v1.12.1`
-- Last release commit: see tag `v1.12.1`
+- Last release at the time this file was written: `v1.12.2`
+- Last release commit: see tag `v1.12.2`
 - Release URL:
-  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.12.1`
+  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.12.2`
 - Release package:
   `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_11_0.pext`
 - Public release asset SHA-256:
@@ -116,7 +116,7 @@ changes.
 Use Playnite Toolbox from the local Playnite install.
 
 ```powershell
-$version = "1.12.1"
+$version = "1.12.2"
 $outDir = ".\package-output\v$version"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 & C:\Playnite\Toolbox.exe pack .\bin\Release $outDir

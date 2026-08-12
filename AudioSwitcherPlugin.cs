@@ -50,6 +50,8 @@ namespace PlayniteAudioSwitcher
         private Task deviceBatteryRefreshTask;
         private string lastMediaSessionDiscoverySignature;
         private TopPanelItem batteryTopPanelItem;
+        private string lastPreferredPlaybackDecision = "Not evaluated in this process.";
+        private string lastPreferredRecordingDecision = "Not evaluated in this process.";
 
         public override Guid Id { get; } = Guid.Parse("708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1");
 
@@ -567,6 +569,8 @@ namespace PlayniteAudioSwitcher
             var deviceId = settings?.PreferredOutputDeviceId;
             if (string.IsNullOrWhiteSpace(deviceId))
             {
+                lastPreferredPlaybackDecision = "Keep the Windows default: no preferred output is configured, so Audio Switcher made no change.";
+                logger.Info(lastPreferredPlaybackDecision);
                 return;
             }
 
@@ -575,15 +579,22 @@ namespace PlayniteAudioSwitcher
                 string.Equals(candidate.Id, deviceId, StringComparison.OrdinalIgnoreCase));
             if (device == null)
             {
-                logger.Info($"Preferred playback device is unavailable: {deviceId}. The current Windows default device will remain in use.");
+                lastPreferredPlaybackDecision = $"Preferred output '{deviceId}' is unavailable. Audio Switcher kept the current Windows default.";
+                logger.Info(lastPreferredPlaybackDecision);
                 return;
             }
 
             var currentDevice = SafeGetDefaultPlaybackDevice("checking the preferred playback device");
             if (!string.Equals(currentDevice?.Id, device.Id, StringComparison.OrdinalIgnoreCase))
             {
+                lastPreferredPlaybackDecision = $"Applied preferred output '{GetDeviceDisplayName(device)}' ({device.Id}); previous Windows default was '{currentDevice?.Name ?? "unavailable"}' ({currentDevice?.Id ?? "none"}).";
+                logger.Info(lastPreferredPlaybackDecision);
                 SetDevice(device.Id, GetDeviceDisplayName(device), false);
+                return;
             }
+
+            lastPreferredPlaybackDecision = $"Preferred output '{GetDeviceDisplayName(device)}' ({device.Id}) was already the Windows default. No change was needed.";
+            logger.Info(lastPreferredPlaybackDecision);
         }
 
         private void ApplyPreferredRecordingDevice()
@@ -591,6 +602,8 @@ namespace PlayniteAudioSwitcher
             var deviceId = settings?.PreferredInputDeviceId;
             if (string.IsNullOrWhiteSpace(deviceId))
             {
+                lastPreferredRecordingDecision = "Keep the Windows default: no preferred input is configured, so Audio Switcher made no change.";
+                logger.Info(lastPreferredRecordingDecision);
                 return;
             }
 
@@ -599,15 +612,22 @@ namespace PlayniteAudioSwitcher
                 string.Equals(candidate.Id, deviceId, StringComparison.OrdinalIgnoreCase));
             if (device == null)
             {
-                logger.Info($"Preferred recording device is unavailable: {deviceId}. The current Windows default device will remain in use.");
+                lastPreferredRecordingDecision = $"Preferred input '{deviceId}' is unavailable. Audio Switcher kept the current Windows default.";
+                logger.Info(lastPreferredRecordingDecision);
                 return;
             }
 
             var currentDevice = SafeGetDefaultRecordingDevice("checking the preferred recording device");
             if (!string.Equals(currentDevice?.Id, device.Id, StringComparison.OrdinalIgnoreCase))
             {
+                lastPreferredRecordingDecision = $"Applied preferred input '{GetInputDeviceDisplayName(device)}' ({device.Id}); previous Windows default was '{currentDevice?.Name ?? "unavailable"}' ({currentDevice?.Id ?? "none"}).";
+                logger.Info(lastPreferredRecordingDecision);
                 SetInputDevice(device.Id, GetInputDeviceDisplayName(device), false);
+                return;
             }
+
+            lastPreferredRecordingDecision = $"Preferred input '{GetInputDeviceDisplayName(device)}' ({device.Id}) was already the Windows default. No change was needed.";
+            logger.Info(lastPreferredRecordingDecision);
         }
 
         private void StartDeviceBatteryDiscovery()
@@ -2966,6 +2986,13 @@ namespace PlayniteAudioSwitcher
                     writer.WriteLine($"Created: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
                     writer.WriteLine($"Session count: {sessions.Count}");
                     writer.WriteLine();
+                    writer.WriteLine("Preferred device evaluation");
+                    writer.WriteLine("---------------------------");
+                    writer.WriteLine($"Configured preferred output: {FormatPreferredDeviceForDiagnostics(settings?.PreferredOutputDeviceId)}");
+                    writer.WriteLine($"Configured preferred input: {FormatPreferredDeviceForDiagnostics(settings?.PreferredInputDeviceId)}");
+                    writer.WriteLine($"Last output decision: {lastPreferredPlaybackDecision}");
+                    writer.WriteLine($"Last input decision: {lastPreferredRecordingDecision}");
+                    writer.WriteLine();
 
                     if (sessions.Count == 0)
                     {
@@ -3114,6 +3141,11 @@ namespace PlayniteAudioSwitcher
                     }
                 });
             }
+        }
+
+        private static string FormatPreferredDeviceForDiagnostics(string deviceId)
+        {
+            return string.IsNullOrWhiteSpace(deviceId) ? "Keep the Windows default" : deviceId;
         }
 
         private void AddGameAudioProcessMenuItems(

@@ -1,5 +1,14 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.12.2
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-12
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.12.2/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_12_2.pext
+    Changelog:
+      - Fixed Playnite Fullscreen startup changing the Windows output device when no preferred device is configured.
+      - Normalized empty output and input preferences to Keep the Windows default and stopped restoring the legacy Fullscreen-only preference.
+      - Added preferred-device startup decisions to the exported audio diagnostics.
+      - Documented that Windows-selected Bluetooth and streaming devices are preserved when switching between Desktop and Fullscreen.
   - Version: 1.12.1
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-10
