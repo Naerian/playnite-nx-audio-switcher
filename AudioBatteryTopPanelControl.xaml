@@ -13,13 +13,13 @@
                 <Style TargetType="Viewbox">
                     <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding BatteryIndicatorIconGeometry}" Value="{x:Null}">
+                        <DataTrigger Binding="{Binding ShowDesktopIndicatorIcon}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Viewbox.Style>
-            <Path Data="{Binding BatteryIndicatorIconGeometry}"
+            <Path Data="{Binding DesktopIndicatorIconGeometry}"
                   Stretch="Uniform"
                   Stroke="{Binding Foreground, ElementName=Root}"
                   StrokeThickness="2"
@@ -40,7 +40,7 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding HasCurrentDeviceBattery}" Value="True" />
-                                <Condition Binding="{Binding ShowBatteryIndicatorPercentage}" Value="True" />
+                                <Condition Binding="{Binding ShowDesktopIndicatorPercentage}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Visible" />
                         </MultiDataTrigger>

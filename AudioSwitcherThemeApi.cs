@@ -28,6 +28,10 @@ namespace PlayniteAudioSwitcher
         private bool showBatteryIndicatorIcon;
         private bool showBatteryIndicatorPercentage;
         private bool shouldShowBatteryIndicator;
+        private Geometry desktopIndicatorIconGeometry;
+        private bool showDesktopIndicatorIcon;
+        private bool showDesktopIndicatorPercentage;
+        private bool shouldShowDesktopIndicator;
         private bool hasDevices;
         private string currentInputDeviceId;
         private string currentInputDeviceName;
@@ -168,7 +172,7 @@ namespace PlayniteAudioSwitcher
 
         public ObservableCollection<AudioSwitcherThemeMediaSession> MediaSessions { get; }
 
-        public string ApiVersion => "1.2.0";
+        public string ApiVersion => "1.3.0";
 
         public bool SupportsOutputDevices => true;
 
@@ -191,6 +195,8 @@ namespace PlayniteAudioSwitcher
         public bool SupportsAvailabilityStates => true;
 
         public bool SupportsDeviceBattery => true;
+
+        public bool SupportsDesktopIndicatorConfiguration => true;
 
         internal bool IsMediaSessionVolumeWritePending => mediaVolumeWriter.HasPendingWork;
 
@@ -340,6 +346,30 @@ namespace PlayniteAudioSwitcher
         {
             get => shouldShowBatteryIndicator;
             private set => SetValue(ref shouldShowBatteryIndicator, value);
+        }
+
+        public Geometry DesktopIndicatorIconGeometry
+        {
+            get => desktopIndicatorIconGeometry;
+            private set => SetValue(ref desktopIndicatorIconGeometry, value);
+        }
+
+        public bool ShowDesktopIndicatorIcon
+        {
+            get => showDesktopIndicatorIcon;
+            private set => SetValue(ref showDesktopIndicatorIcon, value);
+        }
+
+        public bool ShowDesktopIndicatorPercentage
+        {
+            get => showDesktopIndicatorPercentage;
+            private set => SetValue(ref showDesktopIndicatorPercentage, value);
+        }
+
+        public bool ShouldShowDesktopIndicator
+        {
+            get => shouldShowDesktopIndicator;
+            private set => SetValue(ref shouldShowDesktopIndicator, value);
         }
 
         public bool HasDevices
@@ -840,6 +870,7 @@ namespace PlayniteAudioSwitcher
             CurrentDeviceIconGeometry = plugin.GetDeviceIconGeometryForTheme(currentOutput, false) ?? plugin.GetIconGeometry("volume-2");
             SetCurrentDeviceBattery(currentOutput);
             RefreshBatteryIndicator();
+            RefreshDesktopIndicator();
             RefreshVolume();
 
             var currentInput = plugin.GetCurrentRecordingDeviceForTheme();
@@ -914,6 +945,26 @@ namespace PlayniteAudioSwitcher
                 !string.Equals(mode, "PercentageOnly", StringComparison.OrdinalIgnoreCase);
             ShowBatteryIndicatorPercentage = !string.Equals(mode, "IconOnly", StringComparison.OrdinalIgnoreCase);
             ShouldShowBatteryIndicator = HasCurrentDeviceBattery || plugin.Settings?.HideBatteryIndicatorWhenUnavailable != true;
+        }
+
+        private void RefreshDesktopIndicator()
+        {
+            var indicatorIcon = plugin.Settings?.DesktopTopPanelIcon;
+            DesktopIndicatorIconGeometry = string.IsNullOrWhiteSpace(indicatorIcon)
+                ? plugin.GetCurrentDeviceIconGeometry()
+                : plugin.GetIconGeometry(indicatorIcon);
+
+            var mode = plugin.Settings?.DesktopBatteryDisplayMode ?? "IconAndPercentage";
+            var percentageWithFallback = string.Equals(
+                mode,
+                "PercentageWithIconFallback",
+                StringComparison.OrdinalIgnoreCase);
+
+            ShowDesktopIndicatorIcon = DesktopIndicatorIconGeometry != null &&
+                (!percentageWithFallback || !HasCurrentDeviceBattery);
+            ShowDesktopIndicatorPercentage = HasCurrentDeviceBattery &&
+                !string.Equals(mode, "IconOnly", StringComparison.OrdinalIgnoreCase);
+            ShouldShowDesktopIndicator = ShowDesktopIndicatorIcon || ShowDesktopIndicatorPercentage;
         }
 
         private void SetCurrentInputDeviceBattery(AudioDevice device)

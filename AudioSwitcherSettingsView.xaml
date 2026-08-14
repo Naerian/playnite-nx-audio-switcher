@@ -344,6 +344,41 @@
 
             <TabItem Header="{DynamicResource LOCAS_SettingsGeneral}">
                 <TabControl Style="{StaticResource SettingsNavigationTabControl}">
+                    <TabItem Header="{DynamicResource LOCAS_DesktopTab}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="8" HorizontalAlignment="Stretch">
+                                <Border Style="{StaticResource PageIntroCard}">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopIntegrationTitle}" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,6" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopIntegrationHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopIntegrationTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <CheckBox Content="{DynamicResource LOCAS_ShowDesktopAudioSwitcher}"
+                                                  IsChecked="{Binding ShowDesktopBatteryIndicator}"
+                                                  Margin="0,0,0,14" />
+                                        <StackPanel IsEnabled="{Binding ShowDesktopBatteryIndicator}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                                <TextBlock Text="{DynamicResource LOCAS_DesktopIcon}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                                <ComboBox x:Name="DesktopTopPanelIconBox"
+                                                          Grid.Column="1"
+                                                          ItemsSource="{Binding BatteryIconOptions}"
+                                                          SelectedValuePath="Id"
+                                                          SelectedValue="{Binding DesktopTopPanelIcon}" />
+                                            </Grid>
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopIconHelp}" Style="{StaticResource HintText}" Margin="180,6,0,0" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
                     <TabItem Header="{DynamicResource LOCAS_FullscreenTab}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel Margin="8" HorizontalAlignment="Stretch">
@@ -408,9 +443,45 @@
                                 <Border Style="{StaticResource SettingsCard}">
                                     <StackPanel>
                                         <Border Style="{StaticResource SectionHeaderBorder}">
-                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorTitle}" Style="{StaticResource SectionHeaderText}" />
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
-                                        <CheckBox Content="{DynamicResource LOCAS_ShowDesktopBatteryIndicator}" IsChecked="{Binding ShowDesktopBatteryIndicator}" Margin="0,0,0,10" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryRequiresIntegration}"
+                                                   Margin="0,0,0,12">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ShowDesktopBatteryIndicator}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <StackPanel IsEnabled="{Binding ShowDesktopBatteryIndicator}">
+                                            <RadioButton GroupName="DesktopBatteryMode"
+                                                         Content="{DynamicResource LOCAS_DesktopBatteryNone}"
+                                                         IsChecked="{Binding DesktopBatteryIconOnly, Mode=TwoWay}"
+                                                         Margin="0,0,0,10" />
+                                            <RadioButton GroupName="DesktopBatteryMode"
+                                                         Content="{DynamicResource LOCAS_DesktopBatteryIconAndPercentage}"
+                                                         IsChecked="{Binding DesktopBatteryIconAndPercentage, Mode=TwoWay}"
+                                                         Margin="0,0,0,10" />
+                                            <RadioButton GroupName="DesktopBatteryMode"
+                                                         Content="{DynamicResource LOCAS_DesktopBatteryPercentageInsteadOfIcon}"
+                                                         IsChecked="{Binding DesktopBatteryPercentageWithIconFallback, Mode=TwoWay}" />
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryPercentageFallbackHelp}"
+                                                       Style="{StaticResource HintText}"
+                                                       Margin="24,6,0,0" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource SettingsCard}">
+                                    <StackPanel>
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryHelp}" Style="{StaticResource HintText}" Margin="0,0,0,12" />
                                         <CheckBox Content="{DynamicResource LOCAS_HideBatteryWhenUnavailable}" IsChecked="{Binding HideBatteryIndicatorWhenUnavailable}" Margin="0,0,0,6" />
                                         <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorHiddenHelp}"
                                                    Margin="24,0,0,12">
@@ -425,15 +496,20 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-                                        <Grid Margin="0,0,0,10">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorDisplay}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                                            <ComboBox Grid.Column="1" SelectedValue="{Binding BatteryIndicatorDisplayMode}" SelectedValuePath="Tag">
-                                                <ComboBoxItem Tag="IconAndPercentage" Content="{DynamicResource LOCAS_BatteryDisplayIconAndPercentage}" />
-                                                <ComboBoxItem Tag="IconOnly" Content="{DynamicResource LOCAS_BatteryDisplayIconOnly}" />
-                                                <ComboBoxItem Tag="PercentageOnly" Content="{DynamicResource LOCAS_BatteryDisplayPercentageOnly}" />
-                                            </ComboBox>
-                                        </Grid>
+                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorDisplay}" Margin="0,0,0,8" />
+                                        <StackPanel Margin="0,0,0,14">
+                                            <RadioButton GroupName="FullscreenBatteryMode"
+                                                         Content="{DynamicResource LOCAS_BatteryDisplayIconAndPercentage}"
+                                                         IsChecked="{Binding FullscreenBatteryIconAndPercentage, Mode=TwoWay}"
+                                                         Margin="0,0,0,8" />
+                                            <RadioButton GroupName="FullscreenBatteryMode"
+                                                         Content="{DynamicResource LOCAS_BatteryDisplayIconOnly}"
+                                                         IsChecked="{Binding FullscreenBatteryIconOnly, Mode=TwoWay}"
+                                                         Margin="0,0,0,8" />
+                                            <RadioButton GroupName="FullscreenBatteryMode"
+                                                         Content="{DynamicResource LOCAS_BatteryDisplayPercentageOnly}"
+                                                         IsChecked="{Binding FullscreenBatteryPercentageOnly, Mode=TwoWay}" />
+                                        </StackPanel>
                                         <Grid>
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                                             <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIcon}" VerticalAlignment="Center" Margin="0,0,8,0" />

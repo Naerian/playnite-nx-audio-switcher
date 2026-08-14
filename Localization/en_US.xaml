@@ -28,6 +28,7 @@
     <sys:String x:Key="LOCAS_OutputTab">Output</sys:String>
     <sys:String x:Key="LOCAS_InputTab">Input</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Fullscreen</sys:String>
+    <sys:String x:Key="LOCAS_DesktopTab">Desktop</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Custom names</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Enter a simple name for each output you want to use from Playnite. Devices without a custom name will still appear in the full selector.</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">Output devices</sys:String>
@@ -204,7 +205,20 @@
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Not present</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Unavailable</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Battery indicator</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Desktop always keeps the icon visible and adds the battery value when available. Fullscreen themes can use the configurable BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Configure battery information independently for the Desktop top bar and the Fullscreen theme widget.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationTitle">Desktop top-bar integration</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationHelp">Keep Audio Switcher accessible from Playnite's Desktop top bar. Hovering shows the active output device and clicking opens the plugin settings.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Show Audio Switcher in Playnite's Desktop top bar</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIcon">Audio Switcher icon</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIconHelp">Choose a fixed icon or Device icon to follow the active output device. The default speaker is used as the final fallback.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryTitle">Battery in Desktop</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">Enable Audio Switcher under General > Desktop to use these options.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryNone">Do not show battery (icon only)</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentage">Show icon and percentage</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Show percentage instead of the icon</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">When no battery is reported, the configured icon returns as a fallback.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen battery widget</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configure the BatteryWidget used by compatible Fullscreen themes independently from Desktop.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Show in the Desktop top bar</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Hide the Fullscreen widget when no battery is reported</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Display</sys:String>
@@ -213,7 +227,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Percentage only</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icon</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choosing "Device icon" uses the icon assigned or suggested for the active device. If none is available, the default speaker icon is shown.</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">This only affects the Fullscreen BatteryWidget; the Desktop top-bar icon remains visible.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">This option only affects the Fullscreen BatteryWidget.</sys:String>
 </ResourceDictionary>
 
 

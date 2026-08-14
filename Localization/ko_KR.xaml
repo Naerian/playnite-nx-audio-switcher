@@ -203,8 +203,22 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">연결 끊김</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">없음</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">사용 불가</sys:String>
+    <sys:String x:Key="LOCAS_DesktopTab">데스크톱</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationTitle">데스크톱 상단 표시줄 통합</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationHelp">Playnite의 데스크톱 상단 표시줄에서 Audio Switcher에 접근할 수 있습니다. 마우스를 올리면 활성 출력 장치가 표시되고 클릭하면 설정이 열립니다.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Playnite 데스크톱 상단 표시줄에 Audio Switcher 표시</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIcon">Audio Switcher 아이콘</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIconHelp">고정 아이콘 또는 활성 출력 장치를 따르는 장치 아이콘을 선택합니다. 마지막 대안으로 기본 스피커 아이콘을 사용합니다.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryTitle">데스크톱 배터리</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">이 옵션을 사용하려면 일반 &gt; 데스크톱에서 Audio Switcher를 활성화하세요.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryNone">배터리 표시 안 함(아이콘만)</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentage">아이콘과 백분율 표시</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">아이콘 대신 백분율 표시</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">배터리가 보고되지 않으면 설정된 아이콘이 대안으로 다시 표시됩니다.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen 배터리 위젯</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">호환되는 Fullscreen 테마의 BatteryWidget을 데스크톱과 별도로 설정합니다.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">배터리 표시기</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Desktop에서는 아이콘을 항상 표시하고 배터리 정보가 있을 때만 값을 추가합니다. Fullscreen 테마는 설정 가능한 BatteryWidget을 사용할 수 있습니다.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">데스크톱 상단 표시줄과 Fullscreen 테마 위젯의 배터리 정보를 각각 설정합니다.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Desktop 상단 표시줄에 표시</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">배터리 정보가 없으면 Fullscreen 위젯 숨기기</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">표시</sys:String>
@@ -213,6 +227,6 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">백분율만</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">아이콘</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“장치 아이콘”을 선택하면 활성 장치에 지정되었거나 추천된 아이콘을 사용합니다. 사용할 수 있는 아이콘이 없으면 기본 스피커 아이콘을 표시합니다.</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Fullscreen BatteryWidget에만 적용되며 Desktop 상단 표시줄 아이콘은 계속 표시됩니다.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">이 옵션은 Fullscreen BatteryWidget에만 적용됩니다.</sys:String>
 </ResourceDictionary>
 

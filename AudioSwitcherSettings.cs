@@ -42,6 +42,8 @@ namespace PlayniteAudioSwitcher
         private string currentSpatialSoundMode;
         private int volumeStepPercent = 5;
         private bool showDesktopBatteryIndicator;
+        private string desktopTopPanelIcon;
+        private string desktopBatteryDisplayMode;
         private bool hideBatteryIndicatorWhenUnavailable = true;
         private string batteryIndicatorDisplayMode = "IconAndPercentage";
         private string batteryIndicatorIcon = string.Empty;
@@ -83,12 +85,20 @@ namespace PlayniteAudioSwitcher
                 ShowDiagnosticNotifications = savedSettings.ShowDiagnosticNotifications;
                 VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
                 ShowDesktopBatteryIndicator = savedSettings.ShowDesktopBatteryIndicator;
+                DesktopTopPanelIcon = savedSettings.DesktopTopPanelIcon ?? savedSettings.BatteryIndicatorIcon ?? string.Empty;
+                DesktopBatteryDisplayMode = savedSettings.DesktopBatteryDisplayMode ??
+                    MigrateDesktopBatteryDisplayMode(savedSettings.BatteryIndicatorDisplayMode);
                 HideBatteryIndicatorWhenUnavailable = savedSettings.HideBatteryIndicatorWhenUnavailable;
                 BatteryIndicatorDisplayMode = string.IsNullOrWhiteSpace(savedSettings.BatteryIndicatorDisplayMode)
                     ? "IconAndPercentage"
                     : savedSettings.BatteryIndicatorDisplayMode;
                 BatteryIndicatorIcon = savedSettings.BatteryIndicatorIcon ?? string.Empty;
             }
+
+            DesktopTopPanelIcon = DesktopTopPanelIcon ?? string.Empty;
+            DesktopBatteryDisplayMode = string.IsNullOrWhiteSpace(DesktopBatteryDisplayMode)
+                ? "IconAndPercentage"
+                : DesktopBatteryDisplayMode;
 
             MigrateFavoritesToAliases();
             RefreshDevices();
@@ -233,6 +243,7 @@ namespace PlayniteAudioSwitcher
                 if (options.Count > 0)
                 {
                     options[0].Name = plugin?.Loc("LOCAS_DeviceIcon") ?? "Device icon";
+                    options[0].IconFileName = "volume.svg";
                 }
 
                 return options;
@@ -495,6 +506,49 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref showDesktopBatteryIndicator, value);
         }
 
+        public string DesktopTopPanelIcon
+        {
+            get => desktopTopPanelIcon;
+            set => SetValue(ref desktopTopPanelIcon, value ?? string.Empty);
+        }
+
+        public string DesktopBatteryDisplayMode
+        {
+            get => desktopBatteryDisplayMode;
+            set
+            {
+                var normalized = NormalizeDesktopBatteryDisplayMode(value);
+                if (!string.Equals(desktopBatteryDisplayMode, normalized, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    SetValue(ref desktopBatteryDisplayMode, normalized);
+                    OnPropertyChanged(nameof(DesktopBatteryIconOnly));
+                    OnPropertyChanged(nameof(DesktopBatteryIconAndPercentage));
+                    OnPropertyChanged(nameof(DesktopBatteryPercentageWithIconFallback));
+                }
+            }
+        }
+
+        [DontSerialize]
+        public bool DesktopBatteryIconOnly
+        {
+            get => string.Equals(DesktopBatteryDisplayMode, "IconOnly", System.StringComparison.OrdinalIgnoreCase);
+            set { if (value) DesktopBatteryDisplayMode = "IconOnly"; }
+        }
+
+        [DontSerialize]
+        public bool DesktopBatteryIconAndPercentage
+        {
+            get => string.Equals(DesktopBatteryDisplayMode, "IconAndPercentage", System.StringComparison.OrdinalIgnoreCase);
+            set { if (value) DesktopBatteryDisplayMode = "IconAndPercentage"; }
+        }
+
+        [DontSerialize]
+        public bool DesktopBatteryPercentageWithIconFallback
+        {
+            get => string.Equals(DesktopBatteryDisplayMode, "PercentageWithIconFallback", System.StringComparison.OrdinalIgnoreCase);
+            set { if (value) DesktopBatteryDisplayMode = "PercentageWithIconFallback"; }
+        }
+
         public bool HideBatteryIndicatorWhenUnavailable
         {
             get => hideBatteryIndicatorWhenUnavailable;
@@ -504,13 +558,81 @@ namespace PlayniteAudioSwitcher
         public string BatteryIndicatorDisplayMode
         {
             get => batteryIndicatorDisplayMode;
-            set => SetValue(ref batteryIndicatorDisplayMode, value);
+            set
+            {
+                var normalized = NormalizeFullscreenBatteryDisplayMode(value);
+                if (!string.Equals(batteryIndicatorDisplayMode, normalized, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    SetValue(ref batteryIndicatorDisplayMode, normalized);
+                    OnPropertyChanged(nameof(FullscreenBatteryIconAndPercentage));
+                    OnPropertyChanged(nameof(FullscreenBatteryIconOnly));
+                    OnPropertyChanged(nameof(FullscreenBatteryPercentageOnly));
+                }
+            }
+        }
+
+        [DontSerialize]
+        public bool FullscreenBatteryIconAndPercentage
+        {
+            get => string.Equals(BatteryIndicatorDisplayMode, "IconAndPercentage", System.StringComparison.OrdinalIgnoreCase);
+            set { if (value) BatteryIndicatorDisplayMode = "IconAndPercentage"; }
+        }
+
+        [DontSerialize]
+        public bool FullscreenBatteryIconOnly
+        {
+            get => string.Equals(BatteryIndicatorDisplayMode, "IconOnly", System.StringComparison.OrdinalIgnoreCase);
+            set { if (value) BatteryIndicatorDisplayMode = "IconOnly"; }
+        }
+
+        [DontSerialize]
+        public bool FullscreenBatteryPercentageOnly
+        {
+            get => string.Equals(BatteryIndicatorDisplayMode, "PercentageOnly", System.StringComparison.OrdinalIgnoreCase);
+            set { if (value) BatteryIndicatorDisplayMode = "PercentageOnly"; }
         }
 
         public string BatteryIndicatorIcon
         {
             get => batteryIndicatorIcon;
             set => SetValue(ref batteryIndicatorIcon, value);
+        }
+
+        private static string MigrateDesktopBatteryDisplayMode(string value)
+        {
+            return string.Equals(value, "PercentageOnly", System.StringComparison.OrdinalIgnoreCase)
+                ? "PercentageWithIconFallback"
+                : NormalizeDesktopBatteryDisplayMode(value);
+        }
+
+        private static string NormalizeDesktopBatteryDisplayMode(string value)
+        {
+            if (string.Equals(value, "IconOnly", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return "IconOnly";
+            }
+
+            if (string.Equals(value, "PercentageWithIconFallback", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return "PercentageWithIconFallback";
+            }
+
+            return "IconAndPercentage";
+        }
+
+        private static string NormalizeFullscreenBatteryDisplayMode(string value)
+        {
+            if (string.Equals(value, "IconOnly", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return "IconOnly";
+            }
+
+            if (string.Equals(value, "PercentageOnly", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return "PercentageOnly";
+            }
+
+            return "IconAndPercentage";
         }
 
         public List<AudioProcessOption> GetAudioProcessOptions(string selectedProcessName)
@@ -768,6 +890,8 @@ namespace PlayniteAudioSwitcher
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
             VolumeStepPercent = editingClone.VolumeStepPercent;
             ShowDesktopBatteryIndicator = editingClone.ShowDesktopBatteryIndicator;
+            DesktopTopPanelIcon = editingClone.DesktopTopPanelIcon;
+            DesktopBatteryDisplayMode = editingClone.DesktopBatteryDisplayMode;
             HideBatteryIndicatorWhenUnavailable = editingClone.HideBatteryIndicatorWhenUnavailable;
             BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
             BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
@@ -914,6 +1038,8 @@ namespace PlayniteAudioSwitcher
                 SpatialSoundToolPath = SpatialSoundToolPath,
                 VolumeStepPercent = VolumeStepPercent,
                 ShowDesktopBatteryIndicator = ShowDesktopBatteryIndicator,
+                DesktopTopPanelIcon = DesktopTopPanelIcon,
+                DesktopBatteryDisplayMode = DesktopBatteryDisplayMode,
                 HideBatteryIndicatorWhenUnavailable = HideBatteryIndicatorWhenUnavailable,
                 BatteryIndicatorDisplayMode = BatteryIndicatorDisplayMode,
                 BatteryIndicatorIcon = BatteryIndicatorIcon

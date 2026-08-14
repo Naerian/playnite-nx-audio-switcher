@@ -203,8 +203,22 @@
     <sys:String x:Key="LOCAS_DeviceStatusDisconnected">已断开连接</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">不存在</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">不可用</sys:String>
+    <sys:String x:Key="LOCAS_DesktopTab">桌面</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationTitle">桌面顶部栏集成</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationHelp">可从 Playnite 桌面顶部栏访问 Audio Switcher。悬停时显示当前输出设备，点击时打开插件设置。</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">在 Playnite 桌面顶部栏显示 Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIcon">Audio Switcher 图标</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIconHelp">选择固定图标或跟随当前输出设备的“设备图标”。最后使用默认扬声器图标作为备用。</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryTitle">桌面电池</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">请在“常规 &gt; 桌面”中启用 Audio Switcher 以使用这些选项。</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryNone">不显示电池（仅图标）</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentage">显示图标和百分比</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">用百分比替代图标</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">未报告电池信息时，将恢复显示所配置的图标。</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryTitle">全屏电池小组件</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">独立于桌面配置兼容全屏主题使用的 BatteryWidget。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">电池指示器</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">桌面模式始终显示图标，仅在有电量信息时追加数值。全屏主题可使用可配置的 BatteryWidget。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">分别配置桌面顶部栏和全屏主题小组件的电池信息。</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">在桌面模式顶部栏显示</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">未报告电量时隐藏全屏小组件</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">显示方式</sys:String>
@@ -213,6 +227,6 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">仅百分比</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">图标</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“设备图标”后，将使用为当前设备指定或建议的图标。如果没有可用图标，则显示默认扬声器图标。</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">此选项仅影响全屏 BatteryWidget；桌面模式顶部栏图标仍保持可见。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">此选项仅影响全屏 BatteryWidget。</sys:String>
 </ResourceDictionary>
 

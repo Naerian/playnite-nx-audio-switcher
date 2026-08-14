@@ -28,6 +28,7 @@
     <sys:String x:Key="LOCAS_OutputTab">Sortie</sys:String>
     <sys:String x:Key="LOCAS_InputTab">Entrée</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Plein écran</sys:String>
+    <sys:String x:Key="LOCAS_DesktopTab">Bureau</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Noms personnalisés</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Saisissez un nom simple pour chaque sortie que vous voulez utiliser depuis Playnite. Les périphériques sans nom personnalisé apparaîtront toujours dans le sélecteur complet.</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">Périphériques de sortie</sys:String>
@@ -204,7 +205,20 @@
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Absent</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Indisponible</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Indicateur de batterie</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Dans Desktop, l'icône reste toujours visible et la batterie apparaît lorsqu'elle est disponible. Les thèmes Fullscreen peuvent utiliser le BatteryWidget configurable.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Configurez séparément les informations de batterie de la barre Desktop et du widget Fullscreen.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationTitle">Intégration à la barre supérieure Desktop</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationHelp">Gardez Audio Switcher accessible dans la barre supérieure Desktop de Playnite. Le survol affiche la sortie active et un clic ouvre les paramètres.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Afficher Audio Switcher dans la barre supérieure Desktop de Playnite</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIcon">Icône Audio Switcher</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIconHelp">Choisissez une icône fixe ou Icône du périphérique pour suivre la sortie active. Le haut-parleur par défaut sert de dernier recours.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryTitle">Batterie dans Desktop</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">Activez Audio Switcher dans Général > Desktop pour utiliser ces options.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryNone">Ne pas afficher la batterie (icône uniquement)</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentage">Afficher l’icône et le pourcentage</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Afficher le pourcentage à la place de l’icône</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Si aucune batterie n’est signalée, l’icône configurée réapparaît comme solution de repli.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Widget de batterie Fullscreen</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configurez le BatteryWidget des thèmes Fullscreen compatibles indépendamment de Desktop.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Afficher dans la barre supérieure de Desktop</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Masquer le widget Fullscreen si aucune batterie n'est signalée</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Affichage</sys:String>
@@ -213,6 +227,6 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Pourcentage seul</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icône</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choisir « Icône du périphérique » utilise l’icône attribuée ou suggérée pour le périphérique actif. Si aucune n’est disponible, l’icône de haut-parleur par défaut est affichée.</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Cela affecte uniquement le BatteryWidget Fullscreen ; l'icône de la barre Desktop reste visible.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Cette option affecte uniquement le BatteryWidget Fullscreen.</sys:String>
 </ResourceDictionary>
 

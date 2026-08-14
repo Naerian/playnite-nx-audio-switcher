@@ -542,7 +542,8 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            batteryTopPanelItem.Visible = settings.ShowDesktopBatteryIndicator;
+            batteryTopPanelItem.Visible = settings.ShowDesktopBatteryIndicator &&
+                Theme.ShouldShowDesktopIndicator;
             batteryTopPanelItem.Title = Theme.CurrentDeviceName;
         }
 

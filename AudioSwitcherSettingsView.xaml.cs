@@ -20,7 +20,9 @@ namespace PlayniteAudioSwitcher
         public AudioSwitcherSettingsView()
         {
             InitializeComponent();
-            BatteryIndicatorIconBox.ItemTemplate = CreateIconTemplate();
+            var iconTemplate = CreateIconTemplate();
+            DesktopTopPanelIconBox.ItemTemplate = iconTemplate;
+            BatteryIndicatorIconBox.ItemTemplate = iconTemplate;
             AboutVersionText.Text = string.Format(
                 TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Version {0} | Narian",
                 GetInstalledVersion());

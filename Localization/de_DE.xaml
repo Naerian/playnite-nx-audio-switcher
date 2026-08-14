@@ -28,6 +28,7 @@
     <sys:String x:Key="LOCAS_OutputTab">Ausgabe</sys:String>
     <sys:String x:Key="LOCAS_InputTab">Eingabe</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Vollbild</sys:String>
+    <sys:String x:Key="LOCAS_DesktopTab">Desktop</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesTitle">Benutzerdefinierte Namen</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Gib jeder Ausgabe, die du in Playnite verwenden möchtest, einen einfachen Namen. Geräte ohne benutzerdefinierten Namen erscheinen weiterhin in der vollständigen Auswahl.</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">Ausgabegeräte</sys:String>
@@ -204,7 +205,20 @@
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Nicht vorhanden</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Nicht verfügbar</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Akkuanzeige</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">In Desktop bleibt das Symbol immer sichtbar und der Akkustand erscheint nur, wenn er verfügbar ist. Fullscreen-Themes können das konfigurierbare BatteryWidget verwenden.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Konfiguriere die Akkuinformationen für die Desktop-Kopfleiste und das Fullscreen-Widget unabhängig voneinander.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationTitle">Integration in die Desktop-Kopfleiste</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIntegrationHelp">Audio Switcher bleibt über die Desktop-Kopfleiste von Playnite erreichbar. Beim Darüberfahren wird das aktive Ausgabegerät angezeigt, ein Klick öffnet die Einstellungen.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Audio Switcher in der Desktop-Kopfleiste von Playnite anzeigen</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIcon">Audio-Switcher-Symbol</sys:String>
+    <sys:String x:Key="LOCAS_DesktopIconHelp">Wähle ein festes Symbol oder Gerätesymbol für das aktive Ausgabegerät. Als letzte Alternative wird das standardmäßige Lautsprechersymbol verwendet.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryTitle">Akku in Desktop</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">Aktiviere Audio Switcher unter Allgemein > Desktop, um diese Optionen zu verwenden.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryNone">Akku nicht anzeigen (nur Symbol)</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentage">Symbol und Prozent anzeigen</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Prozent anstelle des Symbols anzeigen</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Wenn kein Akkustand gemeldet wird, erscheint das konfigurierte Symbol wieder als Alternative.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen-Akkuwidget</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Konfiguriere das BatteryWidget kompatibler Fullscreen-Themes unabhängig von Desktop.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">In der Desktop-Kopfleiste anzeigen</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Fullscreen-Widget ohne gemeldeten Akkustand ausblenden</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Anzeige</sys:String>
@@ -213,6 +227,6 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnly">Nur Prozent</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Symbol</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Bei Auswahl von „Gerätesymbol“ wird das zugewiesene oder vorgeschlagene Symbol des aktiven Geräts verwendet. Ist keines verfügbar, wird das standardmäßige Lautsprechersymbol angezeigt.</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Dies betrifft nur das Fullscreen-BatteryWidget; das Symbol in der Desktop-Kopfleiste bleibt sichtbar.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Diese Option betrifft nur das Fullscreen-BatteryWidget.</sys:String>
 </ResourceDictionary>
 
