@@ -6,41 +6,90 @@
                             Focusable="False">
     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
         <StackPanel.ToolTip>
-            <TextBlock Text="{Binding CurrentDeviceName}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding CurrentDeviceName}" />
+                <TextBlock Text=": ">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasCurrentDeviceBattery}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="{Binding CurrentDeviceBatteryPercent, StringFormat={}{0}%}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasCurrentDeviceBattery}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
         </StackPanel.ToolTip>
-        <Viewbox Width="20" Height="20" Margin="2,0,5,0">
+        <Viewbox Width="20" Height="20">
             <Viewbox.Style>
                 <Style TargetType="Viewbox">
                     <Setter Property="Visibility" Value="Visible" />
+                    <Setter Property="Margin" Value="2,0,5,0" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding ShowDesktopIndicatorIcon}" Value="False">
-                            <Setter Property="Visibility" Value="Collapsed" />
+                        <DataTrigger Binding="{Binding IsCompactTopPanelLayout, ElementName=Root}" Value="True">
+                            <Setter Property="Margin" Value="0" />
                         </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ShowDesktopIndicatorIcon}" Value="False" />
+                                <Condition Binding="{Binding IsCompactTopPanelLayout, ElementName=Root}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </Viewbox.Style>
             <Path Data="{Binding DesktopIndicatorIconGeometry}"
                   Stretch="Uniform"
-                  Stroke="{Binding Foreground, ElementName=Root}"
                   StrokeThickness="2"
                   StrokeStartLineCap="Round"
                   StrokeEndLineCap="Round"
                   StrokeLineJoin="Round"
-                  Fill="Transparent" />
+                  Fill="Transparent">
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Stroke" Value="{Binding Foreground, ElementName=Root}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UseDesktopBatteryColor}" Value="True">
+                                <Setter Property="Stroke" Value="{Binding DesktopIndicatorBatteryBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
         </Viewbox>
         <TextBlock Text="{Binding CurrentDeviceBatteryLabel}"
-                   Foreground="{Binding Foreground, ElementName=Root}"
                    VerticalAlignment="Center"
                    FontWeight="SemiBold"
+                   FontSize="14"
                    Margin="0,0,2,0">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Visibility" Value="Collapsed" />
+                    <Setter Property="Foreground" Value="{Binding Foreground, ElementName=Root}" />
                     <Style.Triggers>
+                        <DataTrigger Binding="{Binding UseDesktopBatteryColor}" Value="True">
+                            <Setter Property="Foreground" Value="{Binding DesktopIndicatorBatteryBrush}" />
+                        </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding HasCurrentDeviceBattery}" Value="True" />
                                 <Condition Binding="{Binding ShowDesktopIndicatorPercentage}" Value="True" />
+                                <Condition Binding="{Binding IsCompactTopPanelLayout, ElementName=Root}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Visible" />
                         </MultiDataTrigger>

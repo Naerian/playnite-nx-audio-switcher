@@ -209,6 +209,8 @@
     <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Audio Switcher'ı Playnite Desktop üst çubuğunda göster</sys:String>
     <sys:String x:Key="LOCAS_DesktopIcon">Audio Switcher simgesi</sys:String>
     <sys:String x:Key="LOCAS_DesktopIconHelp">Sabit bir simge veya etkin çıkışı izleyen Aygıt simgesini seçin. Son alternatif olarak varsayılan hoparlör simgesi kullanılır.</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBattery">Simgeyi ve yüzdeyi pil düzeyine göre renklendir</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBatteryHelp">Pil bilgisi varsa üst çubuk göstergesinin tüm görünür parçaları aynı durum rengini kullanır. Bilgi yoksa temanın metin rengi korunur.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryTitle">Desktop'ta pil</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">Bu seçenekleri kullanmak için Genel &gt; Desktop altında Audio Switcher'ı etkinleştirin.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryNone">Pili gösterme (yalnızca simge)</sys:String>

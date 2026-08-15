@@ -211,6 +211,8 @@
     <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Mostra Audio Switcher nella barra superiore Desktop di Playnite</sys:String>
     <sys:String x:Key="LOCAS_DesktopIcon">Icona Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_DesktopIconHelp">Scegli un’icona fissa o Icona del dispositivo per seguire l’uscita attiva. L’altoparlante predefinito è l’ultima alternativa.</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBattery">Colora icona e percentuale in base al livello della batteria</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBatteryHelp">Quando è disponibile una lettura, tutte le parti visibili dell’indicatore superiore usano lo stesso colore semantico della batteria. Altrimenti viene mantenuto il colore del testo del tema.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryTitle">Batteria in Desktop</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">Attiva Audio Switcher in Generale > Desktop per usare queste opzioni.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryNone">Non mostrare la batteria (solo icona)</sys:String>

@@ -174,12 +174,17 @@ namespace PlayniteAudioSwitcher
             }
 
             batteryText.Visibility = Visibility.Visible;
-            batteryText.Text = $"{ResourceText("LOCAS_Battery", "Battery")}: " +
-                (device?.HasBattery == true ? device.BatteryLabel : "\u2014");
-            batteryText.SetResourceReference(
-                TextBlock.ForegroundProperty,
-                GetBatteryBrushResource(device));
-            batteryText.Opacity = device?.HasBattery == true ? 1 : 0.68;
+            batteryText.ClearValue(TextBlock.ForegroundProperty);
+            batteryText.Opacity = 1;
+            batteryText.Inlines.Clear();
+            batteryText.Inlines.Add(new System.Windows.Documents.Run(
+                $"{ResourceText("LOCAS_Battery", "Battery")}: "));
+            batteryText.Inlines.Add(new System.Windows.Documents.Run(
+                device?.HasBattery == true ? device.BatteryLabel : "\u2014")
+            {
+                Foreground = BatteryColorPalette.GetBrush(device),
+                FontWeight = FontWeights.SemiBold
+            });
         }
 
         private string ResourceText(string key, string fallback)
@@ -250,11 +255,8 @@ namespace PlayniteAudioSwitcher
                     "LOCAS_Battery",
                     "Battery",
                     device.HasBattery ? device.BatteryLabel : "\u2014",
-                    new Thickness(0));
-                batteryLine.SetResourceReference(
-                    TextBlock.ForegroundProperty,
-                    GetBatteryBrushResource(device));
-                batteryLine.Opacity = device.HasBattery ? 1 : 0.68;
+                    new Thickness(0),
+                    BatteryColorPalette.GetBrush(device));
                 namePanel.Children.Add(batteryLine);
                 Grid.SetColumnSpan(namePanel, 4);
                 grid.Children.Add(namePanel);
@@ -401,7 +403,8 @@ namespace PlayniteAudioSwitcher
             string labelResource,
             string fallbackLabel,
             string value,
-            Thickness margin)
+            Thickness margin,
+            Brush valueBrush = null)
         {
             var label = Application.Current.TryFindResource(labelResource) as string ?? fallbackLabel;
             var text = new TextBlock
@@ -413,23 +416,15 @@ namespace PlayniteAudioSwitcher
             {
                 FontWeight = FontWeights.Bold
             });
-            text.Inlines.Add(new System.Windows.Documents.Run(value ?? "\u2014"));
+            var valueRun = new System.Windows.Documents.Run(value ?? "\u2014");
+            if (valueBrush != null)
+            {
+                valueRun.Foreground = valueBrush;
+                valueRun.FontWeight = FontWeights.SemiBold;
+            }
+
+            text.Inlines.Add(valueRun);
             return text;
-        }
-
-        private static string GetBatteryBrushResource(AudioDevice device)
-        {
-            if (device?.HasBattery != true)
-            {
-                return "GlyphBrush";
-            }
-
-            if (device.IsBatteryCharging || device.BatteryPercent > 50)
-            {
-                return "PositiveRatingBrush";
-            }
-
-            return device.BatteryPercent > 20 ? "MixedRatingBrush" : "NegativeRatingBrush";
         }
 
         private void RebuildGameProfileRows()

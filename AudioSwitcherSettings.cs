@@ -42,6 +42,7 @@ namespace PlayniteAudioSwitcher
         private string currentSpatialSoundMode;
         private int volumeStepPercent = 5;
         private bool showDesktopBatteryIndicator;
+        private bool colorDesktopIndicatorByBattery = true;
         private string desktopTopPanelIcon;
         private string desktopBatteryDisplayMode;
         private bool hideBatteryIndicatorWhenUnavailable = true;
@@ -85,6 +86,7 @@ namespace PlayniteAudioSwitcher
                 ShowDiagnosticNotifications = savedSettings.ShowDiagnosticNotifications;
                 VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
                 ShowDesktopBatteryIndicator = savedSettings.ShowDesktopBatteryIndicator;
+                ColorDesktopIndicatorByBattery = savedSettings.ColorDesktopIndicatorByBattery;
                 DesktopTopPanelIcon = savedSettings.DesktopTopPanelIcon ?? savedSettings.BatteryIndicatorIcon ?? string.Empty;
                 DesktopBatteryDisplayMode = savedSettings.DesktopBatteryDisplayMode ??
                     MigrateDesktopBatteryDisplayMode(savedSettings.BatteryIndicatorDisplayMode);
@@ -506,6 +508,12 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref showDesktopBatteryIndicator, value);
         }
 
+        public bool ColorDesktopIndicatorByBattery
+        {
+            get => colorDesktopIndicatorByBattery;
+            set => SetValue(ref colorDesktopIndicatorByBattery, value);
+        }
+
         public string DesktopTopPanelIcon
         {
             get => desktopTopPanelIcon;
@@ -890,6 +898,7 @@ namespace PlayniteAudioSwitcher
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
             VolumeStepPercent = editingClone.VolumeStepPercent;
             ShowDesktopBatteryIndicator = editingClone.ShowDesktopBatteryIndicator;
+            ColorDesktopIndicatorByBattery = editingClone.ColorDesktopIndicatorByBattery;
             DesktopTopPanelIcon = editingClone.DesktopTopPanelIcon;
             DesktopBatteryDisplayMode = editingClone.DesktopBatteryDisplayMode;
             HideBatteryIndicatorWhenUnavailable = editingClone.HideBatteryIndicatorWhenUnavailable;
@@ -1038,6 +1047,7 @@ namespace PlayniteAudioSwitcher
                 SpatialSoundToolPath = SpatialSoundToolPath,
                 VolumeStepPercent = VolumeStepPercent,
                 ShowDesktopBatteryIndicator = ShowDesktopBatteryIndicator,
+                ColorDesktopIndicatorByBattery = ColorDesktopIndicatorByBattery,
                 DesktopTopPanelIcon = DesktopTopPanelIcon,
                 DesktopBatteryDisplayMode = DesktopBatteryDisplayMode,
                 HideBatteryIndicatorWhenUnavailable = HideBatteryIndicatorWhenUnavailable,

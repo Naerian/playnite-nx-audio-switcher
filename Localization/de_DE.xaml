@@ -211,6 +211,8 @@
     <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Audio Switcher in der Desktop-Kopfleiste von Playnite anzeigen</sys:String>
     <sys:String x:Key="LOCAS_DesktopIcon">Audio-Switcher-Symbol</sys:String>
     <sys:String x:Key="LOCAS_DesktopIconHelp">Wähle ein festes Symbol oder Gerätesymbol für das aktive Ausgabegerät. Als letzte Alternative wird das standardmäßige Lautsprechersymbol verwendet.</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBattery">Symbol und Prozentwert nach Akkustand einfärben</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBatteryHelp">Wenn ein Akkustand verfügbar ist, verwenden alle sichtbaren Teile der oberen Anzeige dieselbe semantische Akkufarbe. Andernfalls bleibt die Textfarbe des Themes erhalten.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryTitle">Akku in Desktop</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">Aktiviere Audio Switcher unter Allgemein > Desktop, um diese Optionen zu verwenden.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryNone">Akku nicht anzeigen (nur Symbol)</sys:String>

@@ -209,6 +209,8 @@
     <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Playniteのデスクトップ トップバーにAudio Switcherを表示</sys:String>
     <sys:String x:Key="LOCAS_DesktopIcon">Audio Switcher アイコン</sys:String>
     <sys:String x:Key="LOCAS_DesktopIconHelp">固定アイコン、または現在の出力デバイスに合わせる「デバイス アイコン」を選択します。最後の代替として既定のスピーカー アイコンを使用します。</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBattery">バッテリー残量に応じてアイコンとパーセントに色を付ける</sys:String>
+    <sys:String x:Key="LOCAS_ColorDesktopIndicatorByBatteryHelp">バッテリー情報がある場合、トップバー表示のすべての部分に同じ状態色を使用します。情報がない場合はテーマの文字色を維持します。</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryTitle">デスクトップのバッテリー</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryRequiresIntegration">これらのオプションを使用するには、一般 &gt; デスクトップでAudio Switcherを有効にしてください。</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryNone">バッテリーを表示しない（アイコンのみ）</sys:String>

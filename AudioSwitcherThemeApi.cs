@@ -32,6 +32,8 @@ namespace PlayniteAudioSwitcher
         private bool showDesktopIndicatorIcon;
         private bool showDesktopIndicatorPercentage;
         private bool shouldShowDesktopIndicator;
+        private Brush desktopIndicatorBatteryBrush;
+        private bool useDesktopBatteryColor;
         private bool hasDevices;
         private string currentInputDeviceId;
         private string currentInputDeviceName;
@@ -172,7 +174,7 @@ namespace PlayniteAudioSwitcher
 
         public ObservableCollection<AudioSwitcherThemeMediaSession> MediaSessions { get; }
 
-        public string ApiVersion => "1.3.0";
+        public string ApiVersion => "1.4.0";
 
         public bool SupportsOutputDevices => true;
 
@@ -197,6 +199,8 @@ namespace PlayniteAudioSwitcher
         public bool SupportsDeviceBattery => true;
 
         public bool SupportsDesktopIndicatorConfiguration => true;
+
+        public bool SupportsDesktopBatteryColor => true;
 
         internal bool IsMediaSessionVolumeWritePending => mediaVolumeWriter.HasPendingWork;
 
@@ -370,6 +374,18 @@ namespace PlayniteAudioSwitcher
         {
             get => shouldShowDesktopIndicator;
             private set => SetValue(ref shouldShowDesktopIndicator, value);
+        }
+
+        public Brush DesktopIndicatorBatteryBrush
+        {
+            get => desktopIndicatorBatteryBrush;
+            private set => SetValue(ref desktopIndicatorBatteryBrush, value);
+        }
+
+        public bool UseDesktopBatteryColor
+        {
+            get => useDesktopBatteryColor;
+            private set => SetValue(ref useDesktopBatteryColor, value);
         }
 
         public bool HasDevices
@@ -965,6 +981,11 @@ namespace PlayniteAudioSwitcher
             ShowDesktopIndicatorPercentage = HasCurrentDeviceBattery &&
                 !string.Equals(mode, "IconOnly", StringComparison.OrdinalIgnoreCase);
             ShouldShowDesktopIndicator = ShowDesktopIndicatorIcon || ShowDesktopIndicatorPercentage;
+            DesktopIndicatorBatteryBrush = BatteryColorPalette.GetBrush(
+                HasCurrentDeviceBattery ? (int?)CurrentDeviceBatteryPercent : null,
+                IsCurrentDeviceBatteryCharging);
+            UseDesktopBatteryColor = plugin.Settings?.ColorDesktopIndicatorByBattery == true &&
+                HasCurrentDeviceBattery;
         }
 
         private void SetCurrentInputDeviceBattery(AudioDevice device)

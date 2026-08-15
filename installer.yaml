@@ -1,5 +1,17 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.14.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-16
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.14.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_14_0.pext
+    Changelog:
+      - Added a consistent semantic battery palette to the summary and device cards while preserving theme-colored labels for readability.
+      - Added an optional Desktop setting that colors the top-bar icon and percentage according to the active device battery level.
+      - Added an adaptive icon-only layout for narrow top-panel buttons, including circular 35 px themes such as Mythos.
+      - Added battery-aware tooltips in the form Device name: 68% and centered compact icons without asymmetric spacing.
+      - Reworked both icon selectors into full-width vertical layouts and refined the top-panel percentage size.
+      - Updated the theme API to 1.4.0 with semantic Desktop battery brush and effective color-state properties.
+      - Updated all twelve localizations and the English and Spanish Wiki documentation.
   - Version: 1.13.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-14

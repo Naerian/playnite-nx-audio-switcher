@@ -6,9 +6,9 @@
     <Nullable>disable</Nullable>
     <AssemblyName>PlayniteAudioSwitcher</AssemblyName>
     <RootNamespace>PlayniteAudioSwitcher</RootNamespace>
-    <Version>1.13.0</Version>
-    <AssemblyVersion>1.13.0.0</AssemblyVersion>
-    <FileVersion>1.13.0.0</FileVersion>
+    <Version>1.14.0</Version>
+    <AssemblyVersion>1.14.0.0</AssemblyVersion>
+    <FileVersion>1.14.0.0</FileVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>

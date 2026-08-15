@@ -362,16 +362,15 @@
                                                   IsChecked="{Binding ShowDesktopBatteryIndicator}"
                                                   Margin="0,0,0,14" />
                                         <StackPanel IsEnabled="{Binding ShowDesktopBatteryIndicator}">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                                                <TextBlock Text="{DynamicResource LOCAS_DesktopIcon}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                                                <ComboBox x:Name="DesktopTopPanelIconBox"
-                                                          Grid.Column="1"
-                                                          ItemsSource="{Binding BatteryIconOptions}"
-                                                          SelectedValuePath="Id"
-                                                          SelectedValue="{Binding DesktopTopPanelIcon}" />
-                                            </Grid>
-                                            <TextBlock Text="{DynamicResource LOCAS_DesktopIconHelp}" Style="{StaticResource HintText}" Margin="180,6,0,0" />
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopIcon}" Margin="0,0,0,6" />
+                                            <ComboBox x:Name="DesktopTopPanelIconBox"
+                                                      ItemsSource="{Binding BatteryIconOptions}"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding DesktopTopPanelIcon}" />
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopIconHelp}" Style="{StaticResource HintText}" Margin="0,6,0,0" />
+                                            <CheckBox Content="{DynamicResource LOCAS_ColorDesktopIndicatorByBattery}"
+                                                      IsChecked="{Binding ColorDesktopIndicatorByBattery}"
+                                                      Margin="0,14,0,0" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
@@ -510,16 +509,12 @@
                                                          Content="{DynamicResource LOCAS_BatteryDisplayPercentageOnly}"
                                                          IsChecked="{Binding FullscreenBatteryPercentageOnly, Mode=TwoWay}" />
                                         </StackPanel>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="180" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIcon}" VerticalAlignment="Center" Margin="0,0,8,0" />
-                                            <ComboBox x:Name="BatteryIndicatorIconBox"
-                                                      Grid.Column="1"
-                                                      ItemsSource="{Binding BatteryIconOptions}"
-                                                      SelectedValuePath="Id"
-                                                      SelectedValue="{Binding BatteryIndicatorIcon}" />
-                                        </Grid>
-                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIconHelp}" Style="{StaticResource HintText}" Margin="180,6,0,0" />
+                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIcon}" Margin="0,0,0,6" />
+                                        <ComboBox x:Name="BatteryIndicatorIconBox"
+                                                  ItemsSource="{Binding BatteryIconOptions}"
+                                                  SelectedValuePath="Id"
+                                                  SelectedValue="{Binding BatteryIndicatorIcon}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIconHelp}" Style="{StaticResource HintText}" Margin="0,6,0,0" />
                                         <Button Content="{DynamicResource LOCAS_OverviewRefresh}"
                                                 HorizontalAlignment="Left"
                                                 MinWidth="130"
