@@ -8,7 +8,7 @@ Packages:
       - Added a consistent semantic battery palette to the summary and device cards while preserving theme-colored labels for readability.
       - Added an optional Desktop setting that colors the top-bar icon and percentage according to the active device battery level.
       - Added an adaptive icon-only layout for narrow top-panel buttons, including circular 35 px themes such as Mythos.
-      - Added battery-aware tooltips in the form Device name: 68% and centered compact icons without asymmetric spacing.
+      - Added battery-aware tooltips showing the device name and percentage, and centered compact icons without asymmetric spacing.
       - Reworked both icon selectors into full-width vertical layouts and refined the top-panel percentage size.
       - Updated the theme API to 1.4.0 with semantic Desktop battery brush and effective color-state properties.
       - Updated all twelve localizations and the English and Spanish Wiki documentation.
