@@ -123,6 +123,7 @@
     <sys:String x:Key="LOCAS_SpatialSoundToolStatusUnknownExe">Seçilen dosya SoundVolumeView.exe veya svcl.exe gibi görünmüyor.</sys:String>
     <sys:String x:Key="LOCAS_SpatialDoNotChange">Değiştirme</sys:String>
     <sys:String x:Key="LOCAS_SpatialOff">Kapalı</sys:String>
+    <sys:String x:Key="LOCAS_SpatialOn">Açık</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">Uzamsal Ses aracı yolu yapılandırılmamış veya mevcut değil.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">Uzamsal Ses değiştirilemedi</sys:String>
     <sys:String x:Key="LOCAS_VolumeTitle">Tam ekran ses kontrolleri</sys:String>
@@ -230,5 +231,27 @@
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Simge</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">“Aygıt simgesi” seçildiğinde etkin aygıt için atanmış veya önerilen simge kullanılır. Kullanılabilir bir simge yoksa varsayılan hoparlör simgesi gösterilir.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Bu seçenek yalnızca Fullscreen BatteryWidget'ını etkiler.</sys:String>
+    <sys:String x:Key="LOCAS_ExpandSectionHint">Bu bölümü yapılandırmak için genişletin.</sys:String>
+    <sys:String x:Key="LOCAS_EnableQuickSwitchHelp">Tam ekranda Görünür çıkış aygıtları arasında Geri + RB ile gezinir.</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevicesHelp">Kapalıyken hızlı geçiş yalnızca özel bir Playnite adı olan aygıtları içerir.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Masaüstü üst çubuğunda yapılandırılmış simgeyi tutar ve pil yüzdesini göstermez.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Yapılandırılmış simgeyi ve bildirilen pil yüzdesini birlikte gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">Bir oyun başladığında Audio Switcher kaydedilmiş çıkış, giriş, Spatial Sound ve ses düzeyi profilini uygulayabilir.</sys:String>
+    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">Profilli bir oyun kapandıktan sonra, başlamadan önce etkin olan çıkış ve giriş aygıtlarını geri yükler.</sys:String>
+    <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher seçilen NirSoft aracını çağırır. Araçlar pakete dahil edilmez ve indirilmez.</sys:String>
+    <sys:String x:Key="LOCAS_ShowNotificationHelp">Audio Switcher’ın hangi bilgilendirme bildirimlerini göstereceğini seçin. Önemli hatalar her zaman gösterilir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Varsayılan oynatma aygıtı değiştiğinde bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDeviceHelp">Varsayılan kayıt aygıtı değiştiğinde bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolumeHelp">Ana, oyun, giriş veya medya ses düzeyi değiştiğinde bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMuteHelp">Ses kapatıldığında veya açıldığında bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfileHelp">Bir oyun ses profili uygulandığında veya geri yüklendiğinde bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSoundHelp">Bir oyun profili Spatial Sound’u değiştirdiğinde bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnosticsHelp">Bir tanılama dışa aktarımı bittiğinde bir bildirim gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentageHelp">BatteryWidget simgesini ve bildirilen yüzdeyi birlikte gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">Yalnızca BatteryWidget simgesini gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">BatteryWidget içinde yalnızca bildirilen yüzdeyi gösterir.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryHelp">Bu seçenekler pil bilgisinin Playnite Masaüstü üst çubuğunda nasıl görüneceğini kontrol eder. Tam ekran BatteryWidget’ı değiştirmezler.</sys:String>
+    <sys:String x:Key="LOCAS_NotePrefix">NOT:</sys:String>
 </ResourceDictionary>
 

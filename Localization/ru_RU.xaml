@@ -123,6 +123,7 @@
     <sys:String x:Key="LOCAS_SpatialSoundToolStatusUnknownExe">Выбранный файл не похож на SoundVolumeView.exe или svcl.exe.</sys:String>
     <sys:String x:Key="LOCAS_SpatialDoNotChange">Не изменять</sys:String>
     <sys:String x:Key="LOCAS_SpatialOff">Выкл.</sys:String>
+    <sys:String x:Key="LOCAS_SpatialOn">Вкл.</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">Путь к инструменту пространственного звука не настроен или не существует.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">Не удалось переключить пространственный звук</sys:String>
     <sys:String x:Key="LOCAS_VolumeTitle">Управление громкостью в полноэкранном режиме</sys:String>
@@ -230,5 +231,27 @@
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Значок</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">При выборе «Значок устройства» используется назначенный или предложенный значок активного устройства. Если значок недоступен, отображается стандартный значок динамика.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Этот параметр влияет только на BatteryWidget Fullscreen.</sys:String>
+    <sys:String x:Key="LOCAS_ExpandSectionHint">Разверните, чтобы настроить этот раздел.</sys:String>
+    <sys:String x:Key="LOCAS_EnableQuickSwitchHelp">Переключает видимые устройства вывода в полноэкранном режиме сочетанием Назад + RB.</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevicesHelp">Если параметр выключен, быстрое переключение включает только устройства с пользовательским именем Playnite.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Оставляет настроенный значок на верхней панели рабочего стола и не показывает процент батареи.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Показывает вместе настроенный значок и сообщаемый процент батареи.</sys:String>
+    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">При запуске игры Audio Switcher может применить сохранённый профиль вывода, ввода, Spatial Sound и громкости.</sys:String>
+    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">После закрытия игры с профилем восстанавливает устройства вывода и ввода, которые были активны до запуска.</sys:String>
+    <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher вызывает выбранный инструмент NirSoft. Инструменты не входят в поставку и не загружаются.</sys:String>
+    <sys:String x:Key="LOCAS_ShowNotificationHelp">Выберите, какие информационные уведомления показывает Audio Switcher. Важные ошибки отображаются всегда.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Показывает уведомление при смене устройства воспроизведения по умолчанию.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDeviceHelp">Показывает уведомление при смене устройства записи по умолчанию.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolumeHelp">Показывает уведомление при изменении общей, игровой, входной или медиагромкости.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMuteHelp">Показывает уведомление при отключении или включении звука.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfileHelp">Показывает уведомление при применении или восстановлении игрового аудиопрофиля.</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSoundHelp">Показывает уведомление, когда Spatial Sound меняется игровым профилем.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnosticsHelp">Показывает уведомление по завершении экспорта диагностики.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentageHelp">Показывает вместе значок BatteryWidget и сообщаемый процент.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">Показывает только значок BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Показывает только сообщаемый процент в BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryHelp">Эти параметры управляют отображением батареи на верхней панели рабочего стола Playnite. Они не меняют BatteryWidget полноэкранного режима.</sys:String>
+    <sys:String x:Key="LOCAS_NotePrefix">ПРИМЕЧАНИЕ:</sys:String>
 </ResourceDictionary>
 

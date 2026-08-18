@@ -124,6 +124,7 @@
     <sys:String x:Key="LOCAS_SpatialSoundToolStatusUnknownExe">Le fichier sélectionné ne semble pas être SoundVolumeView.exe ni svcl.exe.</sys:String>
     <sys:String x:Key="LOCAS_SpatialDoNotChange">Ne pas changer</sys:String>
     <sys:String x:Key="LOCAS_SpatialOff">Désactivé</sys:String>
+    <sys:String x:Key="LOCAS_SpatialOn">Activé</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">Le chemin de l'outil de son spatial n'est pas configuré ou n'existe pas.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">Échec du changement de son spatial</sys:String>
     <sys:String x:Key="LOCAS_VolumeTitle">Contrôles de volume en plein écran</sys:String>
@@ -230,5 +231,27 @@
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">Icône</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">Choisir « Icône du périphérique » utilise l’icône attribuée ou suggérée pour le périphérique actif. Si aucune n’est disponible, l’icône de haut-parleur par défaut est affichée.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">Cette option affecte uniquement le BatteryWidget Fullscreen.</sys:String>
+    <sys:String x:Key="LOCAS_ExpandSectionHint">Développez pour configurer cette section.</sys:String>
+    <sys:String x:Key="LOCAS_EnableQuickSwitchHelp">Parcourt les périphériques de sortie visibles en plein écran avec Retour + RB.</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevicesHelp">Lorsque cette option est désactivée, le basculement rapide n’inclut que les périphériques avec un nom Playnite personnalisé.</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Conserve l’icône configurée dans la barre supérieure Bureau et n’affiche pas le pourcentage de batterie.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Affiche ensemble l’icône configurée et le pourcentage de batterie signalé.</sys:String>
+    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">Au lancement d’un jeu, Audio Switcher peut appliquer son profil enregistré de sortie, d’entrée, Spatial Sound et volume.</sys:String>
+    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">Après la fermeture d’un jeu profilé, restaure les périphériques de sortie et d’entrée actifs avant son lancement.</sys:String>
+    <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher appelle l’outil NirSoft sélectionné. Les outils ne sont ni fournis ni téléchargés.</sys:String>
+    <sys:String x:Key="LOCAS_ShowNotificationHelp">Choisissez les notifications d’information affichées par Audio Switcher. Les erreurs importantes sont toujours affichées.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Affiche une notification lorsque le périphérique de lecture par défaut change.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDeviceHelp">Affiche une notification lorsque le périphérique d’enregistrement par défaut change.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolumeHelp">Affiche une notification lorsque le volume principal, du jeu, d’entrée ou média change.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMuteHelp">Affiche une notification lorsque l’audio est coupé ou rétabli.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfileHelp">Affiche une notification lorsqu’un profil audio de jeu est appliqué ou restauré.</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSoundHelp">Affiche une notification lorsque Spatial Sound change pour un profil de jeu.</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnosticsHelp">Affiche une notification lorsqu’une exportation de diagnostic se termine.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentageHelp">Affiche ensemble l’icône du BatteryWidget et le pourcentage signalé.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">Affiche uniquement l’icône du BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Affiche uniquement le pourcentage signalé dans le BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryHelp">Ces options contrôlent l’affichage de la batterie dans la barre supérieure Bureau de Playnite. Elles ne modifient pas le BatteryWidget Fullscreen.</sys:String>
+    <sys:String x:Key="LOCAS_NotePrefix">NOTE :</sys:String>
 </ResourceDictionary>
 

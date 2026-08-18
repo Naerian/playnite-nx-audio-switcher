@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.15.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-18
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.15.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_0.pext
+    Changelog:
+      - Rebuilt the Desktop settings window with Overview, Devices, General, Notifications, Maintenance, and About tabs, matching the visual system used by the other NX extensions.
+      - Moved Desktop, Fullscreen, Battery, Game profiles, and Spatial Sound under General, and kept nested options visible but disabled when their parent setting is off.
+      - Added Overview status and capability badges and applied a consistent type, spacing, and badge scale throughout settings.
+      - Filled the Playnite settings host so the panel uses the available window instead of a narrow column.
+      - Updated all twelve localizations and the English and Spanish Wiki documentation.
   - Version: 1.14.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-16

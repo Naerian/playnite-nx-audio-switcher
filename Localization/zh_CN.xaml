@@ -123,6 +123,7 @@
     <sys:String x:Key="LOCAS_SpatialSoundToolStatusUnknownExe">所选文件看起来不像 SoundVolumeView.exe 或 svcl.exe。</sys:String>
     <sys:String x:Key="LOCAS_SpatialDoNotChange">不更改</sys:String>
     <sys:String x:Key="LOCAS_SpatialOff">关闭</sys:String>
+    <sys:String x:Key="LOCAS_SpatialOn">开启</sys:String>
     <sys:String x:Key="LOCAS_SpatialToolMissing">空间音效工具路径未配置或不存在。</sys:String>
     <sys:String x:Key="LOCAS_SpatialSwitchFailed">空间音效切换失败</sys:String>
     <sys:String x:Key="LOCAS_VolumeTitle">全屏音量控制</sys:String>
@@ -230,5 +231,27 @@
     <sys:String x:Key="LOCAS_BatteryIndicatorIcon">图标</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorIconHelp">选择“设备图标”后，将使用为当前设备指定或建议的图标。如果没有可用图标，则显示默认扬声器图标。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">此选项仅影响全屏 BatteryWidget。</sys:String>
+    <sys:String x:Key="LOCAS_ExpandSectionHint">展开以配置此部分。</sys:String>
+    <sys:String x:Key="LOCAS_EnableQuickSwitchHelp">在全屏模式下使用 Back + RB 循环切换可见的输出设备。</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevicesHelp">关闭后，快速切换仅包含具有自定义 Playnite 名称的设备。</sys:String>
+    <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">在桌面顶栏保留已配置的图标，不显示电池百分比。</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">同时显示已配置的图标和报告的电池百分比。</sys:String>
+    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">游戏启动时，Audio Switcher 可以应用已保存的输出、输入、Spatial Sound 和音量配置。</sys:String>
+    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">带配置的游戏结束后，恢复启动前处于活动状态的输出和输入设备。</sys:String>
+    <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher 会调用所选的 NirSoft 工具。这些工具既不随附，也不会自动下载。</sys:String>
+    <sys:String x:Key="LOCAS_ShowNotificationHelp">选择 Audio Switcher 显示哪些信息通知。重要错误始终会显示。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">默认播放设备更改时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyInputDeviceHelp">默认录制设备更改时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyVolumeHelp">主音量、游戏、输入或媒体音量更改时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyMuteHelp">静音或取消静音时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyGameProfileHelp">应用或恢复游戏音频配置时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_NotifySpatialSoundHelp">游戏配置更改 Spatial Sound 时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_NotifyDiagnosticsHelp">诊断导出完成时显示通知。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentageHelp">同时显示 BatteryWidget 图标和报告的百分比。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">仅显示 BatteryWidget 图标。</sys:String>
+    <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">在 BatteryWidget 中仅显示报告的百分比。</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryHelp">这些选项控制电池信息在 Playnite 桌面顶栏中的显示方式。它们不会更改全屏 BatteryWidget。</sys:String>
+    <sys:String x:Key="LOCAS_NotePrefix">注意：</sys:String>
 </ResourceDictionary>
 
