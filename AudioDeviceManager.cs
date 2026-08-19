@@ -274,15 +274,24 @@ namespace PlayniteAudioSwitcher
                     {
                         Marshal.ThrowExceptionForHR(collection.Item(i, out device));
                         Marshal.ThrowExceptionForHR(device.GetId(out var id));
-                        Marshal.ThrowExceptionForHR(device.GetState(out var state));
-                        var name = GetDeviceName(device);
+                        var endpointState = AudioEndpointState.Unknown;
+                        try
+                        {
+                            Marshal.ThrowExceptionForHR(device.GetState(out var state));
+                            endpointState = ToAudioEndpointState(state);
+                        }
+                        catch
+                        {
+                            endpointState = AudioEndpointState.Active;
+                        }
 
+                        var name = GetDeviceName(device);
                         var audioDevice = new AudioDevice
                         {
                             Id = id,
                             Name = string.IsNullOrWhiteSpace(name) ? id : name,
                             IsDefault = string.Equals(id, defaultId, StringComparison.OrdinalIgnoreCase),
-                            State = ToAudioEndpointState(state),
+                            State = endpointState,
                             ContainerId = GetDeviceContainerId(device)
                         };
                         ApplyBatteryInfo(audioDevice);
@@ -936,25 +945,32 @@ namespace PlayniteAudioSwitcher
         private AudioDevice GetDefaultDevice(EDataFlow dataFlow)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            var result = enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device);
-            if (IsEndpointNotFound(result))
+            IMMDevice device = null;
+            try
             {
-                return null;
+                device = TryGetDefaultAudioEndpoint(enumerator, dataFlow);
+                if (device == null)
+                {
+                    return null;
+                }
+
+                Marshal.ThrowExceptionForHR(device.GetId(out var id));
+                var name = GetDeviceName(device);
+                var audioDevice = new AudioDevice
+                {
+                    Id = id,
+                    Name = string.IsNullOrWhiteSpace(name) ? id : name,
+                    IsDefault = true,
+                    State = AudioEndpointState.Active,
+                    ContainerId = GetDeviceContainerId(device)
+                };
+                ApplyBatteryInfo(audioDevice);
+                return audioDevice;
             }
-
-            Marshal.ThrowExceptionForHR(result);
-            Marshal.ThrowExceptionForHR(device.GetId(out var id));
-
-            var audioDevice = new AudioDevice
+            finally
             {
-                Id = id,
-                Name = GetDeviceName(device),
-                IsDefault = true,
-                State = AudioEndpointState.Active,
-                ContainerId = GetDeviceContainerId(device)
-            };
-            ApplyBatteryInfo(audioDevice);
-            return audioDevice;
+                ReleaseDistinctComObjects(device, enumerator);
+            }
         }
 
         private void SetDefaultDevice(string deviceId)
@@ -1021,22 +1037,38 @@ namespace PlayniteAudioSwitcher
         private IAudioEndpointVolume GetDefaultVolumeEndpoint(EDataFlow dataFlow)
         {
             var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            var result = enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device);
-            if (IsEndpointNotFound(result))
+            IMMDevice device = null;
+            try
+            {
+                device = TryGetDefaultAudioEndpoint(enumerator, dataFlow);
+                if (device == null)
+                {
+                    return null;
+                }
+
+                var interfaceId = typeof(IAudioEndpointVolume).GUID;
+                var activateResult = device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer);
+                if (activateResult < 0 || interfacePointer == IntPtr.Zero)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    return (IAudioEndpointVolume)Marshal.GetObjectForIUnknown(interfacePointer);
+                }
+                finally
+                {
+                    Marshal.Release(interfacePointer);
+                }
+            }
+            catch
             {
                 return null;
             }
-
-            Marshal.ThrowExceptionForHR(result);
-            var interfaceId = typeof(IAudioEndpointVolume).GUID;
-            Marshal.ThrowExceptionForHR(device.Activate(ref interfaceId, 23, IntPtr.Zero, out var interfacePointer));
-            try
-            {
-                return (IAudioEndpointVolume)Marshal.GetObjectForIUnknown(interfacePointer);
-            }
             finally
             {
-                Marshal.Release(interfacePointer);
+                ReleaseDistinctComObjects(device, enumerator);
             }
         }
 
@@ -1052,15 +1084,15 @@ namespace PlayniteAudioSwitcher
 
         private static string GetDefaultDeviceId(IMMDeviceEnumerator enumerator, EDataFlow dataFlow)
         {
+            IMMDevice device = null;
             try
             {
-                var result = enumerator.GetDefaultAudioEndpoint(dataFlow, ERole.eMultimedia, out var device);
-                if (IsEndpointNotFound(result))
+                device = TryGetDefaultAudioEndpoint(enumerator, dataFlow);
+                if (device == null)
                 {
                     return null;
                 }
 
-                Marshal.ThrowExceptionForHR(result);
                 Marshal.ThrowExceptionForHR(device.GetId(out var id));
                 return id;
             }
@@ -1068,22 +1100,67 @@ namespace PlayniteAudioSwitcher
             {
                 return null;
             }
+            finally
+            {
+                ReleaseDistinctComObjects(device);
+            }
+        }
+
+        private static IMMDevice TryGetDefaultAudioEndpoint(IMMDeviceEnumerator enumerator, EDataFlow dataFlow)
+        {
+            var roles = new[] { ERole.eMultimedia, ERole.eConsole, ERole.eCommunications };
+            for (var i = 0; i < roles.Length; i++)
+            {
+                IMMDevice device = null;
+                var result = enumerator.GetDefaultAudioEndpoint(dataFlow, roles[i], out device);
+                if (result >= 0 && device != null)
+                {
+                    return device;
+                }
+
+                ReleaseDistinctComObjects(device);
+            }
+
+            return null;
         }
 
         private static string GetDeviceName(IMMDevice device)
         {
-            Marshal.ThrowExceptionForHR(device.OpenPropertyStore(StorageAccessMode.Read, out var propertyStore));
             try
             {
-                using (var prop = new PropVariantHandle())
+                Marshal.ThrowExceptionForHR(device.OpenPropertyStore(StorageAccessMode.Read, out var propertyStore));
+                try
                 {
-                    Marshal.ThrowExceptionForHR(propertyStore.GetValue(PropertyKeys.DeviceFriendlyName, prop.Pointer));
-                    return prop.GetString();
+                    var friendlyName = GetPropertyString(propertyStore, PropertyKeys.DeviceFriendlyName);
+                    if (!string.IsNullOrWhiteSpace(friendlyName))
+                    {
+                        return friendlyName;
+                    }
+
+                    return GetPropertyString(propertyStore, PropertyKeys.DeviceDesc);
+                }
+                finally
+                {
+                    ReleaseDistinctComObjects(propertyStore);
                 }
             }
-            finally
+            catch
             {
-                ReleaseDistinctComObjects(propertyStore);
+                return null;
+            }
+        }
+
+        private static string GetPropertyString(IPropertyStore propertyStore, PropertyKey key)
+        {
+            using (var prop = new PropVariantHandle())
+            {
+                var result = propertyStore.GetValue(key, prop.Pointer);
+                if (result < 0)
+                {
+                    return null;
+                }
+
+                return prop.GetString();
             }
         }
 
@@ -1116,8 +1193,15 @@ namespace PlayniteAudioSwitcher
 
         private void ApplyBatteryInfo(AudioDevice device)
         {
-            if (device?.ContainerId == null)
+            if (device == null)
             {
+                return;
+            }
+
+            if (!device.IsAvailable || device.ContainerId == null)
+            {
+                device.BatteryPercent = null;
+                device.IsBatteryCharging = false;
                 return;
             }
 
@@ -1500,6 +1584,12 @@ namespace PlayniteAudioSwitcher
             {
                 FormatId = new Guid("A45C254E-DF1C-4EFD-8020-67D146A850E0"),
                 PropertyId = 14
+            };
+
+            public static PropertyKey DeviceDesc = new PropertyKey
+            {
+                FormatId = new Guid("A45C254E-DF1C-4EFD-8020-67D146A850E0"),
+                PropertyId = 2
             };
 
             public static PropertyKey DeviceContainerId = new PropertyKey

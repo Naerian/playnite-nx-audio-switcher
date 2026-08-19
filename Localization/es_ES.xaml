@@ -40,6 +40,8 @@
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher aplica este dispositivo al iniciar Playnite. Los perfiles por juego pueden sustituirlo temporalmente y restaurarlo al cerrar el juego.</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Mantener el predeterminado de Windows</sys:String>
     <sys:String x:Key="LOCAS_SystemDevices">Dispositivos del sistema</sys:String>
+    <sys:String x:Key="LOCAS_NoSystemDevices">Windows no ha informado de ningún dispositivo aquí. Revisa Playnite.log y evita ejecutar Playnite como administrador.</sys:String>
+    <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">Los dispositivos de Windows desconectados o ausentes se ocultan aquí hasta que vuelvan. Se recuerdan el nombre, el icono y la visibilidad personalizados.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Dispositivo</sys:String>
     <sys:String x:Key="LOCAS_Status">Estado</sys:String>
     <sys:String x:Key="LOCAS_Battery">Batería</sys:String>

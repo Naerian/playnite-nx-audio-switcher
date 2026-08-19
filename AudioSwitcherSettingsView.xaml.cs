@@ -308,43 +308,29 @@ namespace PlayniteAudioSwitcher
             }
 
             var plugin = settings.Plugin;
-            try
-            {
-                UpdateDeviceOverview(
-                    plugin.GetCurrentDeviceDisplayName(),
-                    plugin.GetCurrentVolumeState(),
-                    plugin.GetCurrentPlaybackDeviceForTheme(),
-                    OverviewOutputText,
-                    OverviewOutputVolumeText,
-                    OverviewOutputVolumePill,
-                    OverviewOutputBatteryText,
-                    OverviewOutputBatteryPill,
-                    OverviewOutputPills);
-            }
-            catch
-            {
-                OverviewOutputText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
-                CollapseOverviewPills(OverviewOutputPills, OverviewOutputVolumePill, OverviewOutputBatteryPill);
-            }
+            var outputDevice = plugin.GetCurrentPlaybackDeviceForTheme();
+            UpdateDeviceOverview(
+                outputDevice == null ? null : plugin.GetDeviceDisplayNameForTheme(outputDevice),
+                GetOverviewVolume(new Func<AudioVolumeState>(plugin.GetCurrentVolumeState)),
+                outputDevice,
+                OverviewOutputText,
+                OverviewOutputVolumeText,
+                OverviewOutputVolumePill,
+                OverviewOutputBatteryText,
+                OverviewOutputBatteryPill,
+                OverviewOutputPills);
 
-            try
-            {
-                UpdateDeviceOverview(
-                    plugin.GetCurrentInputDeviceDisplayName(),
-                    plugin.GetCurrentInputVolumeState(),
-                    plugin.GetCurrentRecordingDeviceForTheme(),
-                    OverviewInputText,
-                    OverviewInputVolumeText,
-                    OverviewInputVolumePill,
-                    OverviewInputBatteryText,
-                    OverviewInputBatteryPill,
-                    OverviewInputPills);
-            }
-            catch
-            {
-                OverviewInputText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
-                CollapseOverviewPills(OverviewInputPills, OverviewInputVolumePill, OverviewInputBatteryPill);
-            }
+            var inputDevice = plugin.GetCurrentRecordingDeviceForTheme();
+            UpdateDeviceOverview(
+                inputDevice == null ? null : plugin.GetInputDeviceDisplayNameForTheme(inputDevice),
+                GetOverviewVolume(new Func<AudioVolumeState>(plugin.GetCurrentInputVolumeState)),
+                inputDevice,
+                OverviewInputText,
+                OverviewInputVolumeText,
+                OverviewInputVolumePill,
+                OverviewInputBatteryText,
+                OverviewInputBatteryPill,
+                OverviewInputPills);
 
             var profileCount = settings.AvailableGameProfiles.Count;
             var manualProcessCount = settings.AvailableGameProfiles.Count(profile => !string.IsNullOrWhiteSpace(profile.AudioProcessName));
@@ -390,14 +376,16 @@ namespace PlayniteAudioSwitcher
             Border batteryPill,
             Panel pillsPanel)
         {
-            if (string.IsNullOrWhiteSpace(deviceName))
+            if (device == null)
             {
                 deviceText.Text = ResourceText("LOCAS_OverviewNoDevice", "No default device");
                 CollapseOverviewPills(pillsPanel, volumePill, batteryPill);
                 return;
             }
 
-            deviceText.Text = deviceName;
+            deviceText.Text = string.IsNullOrWhiteSpace(deviceName)
+                ? (string.IsNullOrWhiteSpace(device.Name) ? device.Id : device.Name)
+                : deviceName;
 
             var showVolume = volumeState != null && volumeState.IsAvailable;
             if (showVolume)
@@ -443,6 +431,19 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        private static AudioVolumeState GetOverviewVolume(Func<AudioVolumeState> getVolume)
+        {
+            try
+            {
+                var volumeState = getVolume();
+                return volumeState ?? new AudioVolumeState { IsAvailable = false };
+            }
+            catch
+            {
+                return new AudioVolumeState { IsAvailable = false };
+            }
+        }
+
         private string ResourceText(string key, string fallback)
         {
             return TryFindResource(key) as string ?? fallback;
@@ -465,6 +466,22 @@ namespace PlayniteAudioSwitcher
             panel.Children.Clear();
 
             var deviceList = (devices ?? Enumerable.Empty<AudioDevice>()).ToList();
+            if (deviceList.Count == 0)
+            {
+                var empty = new TextBlock
+                {
+                    Text = ResourceText(
+                        "LOCAS_NoSystemDevices",
+                        "Windows did not report any devices here. Check Playnite.log and avoid running Playnite as Administrator."),
+                    FontSize = 12,
+                    Opacity = 0.78,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 8, 0, 0)
+                };
+                empty.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
+                panel.Children.Add(empty);
+                return;
+            }
             for (var index = 0; index < deviceList.Count; index++)
             {
                 panel.Children.Add(CreateDeviceRow(
@@ -619,7 +636,7 @@ namespace PlayniteAudioSwitcher
                 var customNameLabel = CreateFieldLabel("LOCAS_PlayniteName");
                 var customNameBox = new TextBox
                 {
-                    Text = device.CustomName ?? string.Empty
+                    Text = AudioSwitcherSettings.SanitizeCustomName(device.CustomName) ?? string.Empty
                 };
                 customNameBox.TextChanged += (_, __) => device.CustomName = customNameBox.Text;
                 customNamePanel.Children.Add(customNameLabel);

@@ -424,14 +424,8 @@ namespace PlayniteAudioSwitcher
             // IDs locally so a background device/battery refresh cannot erase them.
             var selectedOutputDeviceId = PreferredOutputDeviceId;
             var selectedInputDeviceId = PreferredInputDeviceId;
-            var profileOutputIds = new HashSet<string>(AvailableGameProfiles
-                .Where(profile => !string.IsNullOrWhiteSpace(profile.DeviceId))
-                .Select(profile => profile.DeviceId));
-            var profileInputIds = new HashSet<string>(AvailableGameProfiles
-                .Where(profile => !string.IsNullOrWhiteSpace(profile.InputDeviceId))
-                .Select(profile => profile.InputDeviceId));
-            AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetAllPlaybackDevices(), false, profileOutputIds);
-            AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetAllRecordingDevices(), true, profileInputIds);
+            AvailablePlaybackDevices = RefreshDeviceList(DeviceAliases, () => plugin.AudioDevices.GetAllPlaybackDevices(), false);
+            AvailableRecordingDevices = RefreshDeviceList(InputDeviceAliases, () => plugin.AudioDevices.GetAllRecordingDevices(), true);
             PreferredPlaybackDeviceOptions = CreatePreferredDeviceOptions(AvailablePlaybackDevices, selectedOutputDeviceId);
             PreferredRecordingDeviceOptions = CreatePreferredDeviceOptions(AvailableRecordingDevices, selectedInputDeviceId);
             PreferredOutputDeviceId = selectedOutputDeviceId;
@@ -910,39 +904,8 @@ namespace PlayniteAudioSwitcher
 
         public void EndEdit()
         {
-            var playbackDeviceIds = new HashSet<string>(AvailablePlaybackDevices.Select(device => device.Id));
-            DeviceAliases = AvailablePlaybackDevices
-                .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
-                    !a.IsIconSuggested && !string.IsNullOrWhiteSpace(a.Icon) ||
-                    !a.IsVisible ||
-                    a.DefaultVolumePercent.HasValue)
-                .Select(a => new AudioDeviceAlias
-                {
-                    DeviceId = a.Id,
-                    CustomName = a.CustomName?.Trim(),
-                    Icon = a.IsIconSuggested ? null : a.Icon,
-                    IsVisible = a.IsVisible ? (bool?)null : false,
-                    DefaultVolumePercent = a.DefaultVolumePercent
-                })
-                .Concat(DeviceAliases.Where(alias => !playbackDeviceIds.Contains(alias.DeviceId)))
-                .ToList();
-
-            var recordingDeviceIds = new HashSet<string>(AvailableRecordingDevices.Select(device => device.Id));
-            InputDeviceAliases = AvailableRecordingDevices
-                .Where(a => !string.IsNullOrWhiteSpace(a.CustomName) ||
-                    !a.IsIconSuggested && !string.IsNullOrWhiteSpace(a.Icon) ||
-                    !a.IsVisible ||
-                    a.DefaultVolumePercent.HasValue)
-                .Select(a => new AudioDeviceAlias
-                {
-                    DeviceId = a.Id,
-                    CustomName = a.CustomName?.Trim(),
-                    Icon = a.IsIconSuggested ? null : a.Icon,
-                    IsVisible = a.IsVisible ? (bool?)null : false,
-                    DefaultVolumePercent = a.DefaultVolumePercent
-                })
-                .Concat(InputDeviceAliases.Where(alias => !recordingDeviceIds.Contains(alias.DeviceId)))
-                .ToList();
+            DeviceAliases = PersistAliases(AvailablePlaybackDevices, DeviceAliases);
+            InputDeviceAliases = PersistAliases(AvailableRecordingDevices, InputDeviceAliases);
 
             plugin.ReplaceGameProfiles(AvailableGameProfiles);
 
@@ -1062,8 +1025,7 @@ namespace PlayniteAudioSwitcher
         private List<AudioDevice> RefreshDeviceList(
             List<AudioDeviceAlias> aliasesSource,
             System.Func<IReadOnlyList<AudioDevice>> getDevices,
-            bool isInput,
-            ISet<string> profileDeviceIds)
+            bool isInput)
         {
             try
             {
@@ -1071,17 +1033,15 @@ namespace PlayniteAudioSwitcher
                     .Where(a => !string.IsNullOrWhiteSpace(a.DeviceId))
                     .GroupBy(a => a.DeviceId)
                     .ToDictionary(a => a.Key, a => a.Last());
-                var retainedInactiveIds = new HashSet<string>(aliases.Keys);
-                retainedInactiveIds.UnionWith(profileDeviceIds ?? new HashSet<string>());
-
-                return getDevices()
-                    .Where(device => device.IsAvailable || retainedInactiveIds.Contains(device.Id))
+                var windowsDevices = (getDevices() ?? new AudioDevice[0]).ToList();
+                var settingsDevices = windowsDevices
+                    .Where(ShouldShowInSettingsDeviceList)
                     .OrderBy(a => a.Name)
                     .Select(device =>
                     {
                         if (aliases.TryGetValue(device.Id, out var alias))
                         {
-                            device.CustomName = alias.CustomName;
+                            device.CustomName = SanitizeCustomName(alias.CustomName);
                             device.Icon = alias.Icon;
                             device.IsVisible = alias.IsVisible != false;
                             device.DefaultVolumePercent = alias.DefaultVolumePercent;
@@ -1098,11 +1058,127 @@ namespace PlayniteAudioSwitcher
                         return device;
                     })
                     .ToList();
+                LogDeviceEnumeration(isInput, windowsDevices, settingsDevices);
+                return settingsDevices;
+            }
+            catch (System.Exception ex)
+            {
+                try
+                {
+                    Playnite.SDK.LogManager.GetLogger().Error(ex, "Failed to refresh Audio Switcher device list.");
+                }
+                catch
+                {
+                }
+
+                return new List<AudioDevice>();
+            }
+        }
+
+        private static bool ShouldShowInSettingsDeviceList(AudioDevice device)
+        {
+            return device != null &&
+                (device.IsAvailable ||
+                    device.State == AudioEndpointState.Unknown ||
+                    device.State == AudioEndpointState.Disabled);
+        }
+
+        private static void LogDeviceEnumeration(bool isInput, IReadOnlyList<AudioDevice> windowsDevices, IReadOnlyList<AudioDevice> settingsDevices)
+        {
+            try
+            {
+                var kind = isInput ? "input" : "output";
+                var active = CountDeviceState(windowsDevices, AudioEndpointState.Active);
+                var disabled = CountDeviceState(windowsDevices, AudioEndpointState.Disabled);
+                var unplugged = CountDeviceState(windowsDevices, AudioEndpointState.Unplugged);
+                var notPresent = CountDeviceState(windowsDevices, AudioEndpointState.NotPresent);
+                var unknown = CountDeviceState(windowsDevices, AudioEndpointState.Unknown);
+                Playnite.SDK.LogManager.GetLogger().Info(
+                    $"Audio Switcher {kind} enumeration: windows={windowsDevices.Count} (active={active}, disabled={disabled}, unplugged={unplugged}, notPresent={notPresent}, unknown={unknown}); settings list={settingsDevices.Count}.");
             }
             catch
             {
-                return new List<AudioDevice>();
             }
+        }
+
+        private static int CountDeviceState(IEnumerable<AudioDevice> devices, AudioEndpointState state)
+        {
+            return devices.Count(device => device.State == state);
+        }
+
+        private static List<AudioDeviceAlias> PersistAliases(
+            IEnumerable<AudioDevice> currentDevices,
+            IEnumerable<AudioDeviceAlias> existingAliases)
+        {
+            var devices = (currentDevices ?? Enumerable.Empty<AudioDevice>()).ToList();
+            var currentIds = new HashSet<string>(devices.Select(device => device.Id));
+            return devices
+                .Where(HasMeaningfulDeviceCustomization)
+                .Select(ToAlias)
+                .Concat((existingAliases ?? Enumerable.Empty<AudioDeviceAlias>())
+                    .Where(alias => !string.IsNullOrWhiteSpace(alias.DeviceId) &&
+                        !currentIds.Contains(alias.DeviceId) &&
+                        HasMeaningfulAlias(alias))
+                    .Select(SanitizeAlias))
+                .ToList();
+        }
+
+        private static bool HasMeaningfulDeviceCustomization(AudioDevice device)
+        {
+            return device != null &&
+                (!string.IsNullOrWhiteSpace(SanitizeCustomName(device.CustomName)) ||
+                    !device.IsIconSuggested && !string.IsNullOrWhiteSpace(device.Icon) ||
+                    !device.IsVisible ||
+                    device.DefaultVolumePercent.HasValue);
+        }
+
+        private static bool HasMeaningfulAlias(AudioDeviceAlias alias)
+        {
+            return alias != null &&
+                (!string.IsNullOrWhiteSpace(SanitizeCustomName(alias.CustomName)) ||
+                    !string.IsNullOrWhiteSpace(alias.Icon) ||
+                    alias.IsVisible == false ||
+                    alias.DefaultVolumePercent.HasValue);
+        }
+
+        private static AudioDeviceAlias ToAlias(AudioDevice device)
+        {
+            return new AudioDeviceAlias
+            {
+                DeviceId = device.Id,
+                CustomName = SanitizeCustomName(device.CustomName),
+                Icon = device.IsIconSuggested ? null : device.Icon,
+                IsVisible = device.IsVisible ? (bool?)null : false,
+                DefaultVolumePercent = device.DefaultVolumePercent
+            };
+        }
+
+        private static AudioDeviceAlias SanitizeAlias(AudioDeviceAlias alias)
+        {
+            return new AudioDeviceAlias
+            {
+                DeviceId = alias.DeviceId,
+                CustomName = SanitizeCustomName(alias.CustomName),
+                Icon = alias.Icon,
+                IsVisible = alias.IsVisible,
+                DefaultVolumePercent = alias.DefaultVolumePercent
+            };
+        }
+
+        internal static string SanitizeCustomName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            var trimmed = value.Trim();
+            if (trimmed == "-" || trimmed == "\u2014" || trimmed == "\u2013")
+            {
+                return null;
+            }
+
+            return trimmed;
         }
 
         private string GetDeviceStatusDisplayName(AudioEndpointState state)
@@ -1145,7 +1221,7 @@ namespace PlayniteAudioSwitcher
 
         private static string GetCustomName(List<AudioDeviceAlias> aliases, string deviceId)
         {
-            return aliases.FirstOrDefault(a => a.DeviceId == deviceId)?.CustomName;
+            return SanitizeCustomName(aliases.FirstOrDefault(a => a.DeviceId == deviceId)?.CustomName);
         }
 
         private static string GetIcon(List<AudioDeviceAlias> aliases, string deviceId)

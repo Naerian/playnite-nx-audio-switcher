@@ -584,6 +584,7 @@
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource HintText}" />
                                     </StackPanel>
                                     <StackPanel x:Name="DeviceRowsPanel" />
                                 </StackPanel>
@@ -614,6 +615,7 @@
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource HintText}" />
                                     </StackPanel>
                                     <StackPanel x:Name="InputDeviceRowsPanel" />
                                 </StackPanel>

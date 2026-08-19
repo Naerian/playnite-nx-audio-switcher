@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.15.1
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-19
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.15.1/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_1.pext
+    Changelog:
+      - Fixed Desktop settings showing stale disconnected devices, including leftover battery readings, instead of the live Windows device list used by Fullscreen.
+      - Stopped placeholder Playnite names such as "-" from pinning missing devices in the settings catalog.
+      - Hardened default-device and volume lookup so Overview can still show the current endpoint if one Core Audio role or volume query fails.
+      - Logged Windows endpoint counts when refreshing the settings device list to make empty-list reports diagnosable.
+      - Updated all twelve localizations and the English and Spanish Wiki documentation.
   - Version: 1.15.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-18

@@ -28,14 +28,14 @@ changes to the extension.
 ## Last Known Stable State
 
 - Branch: `main`
-- Last release at the time this file was written: `v1.15.0`
-- Last release commit: see tag `v1.15.0`
+- Last release at the time this file was written: `v1.15.1`
+- Last release commit: see tag `v1.15.1`
 - Release URL:
-  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.15.0`
+  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.15.1`
 - Release package:
-  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_0.pext`
+  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_1.pext`
 - Public release asset SHA-256:
-  `9097DF35BEDEF58EA86C685F99B05602CBA5FEDC64509186325837F538C283F2`
+  `FB2DE5F15A4210120D32654B37AD6A49A01021EF242791A822604E2ABA321419`
 - Main repo state before this handoff was created: clean and synced with
   `origin/main`.
 

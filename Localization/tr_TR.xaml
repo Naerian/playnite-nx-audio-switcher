@@ -39,6 +39,8 @@
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Audio Switcher bu aygıtı Playnite başladığında uygular. Oyun profilleri geçici olarak geçersiz kılabilir ve oyun kapanınca geri yükleyebilir.</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows varsayılanını koru</sys:String>
     <sys:String x:Key="LOCAS_SystemDevices">Sistem aygıtları</sys:String>
+    <sys:String x:Key="LOCAS_NoSystemDevices">Windows burada hiçbir aygıt bildirmedi. Playnite.log dosyasını kontrol edin ve Playnite’i yönetici olarak çalıştırmayın.</sys:String>
+    <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">Bağlı olmayan veya eksik Windows aygıtları geri gelene kadar burada gizlenir. Özel adlar, simgeler ve görünürlük hatırlanır.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Aygıt</sys:String>
     <sys:String x:Key="LOCAS_Status">Durum</sys:String>
     <sys:String x:Key="LOCAS_Battery">Pil</sys:String>

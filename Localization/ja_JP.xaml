@@ -39,6 +39,8 @@
     <sys:String x:Key="LOCAS_PreferredDeviceHelp">Playnite の起動時に Audio Switcher がこのデバイスを適用します。ゲームプロファイルで一時的に上書きし、終了時に復元できます。</sys:String>
     <sys:String x:Key="LOCAS_KeepWindowsDefault">Windows の既定を維持</sys:String>
     <sys:String x:Key="LOCAS_SystemDevices">システム デバイス</sys:String>
+    <sys:String x:Key="LOCAS_NoSystemDevices">Windows はこの一覧にデバイスを報告しませんでした。Playnite.log を確認し、Playnite を管理者として実行しないでください。</sys:String>
+    <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">切断されている、または存在しない Windows デバイスは、再接続されるまでここには表示されません。カスタム名、アイコン、表示設定は保持されます。</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">デバイス</sys:String>
     <sys:String x:Key="LOCAS_Status">状態</sys:String>
     <sys:String x:Key="LOCAS_Battery">バッテリー</sys:String>
