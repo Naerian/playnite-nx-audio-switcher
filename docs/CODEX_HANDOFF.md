@@ -95,6 +95,9 @@ Current major areas:
 - `Icons\LICENSE-TABLER.txt`: bundled Tabler Icons MIT license.
 - `media\icon.png`: extension icon used by Playnite and metadata.
 - `README.md`: quick public documentation.
+- `docs/PLAYNITE-SDK.md`: local Playnite SDK 6.16 / Playnite 10 reference.
+  Consult it before changing plugin settings, events, menus, localization,
+  `extension.yaml`, or other SDK-facing integration.
 - GitHub Wiki: detailed user and theme developer documentation.
 
 ## Build
