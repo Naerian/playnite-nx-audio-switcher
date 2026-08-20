@@ -10,6 +10,11 @@ namespace PlayniteAudioSwitcher
     public sealed class AudioDeviceManager
     {
         private const int HResultElementNotFound = unchecked((int)0x80070490);
+        private const uint ClsCtxInProcServer = 1;
+        // Playnite Sounds (NAudio) also imports MMDeviceEnumerator with this CLSID.
+        // `new ComImportClass()` can then return NAudio's RCW and fail our interface cast.
+        private static readonly Guid MmDeviceEnumeratorClsid = new Guid("BCDE0395-E52F-467C-8E3D-C4579291692E");
+        private static readonly Guid PolicyConfigClientClsid = new Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9");
         private readonly object batteryCacheLock = new object();
         private readonly AudioDeviceBatteryReader batteryReader = new AudioDeviceBatteryReader();
         private IReadOnlyDictionary<Guid, AudioDeviceBatteryInfo> batteryByContainerId = new Dictionary<Guid, AudioDeviceBatteryInfo>();
@@ -259,7 +264,7 @@ namespace PlayniteAudioSwitcher
         private IReadOnlyList<AudioDevice> GetDevices(EDataFlow dataFlow, DeviceState stateMask)
         {
             var devices = new List<AudioDevice>();
-            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            var enumerator = CreateComInstance<IMMDeviceEnumerator>(MmDeviceEnumeratorClsid);
             IMMDeviceCollection collection = null;
             try
             {
@@ -646,6 +651,26 @@ namespace PlayniteAudioSwitcher
             return sessions;
         }
 
+        private static T CreateComInstance<T>(Guid clsid) where T : class
+        {
+            var interfaceId = typeof(T).GUID;
+            var classId = clsid;
+            Marshal.ThrowExceptionForHR(CoCreateInstance(ref classId, IntPtr.Zero, ClsCtxInProcServer, ref interfaceId, out var pointer));
+            if (pointer == IntPtr.Zero)
+            {
+                throw new InvalidComObjectException("CoCreateInstance returned a null COM pointer.");
+            }
+
+            try
+            {
+                return (T)Marshal.GetTypedObjectForIUnknown(pointer, typeof(T));
+            }
+            finally
+            {
+                Marshal.Release(pointer);
+            }
+        }
+
         private static void ReleaseDistinctComObjects(params object[] objects)
         {
             var released = new List<object>();
@@ -807,14 +832,22 @@ namespace PlayniteAudioSwitcher
         private IReadOnlyList<IMMDevice> GetEndpointDevices(EDataFlow dataFlow)
         {
             var devices = new List<IMMDevice>();
-            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
-            Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active, out var collection));
-            Marshal.ThrowExceptionForHR(collection.GetCount(out var count));
-
-            for (uint i = 0; i < count; i++)
+            var enumerator = CreateComInstance<IMMDeviceEnumerator>(MmDeviceEnumeratorClsid);
+            IMMDeviceCollection collection = null;
+            try
             {
-                Marshal.ThrowExceptionForHR(collection.Item(i, out var device));
-                devices.Add(device);
+                Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active, out collection));
+                Marshal.ThrowExceptionForHR(collection.GetCount(out var count));
+
+                for (uint i = 0; i < count; i++)
+                {
+                    Marshal.ThrowExceptionForHR(collection.Item(i, out var device));
+                    devices.Add(device);
+                }
+            }
+            finally
+            {
+                ReleaseDistinctComObjects(collection, enumerator);
             }
 
             return devices;
@@ -944,7 +977,7 @@ namespace PlayniteAudioSwitcher
 
         private AudioDevice GetDefaultDevice(EDataFlow dataFlow)
         {
-            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            var enumerator = CreateComInstance<IMMDeviceEnumerator>(MmDeviceEnumeratorClsid);
             IMMDevice device = null;
             try
             {
@@ -980,10 +1013,17 @@ namespace PlayniteAudioSwitcher
                 throw new ArgumentException("Se necesita el identificador del dispositivo.", nameof(deviceId));
             }
 
-            var policyConfig = (IPolicyConfig)new PolicyConfigClient();
-            Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole));
-            Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eMultimedia));
-            Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications));
+            var policyConfig = CreateComInstance<IPolicyConfig>(PolicyConfigClientClsid);
+            try
+            {
+                Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eConsole));
+                Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eMultimedia));
+                Marshal.ThrowExceptionForHR(policyConfig.SetDefaultEndpoint(deviceId, ERole.eCommunications));
+            }
+            finally
+            {
+                ReleaseDistinctComObjects(policyConfig);
+            }
         }
 
         private AudioVolumeState GetDefaultVolume(EDataFlow dataFlow)
@@ -1036,7 +1076,7 @@ namespace PlayniteAudioSwitcher
 
         private IAudioEndpointVolume GetDefaultVolumeEndpoint(EDataFlow dataFlow)
         {
-            var enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            var enumerator = CreateComInstance<IMMDeviceEnumerator>(MmDeviceEnumeratorClsid);
             IMMDevice device = null;
             try
             {
@@ -1245,18 +1285,6 @@ namespace PlayniteAudioSwitcher
         private enum StorageAccessMode
         {
             Read = 0
-        }
-
-        [ComImport]
-        [Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
-        private class MMDeviceEnumerator
-        {
-        }
-
-        [ComImport]
-        [Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9")]
-        private class PolicyConfigClient
-        {
         }
 
         [ComImport]
@@ -1641,6 +1669,14 @@ namespace PlayniteAudioSwitcher
                 Marshal.FreeCoTaskMem(Pointer);
             }
         }
+
+        [DllImport("ole32.dll")]
+        private static extern int CoCreateInstance(
+            [In] ref Guid clsid,
+            IntPtr outer,
+            uint context,
+            [In] ref Guid iid,
+            out IntPtr pointer);
 
         [DllImport("ole32.dll")]
         private static extern int PropVariantClear(IntPtr propVariant);

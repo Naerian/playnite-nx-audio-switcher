@@ -1763,7 +1763,23 @@ namespace PlayniteAudioSwitcher
 
         public Geometry GetIconGeometry(string icon)
         {
-            var data = settings.IconOptions.FirstOrDefault(a => string.Equals(a.Id, icon, StringComparison.OrdinalIgnoreCase))?.GeometryData;
+            if (string.IsNullOrWhiteSpace(icon))
+            {
+                return null;
+            }
+
+            var resolved = settings.ResolveIconId(icon);
+            if (string.IsNullOrWhiteSpace(resolved))
+            {
+                resolved = AudioSwitcherSettings.DefaultVolumeIconId;
+            }
+
+            var data = settings.IconOptions.FirstOrDefault(a => string.Equals(a.Id, resolved, StringComparison.OrdinalIgnoreCase))?.GeometryData;
+            if (string.IsNullOrWhiteSpace(data))
+            {
+                data = settings.IconOptions.FirstOrDefault(a => string.Equals(a.Id, AudioSwitcherSettings.DefaultVolumeIconId, StringComparison.OrdinalIgnoreCase))?.GeometryData;
+            }
+
             return string.IsNullOrWhiteSpace(data) ? null : Geometry.Parse(data);
         }
 

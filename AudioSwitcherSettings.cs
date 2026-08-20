@@ -46,6 +46,8 @@ namespace PlayniteAudioSwitcher
         private string desktopTopPanelIcon;
         private string desktopBatteryDisplayMode;
         private bool hideBatteryIndicatorWhenUnavailable = true;
+        private bool showDisabledOutputDevices;
+        private bool showDisabledInputDevices;
         private string batteryIndicatorDisplayMode = "IconAndPercentage";
         private string batteryIndicatorIcon = string.Empty;
 
@@ -91,6 +93,8 @@ namespace PlayniteAudioSwitcher
                 DesktopBatteryDisplayMode = savedSettings.DesktopBatteryDisplayMode ??
                     MigrateDesktopBatteryDisplayMode(savedSettings.BatteryIndicatorDisplayMode);
                 HideBatteryIndicatorWhenUnavailable = savedSettings.HideBatteryIndicatorWhenUnavailable;
+                ShowDisabledOutputDevices = savedSettings.ShowDisabledOutputDevices;
+                ShowDisabledInputDevices = savedSettings.ShowDisabledInputDevices;
                 BatteryIndicatorDisplayMode = string.IsNullOrWhiteSpace(savedSettings.BatteryIndicatorDisplayMode)
                     ? "IconAndPercentage"
                     : savedSettings.BatteryIndicatorDisplayMode;
@@ -98,6 +102,9 @@ namespace PlayniteAudioSwitcher
             }
 
             DesktopTopPanelIcon = DesktopTopPanelIcon ?? string.Empty;
+            BatteryIndicatorIcon = BatteryIndicatorIcon ?? string.Empty;
+            DesktopTopPanelIcon = ResolveIconId(DesktopTopPanelIcon);
+            BatteryIndicatorIcon = ResolveIconId(BatteryIndicatorIcon);
             DesktopBatteryDisplayMode = string.IsNullOrWhiteSpace(DesktopBatteryDisplayMode)
                 ? "IconAndPercentage"
                 : DesktopBatteryDisplayMode;
@@ -209,32 +216,24 @@ namespace PlayniteAudioSwitcher
             IconOption("music", "Music", "MUS", "music.svg"),
             IconOption("podcast", "Podcast", "POD", "broadcast.svg"),
             IconOption("radio", "Radio", "RAD", "radio.svg"),
-            IconOption("radio-receiver", "Wireless receiver", "REC", "antenna.svg"),
             IconOption("boom-box", "Audio player", "BOX", "device-audio-tape.svg"),
             IconOption("vinyl", "Turntable", "VIN", "vinyl.svg"),
             IconOption("speaker", "Speaker", "SP", "device-speaker.svg"),
             IconOption("speaker-off", "Speaker unavailable", "SP-", "device-speaker-off.svg"),
-            IconOption("monitor-speaker", "Monitor speakers", "MS", "device-imac.svg"),
             IconOption("speakerphone", "Speakerphone", "CALL", "speakerphone.svg"),
             IconOption("tv", "TV", "TV", "device-tv.svg"),
-            IconOption("tv-old", "Classic TV", "TV2", "device-tv-old.svg"),
             IconOption("monitor", "Monitor", "PC", "device-desktop.svg"),
             IconOption("laptop", "Laptop", "LAP", "device-laptop.svg"),
-            IconOption("pc-case", "PC", "CASE", "server.svg"),
-            IconOption("smartphone", "Smartphone", "PH", "device-mobile.svg"),
-            IconOption("tablet", "Tablet", "TAB", "device-tablet.svg"),
-            IconOption("projector", "Projector", "PROJ", "device-projector.svg"),
-            IconOption("car", "Car audio", "CAR", "car.svg"),
-            IconOption("gamepad-2", "Gamepad", "GP", "device-gamepad.svg"),
             IconOption("bluetooth", "Bluetooth", "BT", "bluetooth.svg"),
             IconOption("bluetooth-connected", "Bluetooth connected", "BT+", "bluetooth-connected.svg"),
             IconOption("bluetooth-searching", "Bluetooth unavailable", "BT-", "bluetooth-off.svg"),
             IconOption("usb", "USB", "USB", "usb.svg"),
             IconOption("hdmi-port", "HDMI", "HDMI", "plug.svg"),
             IconOption("cable", "Cable", "CAB", "plug-connected.svg"),
-            IconOption("cast", "Cast device", "CAST", "cast.svg"),
-            IconOption("video", "Video device", "VID", "video.svg")
+            IconOption("cast", "Cast device", "CAST", "cast.svg")
         };
+
+        public const string DefaultVolumeIconId = "volume-2";
 
         [DontSerialize]
         public List<AudioIconOption> BatteryIconOptions
@@ -557,6 +556,18 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref hideBatteryIndicatorWhenUnavailable, value);
         }
 
+        public bool ShowDisabledOutputDevices
+        {
+            get => showDisabledOutputDevices;
+            set => SetValue(ref showDisabledOutputDevices, value);
+        }
+
+        public bool ShowDisabledInputDevices
+        {
+            get => showDisabledInputDevices;
+            set => SetValue(ref showDisabledInputDevices, value);
+        }
+
         public string BatteryIndicatorDisplayMode
         {
             get => batteryIndicatorDisplayMode;
@@ -704,12 +715,12 @@ namespace PlayniteAudioSwitcher
 
         public string GetIcon(string deviceId)
         {
-            return GetIcon(DeviceAliases, deviceId);
+            return ResolveIconId(GetIcon(DeviceAliases, deviceId));
         }
 
         public string GetInputIcon(string deviceId)
         {
-            return GetIcon(InputDeviceAliases, deviceId);
+            return ResolveIconId(GetIcon(InputDeviceAliases, deviceId));
         }
 
         public bool IsDeviceVisible(string deviceId)
@@ -782,7 +793,7 @@ namespace PlayniteAudioSwitcher
             }
 
             if (text.Contains("chromecast") || text.Contains("airplay") || text.Contains("cast device") ||
-                text.Contains("wireless display"))
+                text.Contains("wireless display") || text.Contains("projector") || text.Contains("proyector"))
             {
                 return "cast";
             }
@@ -792,14 +803,10 @@ namespace PlayniteAudioSwitcher
                 return "usb";
             }
 
-            if (text.Contains("projector") || text.Contains("proyector"))
+            if (text.Contains("monitor") || text.Contains("display") || text.Contains("laptop") ||
+                text.Contains("pc") || text.Contains("realtek"))
             {
-                return "projector";
-            }
-
-            if (text.Contains("monitor") || text.Contains("display"))
-            {
-                return "monitor-speaker";
+                return isInput ? "mic" : "monitor";
             }
 
             if (text.Contains("tv") || text.Contains("television") || text.Contains("televisión"))
@@ -807,7 +814,8 @@ namespace PlayniteAudioSwitcher
                 return "tv";
             }
 
-            if (text.Contains("speaker") || text.Contains("altavoz") || text.Contains("speakers"))
+            if (text.Contains("speaker") || text.Contains("altavoz") || text.Contains("speakers") ||
+                text.Contains("car audio") || text.Contains("automotive") || text.Contains("coche"))
             {
                 return "speaker";
             }
@@ -823,32 +831,37 @@ namespace PlayniteAudioSwitcher
                 return "audio-waveform";
             }
 
-            if (text.Contains("car audio") || text.Contains("automotive") || text.Contains("coche"))
+            if (text.Contains("phone") || text.Contains("smartphone") || text.Contains("tablet"))
             {
-                return "car";
+                return "bluetooth";
             }
 
-            if (text.Contains("phone") || text.Contains("smartphone"))
+            return isInput ? "mic" : DefaultVolumeIconId;
+        }
+
+        public string ResolveIconId(string icon)
+        {
+            if (string.IsNullOrWhiteSpace(icon))
             {
-                return "smartphone";
+                return string.Empty;
             }
 
-            if (text.Contains("tablet"))
+            foreach (var option in IconOptions)
             {
-                return "tablet";
+                if (!string.Equals(option.Id, icon, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(option.Id) || !string.IsNullOrWhiteSpace(option.GeometryData))
+                {
+                    return option.Id;
+                }
+
+                break;
             }
 
-            if (text.Contains("laptop"))
-            {
-                return "laptop";
-            }
-
-            if (text.Contains("pc") || text.Contains("realtek"))
-            {
-                return isInput ? "mic" : "pc-case";
-            }
-
-            return isInput ? "mic" : "volume-2";
+            return DefaultVolumeIconId;
         }
 
         public void BeginEdit()
@@ -896,6 +909,8 @@ namespace PlayniteAudioSwitcher
             DesktopTopPanelIcon = editingClone.DesktopTopPanelIcon;
             DesktopBatteryDisplayMode = editingClone.DesktopBatteryDisplayMode;
             HideBatteryIndicatorWhenUnavailable = editingClone.HideBatteryIndicatorWhenUnavailable;
+            ShowDisabledOutputDevices = editingClone.ShowDisabledOutputDevices;
+            ShowDisabledInputDevices = editingClone.ShowDisabledInputDevices;
             BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
             BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
             AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
@@ -1014,6 +1029,8 @@ namespace PlayniteAudioSwitcher
                 DesktopTopPanelIcon = DesktopTopPanelIcon,
                 DesktopBatteryDisplayMode = DesktopBatteryDisplayMode,
                 HideBatteryIndicatorWhenUnavailable = HideBatteryIndicatorWhenUnavailable,
+                ShowDisabledOutputDevices = ShowDisabledOutputDevices,
+                ShowDisabledInputDevices = ShowDisabledInputDevices,
                 BatteryIndicatorDisplayMode = BatteryIndicatorDisplayMode,
                 BatteryIndicatorIcon = BatteryIndicatorIcon
             };
@@ -1035,7 +1052,7 @@ namespace PlayniteAudioSwitcher
                     .ToDictionary(a => a.Key, a => a.Last());
                 var windowsDevices = (getDevices() ?? new AudioDevice[0]).ToList();
                 var settingsDevices = windowsDevices
-                    .Where(ShouldShowInSettingsDeviceList)
+                    .Where(device => ShouldShowInSettingsDeviceList(device, isInput))
                     .OrderBy(a => a.Name)
                     .Select(device =>
                     {
@@ -1050,6 +1067,13 @@ namespace PlayniteAudioSwitcher
                         if (string.IsNullOrWhiteSpace(device.Icon))
                         {
                             device.Icon = SuggestIconForDevice(device.Name, isInput);
+                            device.IsIconSuggested = true;
+                        }
+
+                        device.Icon = ResolveIconId(device.Icon);
+                        if (string.IsNullOrWhiteSpace(device.Icon))
+                        {
+                            device.Icon = isInput ? "mic" : DefaultVolumeIconId;
                             device.IsIconSuggested = true;
                         }
 
@@ -1075,12 +1099,19 @@ namespace PlayniteAudioSwitcher
             }
         }
 
-        private static bool ShouldShowInSettingsDeviceList(AudioDevice device)
+        private bool ShouldShowInSettingsDeviceList(AudioDevice device, bool isInput)
         {
-            return device != null &&
-                (device.IsAvailable ||
-                    device.State == AudioEndpointState.Unknown ||
-                    device.State == AudioEndpointState.Disabled);
+            if (device == null)
+            {
+                return false;
+            }
+
+            if (device.State == AudioEndpointState.Disabled)
+            {
+                return isInput ? ShowDisabledInputDevices : ShowDisabledOutputDevices;
+            }
+
+            return device.IsAvailable || device.State == AudioEndpointState.Unknown;
         }
 
         private static void LogDeviceEnumeration(bool isInput, IReadOnlyList<AudioDevice> windowsDevices, IReadOnlyList<AudioDevice> settingsDevices)
@@ -1106,7 +1137,7 @@ namespace PlayniteAudioSwitcher
             return devices.Count(device => device.State == state);
         }
 
-        private static List<AudioDeviceAlias> PersistAliases(
+        private List<AudioDeviceAlias> PersistAliases(
             IEnumerable<AudioDevice> currentDevices,
             IEnumerable<AudioDeviceAlias> existingAliases)
         {
@@ -1141,25 +1172,25 @@ namespace PlayniteAudioSwitcher
                     alias.DefaultVolumePercent.HasValue);
         }
 
-        private static AudioDeviceAlias ToAlias(AudioDevice device)
+        private AudioDeviceAlias ToAlias(AudioDevice device)
         {
             return new AudioDeviceAlias
             {
                 DeviceId = device.Id,
                 CustomName = SanitizeCustomName(device.CustomName),
-                Icon = device.IsIconSuggested ? null : device.Icon,
+                Icon = ResolveIconId(device.IsIconSuggested ? null : device.Icon),
                 IsVisible = device.IsVisible ? (bool?)null : false,
                 DefaultVolumePercent = device.DefaultVolumePercent
             };
         }
 
-        private static AudioDeviceAlias SanitizeAlias(AudioDeviceAlias alias)
+        private AudioDeviceAlias SanitizeAlias(AudioDeviceAlias alias)
         {
             return new AudioDeviceAlias
             {
                 DeviceId = alias.DeviceId,
                 CustomName = SanitizeCustomName(alias.CustomName),
-                Icon = alias.Icon,
+                Icon = ResolveIconId(alias.Icon),
                 IsVisible = alias.IsVisible,
                 DefaultVolumePercent = alias.DefaultVolumePercent
             };

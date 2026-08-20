@@ -42,13 +42,16 @@
     <sys:String x:Key="LOCAS_SystemDevices">Dispositivos del sistema</sys:String>
     <sys:String x:Key="LOCAS_NoSystemDevices">Windows no ha informado de ningún dispositivo aquí. Revisa Playnite.log y evita ejecutar Playnite como administrador.</sys:String>
     <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">Los dispositivos de Windows desconectados o ausentes se ocultan aquí hasta que vuelvan. Se recuerdan el nombre, el icono y la visibilidad personalizados.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevices">Mostrar dispositivos deshabilitados por el sistema</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevicesHelp">Los dispositivos deshabilitados no se pueden usar hasta que se activen de nuevo en la configuración de sonido de Windows.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Dispositivo</sys:String>
     <sys:String x:Key="LOCAS_Status">Estado</sys:String>
     <sys:String x:Key="LOCAS_Battery">Batería</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icono</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Volumen personalizado</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">Volumen personalizado</sys:String>
-    <sys:String x:Key="LOCAS_PlayniteName">Nombre en Playnite</sys:String>
+    <sys:String x:Key="LOCAS_PlayniteName">Nombre personalizado</sys:String>
+    <sys:String x:Key="LOCAS_CustomNameHelp">Nombre corto opcional que se muestra en los menús de Playnite y en el selector a pantalla completa. Déjalo vacío para usar el nombre de Windows.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Visualización en pantalla completa</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Texto</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Texto e icono</sys:String>

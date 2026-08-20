@@ -41,13 +41,16 @@
     <sys:String x:Key="LOCAS_SystemDevices">系统设备</sys:String>
     <sys:String x:Key="LOCAS_NoSystemDevices">Windows 未在此处报告任何设备。请查看 Playnite.log，并避免以管理员身份运行 Playnite。</sys:String>
     <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">已断开或不存在的 Windows 设备会在重新出现前从此处隐藏。自定义名称、图标和可见性会被保留。</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevices">显示已被系统禁用的设备</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevicesHelp">已禁用的设备需在 Windows 声音设置中重新启用后才能使用。</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">设备</sys:String>
     <sys:String x:Key="LOCAS_Status">状态</sys:String>
     <sys:String x:Key="LOCAS_Battery">电池</sys:String>
     <sys:String x:Key="LOCAS_Icon">图标</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">自定义音量</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">自定义音量</sys:String>
-    <sys:String x:Key="LOCAS_PlayniteName">Playnite 名称</sys:String>
+    <sys:String x:Key="LOCAS_PlayniteName">自定义名称</sys:String>
+    <sys:String x:Key="LOCAS_CustomNameHelp">显示在 Playnite 菜单和全屏选择器中的可选简称。留空则使用 Windows 设备名称。</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">全屏显示</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">文本</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">文本和图标</sys:String>

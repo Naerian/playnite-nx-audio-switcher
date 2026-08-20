@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -461,6 +462,17 @@ namespace PlayniteAudioSwitcher
             RebuildGameProfileRows();
         }
 
+        private void ShowDisabledSystemDevicesChanged(object sender, RoutedEventArgs e)
+        {
+            if (!(DataContext is AudioSwitcherSettings settings))
+            {
+                return;
+            }
+
+            settings.RefreshDevices();
+            RebuildDeviceRows();
+        }
+
         private void BuildDeviceRows(StackPanel panel, IEnumerable<AudioDevice> devices, AudioSwitcherSettings settings, string defaultVolumeLabelResource)
         {
             panel.Children.Clear();
@@ -482,171 +494,177 @@ namespace PlayniteAudioSwitcher
                 panel.Children.Add(empty);
                 return;
             }
+            var grid = new UniformGrid
+            {
+                Columns = 2,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
             for (var index = 0; index < deviceList.Count; index++)
             {
-                panel.Children.Add(CreateDeviceRow(
+                grid.Children.Add(CreateDeviceCard(
                     deviceList[index],
                     settings,
                     defaultVolumeLabelResource,
-                    index == deviceList.Count - 1));
+                    index));
             }
+
+            panel.Children.Add(grid);
         }
 
-        private static UIElement CreateDeviceRow(
+        private UIElement CreateDeviceCard(
             AudioDevice device,
             AudioSwitcherSettings settings,
             string defaultVolumeLabelResource,
-            bool isLast)
+            int index)
         {
-            var border = new Border
+            var card = new Border
             {
-                Background = Brushes.Transparent,
-                BorderThickness = isLast ? new Thickness(0) : new Thickness(0, 0, 0, 1),
-                Padding = new Thickness(0, 2, 8, isLast ? 0 : 16),
-                Margin = new Thickness(0, 0, 0, isLast ? 0 : 24)
+                Style = TryFindResource("DeviceCard") as Style ?? TryFindResource("SummaryCard") as Style,
+                Margin = new Thickness(index % 2 == 0 ? 0 : 8, 0, index % 2 == 0 ? 8 : 0, 16),
+                MinHeight = 0
             };
-            border.SetResourceReference(Border.BorderBrushProperty, "GlyphBrush");
 
-                var grid = new Grid();
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(190) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                var namePanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
-                namePanel.Children.Add(CreateDeviceInfoLine(
-                    "LOCAS_WindowsName",
-                    "Device",
-                    device.SettingsDisplayName,
-                    new Thickness(0, 0, 0, 4)));
-                namePanel.Children.Add(CreateDeviceInfoLine(
-                    "LOCAS_Status",
-                    "Status",
-                    device.StatusDisplayName,
-                    new Thickness(0, 0, 0, 4)));
-                var batteryLine = CreateDeviceInfoLine(
-                    "LOCAS_Battery",
-                    "Battery",
-                    device.HasBattery ? device.BatteryLabel : "\u2014",
-                    new Thickness(0),
-                    BatteryColorPalette.GetBrush(device));
-                namePanel.Children.Add(batteryLine);
-                Grid.SetColumnSpan(namePanel, 4);
-                grid.Children.Add(namePanel);
+            var root = new Grid();
+            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-                var visiblePanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
-                var visibleLabel = CreateFieldLabel("LOCAS_Visible");
-                var visibleBox = new CheckBox
-                {
-                    IsChecked = device.IsVisible,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 3, 0, 0)
-                };
-                visibleBox.Checked += (_, __) => device.IsVisible = true;
-                visibleBox.Unchecked += (_, __) => device.IsVisible = false;
-                visiblePanel.Children.Add(visibleLabel);
-                visiblePanel.Children.Add(visibleBox);
-                Grid.SetRow(visiblePanel, 1);
-                Grid.SetColumn(visiblePanel, 0);
-                grid.Children.Add(visiblePanel);
+            var top = new Grid { Margin = new Thickness(0, 0, 0, 12) };
+            top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-                var iconPanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
-                var iconLabel = CreateFieldLabel("LOCAS_Icon");
-                var iconBox = new ComboBox
-                {
-                    ItemsSource = settings.IconOptions,
-                    SelectedValuePath = "Id",
-                    SelectedValue = device.Icon ?? string.Empty,
-                    ItemTemplate = CreateIconTemplate()
-                };
-                iconBox.SelectionChanged += (_, __) =>
-                {
-                    device.Icon = iconBox.SelectedValue?.ToString();
-                    device.IsIconSuggested = false;
-                };
-                iconPanel.Children.Add(iconLabel);
-                iconPanel.Children.Add(iconBox);
-                Grid.SetRow(iconPanel, 1);
-                Grid.SetColumn(iconPanel, 1);
-                grid.Children.Add(iconPanel);
+            var infoPanel = new StackPanel { Margin = new Thickness(0, 0, 16, 0) };
+            var nameText = new TextBlock
+            {
+                Style = TryFindResource("SummaryCardValue") as Style,
+                TextWrapping = TextWrapping.Wrap,
+                Text = string.IsNullOrWhiteSpace(device.SettingsDisplayName)
+                    ? (string.IsNullOrWhiteSpace(device.Name) ? device.Id : device.Name)
+                    : device.SettingsDisplayName
+            };
+            infoPanel.Children.Add(nameText);
 
-                var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 0, 10, 0) };
-                var defaultVolumeLabel = CreateFieldLabel(defaultVolumeLabelResource);
-                var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
-                defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                var defaultVolumeEnabled = new CheckBox
-                {
-                    IsChecked = device.DefaultVolumePercent.HasValue,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 8, 0)
-                };
-                var defaultVolumeSlider = new Slider
-                {
-                    Minimum = 0,
-                    Maximum = 100,
-                    Value = device.DefaultVolumePercent ?? 50,
-                    IsSnapToTickEnabled = true,
-                    TickFrequency = 1,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    IsEnabled = device.DefaultVolumePercent.HasValue
-                };
-                var defaultVolumeValue = new TextBlock
-                {
-                    MinWidth = 40,
-                    Margin = new Thickness(8, 0, 0, 0),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    TextAlignment = TextAlignment.Right,
-                    Opacity = 0.85
-                };
+            var pills = new WrapPanel { Margin = new Thickness(0, 8, 0, 0) };
+            pills.Children.Add(CreateMetricPill(
+                ResourceText("LOCAS_Status", "Status"),
+                device.StatusDisplayName ?? "\u2014"));
+            pills.Children.Add(CreateMetricPill(
+                ResourceText("LOCAS_Battery", "Battery"),
+                device.HasBattery ? device.BatteryLabel : "\u2014",
+                BatteryColorPalette.GetBrush(device)));
+            infoPanel.Children.Add(pills);
+            top.Children.Add(infoPanel);
+
+            var controlsPanel = new StackPanel { Margin = new Thickness(16, 0, 0, 0) };
+
+            var visibleBox = new CheckBox
+            {
+                IsChecked = device.IsVisible,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 12)
+            };
+            visibleBox.SetResourceReference(ContentControl.ContentProperty, "LOCAS_Visible");
+            visibleBox.Checked += (_, __) => device.IsVisible = true;
+            visibleBox.Unchecked += (_, __) => device.IsVisible = false;
+            controlsPanel.Children.Add(visibleBox);
+
+            var iconPanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
+            iconPanel.Children.Add(CreateFieldLabel("LOCAS_Icon"));
+            var iconBox = new ComboBox
+            {
+                ItemsSource = settings.IconOptions,
+                SelectedValuePath = "Id",
+                SelectedValue = settings.ResolveIconId(device.Icon),
+                ItemTemplate = CreateIconTemplate()
+            };
+            iconBox.SelectionChanged += (_, __) =>
+            {
+                device.Icon = iconBox.SelectedValue?.ToString();
+                device.IsIconSuggested = false;
+            };
+            iconPanel.Children.Add(iconBox);
+            controlsPanel.Children.Add(iconPanel);
+
+            var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 4, 0, 0) };
+            defaultVolumePanel.Children.Add(CreateFieldLabel(defaultVolumeLabelResource));
+            var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
+            defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var defaultVolumeEnabled = new CheckBox
+            {
+                IsChecked = device.DefaultVolumePercent.HasValue,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 8, 0)
+            };
+            var defaultVolumeSlider = new Slider
+            {
+                Minimum = 0,
+                Maximum = 100,
+                Value = device.DefaultVolumePercent ?? 50,
+                IsSnapToTickEnabled = true,
+                TickFrequency = 1,
+                VerticalAlignment = VerticalAlignment.Center,
+                IsEnabled = device.DefaultVolumePercent.HasValue
+            };
+            var defaultVolumeValue = new TextBlock
+            {
+                MinWidth = 40,
+                Margin = new Thickness(8, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                TextAlignment = TextAlignment.Right,
+                Opacity = 0.85
+            };
+            UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+            defaultVolumeEnabled.Checked += (_, __) =>
+            {
+                device.DefaultVolumePercent = (int)Math.Round(defaultVolumeSlider.Value);
                 UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
-                defaultVolumeEnabled.Checked += (_, __) =>
+            };
+            defaultVolumeEnabled.Unchecked += (_, __) =>
+            {
+                device.DefaultVolumePercent = null;
+                UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+            };
+            defaultVolumeSlider.ValueChanged += (_, __) =>
+            {
+                if (defaultVolumeEnabled.IsChecked == true)
                 {
                     device.DefaultVolumePercent = (int)Math.Round(defaultVolumeSlider.Value);
-                    UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
-                };
-                defaultVolumeEnabled.Unchecked += (_, __) =>
-                {
-                    device.DefaultVolumePercent = null;
-                    UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
-                };
-                defaultVolumeSlider.ValueChanged += (_, __) =>
-                {
-                    if (defaultVolumeEnabled.IsChecked == true)
-                    {
-                        device.DefaultVolumePercent = (int)Math.Round(defaultVolumeSlider.Value);
-                    }
+                }
 
-                    UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
-                };
-                Grid.SetColumn(defaultVolumeSlider, 1);
-                Grid.SetColumn(defaultVolumeValue, 2);
-                defaultVolumeGrid.Children.Add(defaultVolumeEnabled);
-                defaultVolumeGrid.Children.Add(defaultVolumeSlider);
-                defaultVolumeGrid.Children.Add(defaultVolumeValue);
-                defaultVolumePanel.Children.Add(defaultVolumeLabel);
-                defaultVolumePanel.Children.Add(defaultVolumeGrid);
-                Grid.SetRow(defaultVolumePanel, 1);
-                Grid.SetColumn(defaultVolumePanel, 2);
-                grid.Children.Add(defaultVolumePanel);
+                UpdateDefaultVolume(device, defaultVolumeEnabled, defaultVolumeSlider, defaultVolumeValue);
+            };
+            Grid.SetColumn(defaultVolumeSlider, 1);
+            Grid.SetColumn(defaultVolumeValue, 2);
+            defaultVolumeGrid.Children.Add(defaultVolumeEnabled);
+            defaultVolumeGrid.Children.Add(defaultVolumeSlider);
+            defaultVolumeGrid.Children.Add(defaultVolumeValue);
+            defaultVolumePanel.Children.Add(defaultVolumeGrid);
+            controlsPanel.Children.Add(defaultVolumePanel);
 
-                var customNamePanel = new StackPanel();
-                var customNameLabel = CreateFieldLabel("LOCAS_PlayniteName");
-                var customNameBox = new TextBox
-                {
-                    Text = AudioSwitcherSettings.SanitizeCustomName(device.CustomName) ?? string.Empty
-                };
-                customNameBox.TextChanged += (_, __) => device.CustomName = customNameBox.Text;
-                customNamePanel.Children.Add(customNameLabel);
-                customNamePanel.Children.Add(customNameBox);
-                Grid.SetRow(customNamePanel, 1);
-                Grid.SetColumn(customNamePanel, 3);
-                grid.Children.Add(customNamePanel);
+            Grid.SetColumn(controlsPanel, 1);
+            top.Children.Add(controlsPanel);
+            root.Children.Add(top);
 
-                border.Child = grid;
-                return border;
+            var customNamePanel = new StackPanel();
+            customNamePanel.Children.Add(CreateFieldLabel("LOCAS_PlayniteName"));
+            var customNameBox = new TextBox
+            {
+                Text = AudioSwitcherSettings.SanitizeCustomName(device.CustomName) ?? string.Empty
+            };
+            customNameBox.TextChanged += (_, __) => device.CustomName = customNameBox.Text;
+            customNamePanel.Children.Add(customNameBox);
+            var customNameHelp = new TextBlock
+            {
+                Style = TryFindResource("HintText") as Style
+            };
+            customNameHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_CustomNameHelp");
+            customNamePanel.Children.Add(customNameHelp);
+            Grid.SetRow(customNamePanel, 1);
+            root.Children.Add(customNamePanel);
+
+            card.Child = root;
+            return card;
         }
 
         private static TextBlock CreateFieldLabel(string resourceKey)
@@ -662,33 +680,24 @@ namespace PlayniteAudioSwitcher
             return label;
         }
 
-        private static TextBlock CreateDeviceInfoLine(
-            string labelResource,
-            string fallbackLabel,
-            string value,
-            Thickness margin,
-            Brush valueBrush = null)
+        private Border CreateMetricPill(string label, string value, Brush valueBrush = null)
         {
-            var label = Application.Current.TryFindResource(labelResource) as string ?? fallbackLabel;
-            var text = new TextBlock
-            {
-                FontSize = 14,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = margin
-            };
-            text.Inlines.Add(new System.Windows.Documents.Run($"{label}: ")
-            {
-                FontWeight = FontWeights.Bold
-            });
-            var valueRun = new System.Windows.Documents.Run(value ?? "\u2014");
+            var valueRun = new System.Windows.Documents.Run(string.IsNullOrWhiteSpace(value) ? "\u2014" : value);
             if (valueBrush != null)
             {
                 valueRun.Foreground = valueBrush;
                 valueRun.FontWeight = FontWeights.SemiBold;
             }
 
+            var text = new TextBlock();
+            text.Inlines.Add(new System.Windows.Documents.Run($"{label}: "));
             text.Inlines.Add(valueRun);
-            return text;
+
+            return new Border
+            {
+                Style = TryFindResource("SummaryMetricPill") as Style,
+                Child = text
+            };
         }
 
         private void RebuildGameProfileRows()
@@ -1155,7 +1164,7 @@ namespace PlayniteAudioSwitcher
 
             var path = new FrameworkElementFactory(typeof(Path));
             path.SetValue(Path.StretchProperty, Stretch.Uniform);
-            path.SetValue(Path.StrokeProperty, Brushes.Gray);
+            path.SetResourceReference(Path.StrokeProperty, "TextBrush");
             path.SetValue(Path.StrokeThicknessProperty, 2d);
             path.SetValue(Path.StrokeStartLineCapProperty, PenLineCap.Round);
             path.SetValue(Path.StrokeEndLineCapProperty, PenLineCap.Round);
@@ -1167,6 +1176,7 @@ namespace PlayniteAudioSwitcher
 
             var text = new FrameworkElementFactory(typeof(TextBlock));
             text.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+            text.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
             text.SetBinding(TextBlock.TextProperty, new Binding("DisplayName"));
             panel.AppendChild(text);
 

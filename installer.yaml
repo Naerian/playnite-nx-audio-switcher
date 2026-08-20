@@ -1,5 +1,15 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.15.2
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-20
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.15.2/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_2.pext
+    Changelog:
+      - Fixed empty device lists and failed audio diagnostics when Playnite Sounds (NAudio) is also loaded, by creating Core Audio COM objects without sharing NAudio's runtime wrappers.
+      - Presented Output and Input devices as two-column summary cards, with status and battery badges matching Overview, plus visibility, icon, custom volume, and custom name.
+      - Hid Windows-disabled endpoints from the Devices list by default, with independent Output and Input options to show them again.
+      - Matched dropdown icon color to the accompanying text and trimmed unused device icons, falling back to the default volume icon.
+      - Updated all twelve localizations and the English and Spanish Wiki documentation.
   - Version: 1.15.1
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-19

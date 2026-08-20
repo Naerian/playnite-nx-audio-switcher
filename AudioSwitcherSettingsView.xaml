@@ -39,11 +39,14 @@
             <Setter Property="FontSize" Value="12" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Opacity" Value="0.78" />
-            <Setter Property="Margin" Value="0,8,0,16" />
+            <Setter Property="Margin" Value="0,8,0,8" />
         </Style>
         <Style x:Key="SectionSubtitleText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
             <Setter Property="FontStyle" Value="Italic" />
             <Setter Property="Margin" Value="0,0,0,0" />
+        </Style>
+        <Style x:Key="IndentedHintText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+            <Setter Property="Margin" Value="22,8,0,8" />
         </Style>
         <Style x:Key="NoteText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
             <Setter Property="FontStyle" Value="Italic" />
@@ -123,6 +126,14 @@
             <Setter Property="Padding" Value="6,1" />
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="Opacity" Value="0.92" />
+        </Style>
+        <Style x:Key="SummaryMetricPill" TargetType="Border" BasedOn="{StaticResource CapabilityPill}">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style x:Key="DeviceCard" TargetType="Border" BasedOn="{StaticResource SummaryCard}">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="MinHeight" Value="0" />
         </Style>
         <Style x:Key="CompactSliderPanel" TargetType="StackPanel">
             <Setter Property="Width" Value="240" />
@@ -476,10 +487,10 @@
                                         </Border>
                                         <TextBlock x:Name="OverviewOutputText" Style="{StaticResource SummaryCardValue}" />
                                         <WrapPanel x:Name="OverviewOutputPills" Margin="0,8,0,0">
-                                            <Border x:Name="OverviewOutputVolumePill" Style="{StaticResource CapabilityPill}">
+                                            <Border x:Name="OverviewOutputVolumePill" Style="{StaticResource SummaryMetricPill}">
                                                 <TextBlock x:Name="OverviewOutputVolumeText" />
                                             </Border>
-                                            <Border x:Name="OverviewOutputBatteryPill" Style="{StaticResource CapabilityPill}">
+                                            <Border x:Name="OverviewOutputBatteryPill" Style="{StaticResource SummaryMetricPill}">
                                                 <TextBlock x:Name="OverviewOutputBatteryText" />
                                             </Border>
                                         </WrapPanel>
@@ -520,10 +531,10 @@
                                         </Border>
                                         <TextBlock x:Name="OverviewInputText" Style="{StaticResource SummaryCardValue}" />
                                         <WrapPanel x:Name="OverviewInputPills" Margin="0,8,0,0">
-                                            <Border x:Name="OverviewInputVolumePill" Style="{StaticResource CapabilityPill}">
+                                            <Border x:Name="OverviewInputVolumePill" Style="{StaticResource SummaryMetricPill}">
                                                 <TextBlock x:Name="OverviewInputVolumeText" />
                                             </Border>
-                                            <Border x:Name="OverviewInputBatteryPill" Style="{StaticResource CapabilityPill}">
+                                            <Border x:Name="OverviewInputBatteryPill" Style="{StaticResource SummaryMetricPill}">
                                                 <TextBlock x:Name="OverviewInputBatteryText" />
                                             </Border>
                                         </WrapPanel>
@@ -579,12 +590,19 @@
                                               DisplayMemberPath="SettingsDisplayName"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding PreferredOutputDeviceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" Margin="0,8,0,0" />
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,24,0,24">
+                                    <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" />
+                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource HintText}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource SectionSubtitleText}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,0,24">
+                                        <CheckBox Content="{DynamicResource LOCAS_ShowDisabledSystemDevices}"
+                                                  IsChecked="{Binding ShowDisabledOutputDevices}"
+                                                  Click="ShowDisabledSystemDevicesChanged" />
+                                        <TextBlock Text="{DynamicResource LOCAS_ShowDisabledSystemDevicesHelp}"
+                                                   Style="{StaticResource IndentedHintText}" />
                                     </StackPanel>
                                     <StackPanel x:Name="DeviceRowsPanel" />
                                 </StackPanel>
@@ -610,12 +628,19 @@
                                               DisplayMemberPath="SettingsDisplayName"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding PreferredInputDeviceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" Margin="0,8,0,0" />
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,24,0,24">
+                                    <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" />
+                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource HintText}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource SectionSubtitleText}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,0,24">
+                                        <CheckBox Content="{DynamicResource LOCAS_ShowDisabledSystemDevices}"
+                                                  IsChecked="{Binding ShowDisabledInputDevices}"
+                                                  Click="ShowDisabledSystemDevicesChanged" />
+                                        <TextBlock Text="{DynamicResource LOCAS_ShowDisabledSystemDevicesHelp}"
+                                                   Style="{StaticResource IndentedHintText}" />
                                     </StackPanel>
                                     <StackPanel x:Name="InputDeviceRowsPanel" />
                                 </StackPanel>
@@ -659,12 +684,11 @@
                                                   ItemsSource="{Binding BatteryIconOptions}"
                                                   SelectedValuePath="Id"
                                                   SelectedValue="{Binding DesktopTopPanelIcon}" />
-                                        <TextBlock Text="{DynamicResource LOCAS_DesktopIconHelp}" Style="{StaticResource HintText}" Margin="0,8,0,16" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopIconHelp}" Style="{StaticResource HintText}" />
                                         <CheckBox Content="{DynamicResource LOCAS_ColorDesktopIndicatorByBattery}"
                                                   IsChecked="{Binding ColorDesktopIndicatorByBattery}" />
                                         <TextBlock Text="{DynamicResource LOCAS_ColorDesktopIndicatorByBatteryHelp}"
-                                                   Style="{StaticResource HintText}"
-                                                   Margin="22,8,0,0" />
+                                                   Style="{StaticResource HintText}" />
                                     </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
@@ -687,16 +711,14 @@
                                     <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
                                               IsChecked="{Binding QuickSwitchEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableQuickSwitchHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <StackPanel Margin="22,0,0,0" IsEnabled="{Binding QuickSwitchEnabled}">
                                         <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}"
                                                   IsChecked="{Binding QuickSwitchAllDevices}" />
                                         <TextBlock Text="{DynamicResource LOCAS_QuickSwitchAllDevicesHelp}"
-                                                   Style="{StaticResource HintText}"
-                                                   Margin="22,8,0,0" />
+                                                   Style="{StaticResource HintText}" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,24,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_VolumeTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -716,7 +738,7 @@
                                                 Value="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}" />
                                         <TextBlock Text="{DynamicResource LOCAS_VolumeStepRange}" Style="{StaticResource SliderRangeText}" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,24,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_MediaSettingsTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -725,8 +747,7 @@
                                     <CheckBox Content="{DynamicResource LOCAS_ShowMediaSessionIcons}"
                                               IsChecked="{Binding ShowMediaSessionIcons}" />
                                     <TextBlock Text="{DynamicResource LOCAS_ShowMediaSessionIconsHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,0" />
+                                               Style="{StaticResource IndentedHintText}" />
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
@@ -770,20 +791,17 @@
                                                      Content="{DynamicResource LOCAS_DesktopBatteryNone}"
                                                      IsChecked="{Binding DesktopBatteryIconOnly, Mode=TwoWay}" />
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryIconOnlyHelp}"
-                                                   Style="{StaticResource HintText}"
-                                                   Margin="22,8,0,16" />
+                                                   Style="{StaticResource IndentedHintText}" />
                                         <RadioButton GroupName="DesktopBatteryMode"
                                                      Content="{DynamicResource LOCAS_DesktopBatteryIconAndPercentage}"
                                                      IsChecked="{Binding DesktopBatteryIconAndPercentage, Mode=TwoWay}" />
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryIconAndPercentageHelp}"
-                                                   Style="{StaticResource HintText}"
-                                                   Margin="22,8,0,16" />
+                                                   Style="{StaticResource IndentedHintText}" />
                                         <RadioButton GroupName="DesktopBatteryMode"
                                                      Content="{DynamicResource LOCAS_DesktopBatteryPercentageInsteadOfIcon}"
                                                      IsChecked="{Binding DesktopBatteryPercentageWithIconFallback, Mode=TwoWay}" />
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryPercentageFallbackHelp}"
-                                                   Style="{StaticResource HintText}"
-                                                   Margin="22,8,0,16" />
+                                                   Style="{StaticResource IndentedHintText}" />
                                     </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
@@ -794,27 +812,23 @@
                                     <CheckBox Content="{DynamicResource LOCAS_HideBatteryWhenUnavailable}"
                                               IsChecked="{Binding HideBatteryIndicatorWhenUnavailable}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorHiddenHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorDisplay}" Style="{StaticResource FieldLabel}" />
                                     <RadioButton GroupName="FullscreenBatteryMode"
                                                  Content="{DynamicResource LOCAS_BatteryDisplayIconAndPercentage}"
                                                  IsChecked="{Binding FullscreenBatteryIconAndPercentage, Mode=TwoWay}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryDisplayIconAndPercentageHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <RadioButton GroupName="FullscreenBatteryMode"
                                                  Content="{DynamicResource LOCAS_BatteryDisplayIconOnly}"
                                                  IsChecked="{Binding FullscreenBatteryIconOnly, Mode=TwoWay}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryDisplayIconOnlyHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <RadioButton GroupName="FullscreenBatteryMode"
                                                  Content="{DynamicResource LOCAS_BatteryDisplayPercentageOnly}"
                                                  IsChecked="{Binding FullscreenBatteryPercentageOnly, Mode=TwoWay}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryDisplayPercentageOnlyHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIcon}" Style="{StaticResource FieldLabel}" />
                                     <ComboBox x:Name="BatteryIndicatorIconBox"
                                               ItemsSource="{Binding BatteryIconOptions}"
@@ -844,16 +858,14 @@
                                     <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
                                               IsChecked="{Binding GameProfilesEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableGameProfilesHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <StackPanel Margin="22,0,0,0" IsEnabled="{Binding GameProfilesEnabled}">
                                         <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
                                                   IsChecked="{Binding RestoreDeviceAfterGameProfile}" />
                                         <TextBlock Text="{DynamicResource LOCAS_RestoreAfterGameHelp}"
-                                                   Style="{StaticResource HintText}"
-                                                   Margin="22,8,0,0" />
+                                                   Style="{StaticResource HintText}" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,24,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -885,8 +897,7 @@
                                     <CheckBox Content="{DynamicResource LOCAS_EnableSpatialSoundIntegration}"
                                               IsChecked="{Binding SpatialSoundIntegrationEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableSpatialSoundHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="22,8,0,16" />
+                                               Style="{StaticResource IndentedHintText}" />
                                     <StackPanel IsEnabled="{Binding SpatialSoundIntegrationEnabled}">
                                         <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}" Style="{StaticResource FieldLabel}" />
                                         <Grid Margin="0,0,0,8">
@@ -956,8 +967,7 @@
                         <CheckBox Content="{DynamicResource LOCAS_ShowNotification}"
                                   IsChecked="{Binding ShowNotifications}" />
                         <TextBlock Text="{DynamicResource LOCAS_ShowNotificationHelp}"
-                                   Style="{StaticResource HintText}"
-                                   Margin="22,8,0,16" />
+                                   Style="{StaticResource IndentedHintText}" />
                         <Expander Style="{StaticResource SettingsExpander}"
                                   IsExpanded="False"
                                   Header="{DynamicResource LOCAS_NotificationCategories}">
@@ -965,38 +975,31 @@
                                 <CheckBox Content="{DynamicResource LOCAS_NotifyOutputDevice}"
                                           IsChecked="{Binding ShowOutputDeviceNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifyOutputDeviceHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,16" />
+                                           Style="{StaticResource IndentedHintText}" />
                                 <CheckBox Content="{DynamicResource LOCAS_NotifyInputDevice}"
                                           IsChecked="{Binding ShowInputDeviceNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifyInputDeviceHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,16" />
+                                           Style="{StaticResource IndentedHintText}" />
                                 <CheckBox Content="{DynamicResource LOCAS_NotifyVolume}"
                                           IsChecked="{Binding ShowVolumeNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifyVolumeHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,16" />
+                                           Style="{StaticResource IndentedHintText}" />
                                 <CheckBox Content="{DynamicResource LOCAS_NotifyMute}"
                                           IsChecked="{Binding ShowMuteNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifyMuteHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,16" />
+                                           Style="{StaticResource IndentedHintText}" />
                                 <CheckBox Content="{DynamicResource LOCAS_NotifyGameProfile}"
                                           IsChecked="{Binding ShowGameProfileNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifyGameProfileHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,16" />
+                                           Style="{StaticResource IndentedHintText}" />
                                 <CheckBox Content="{DynamicResource LOCAS_NotifySpatialSound}"
                                           IsChecked="{Binding ShowSpatialSoundNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifySpatialSoundHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,16" />
+                                           Style="{StaticResource IndentedHintText}" />
                                 <CheckBox Content="{DynamicResource LOCAS_NotifyDiagnostics}"
                                           IsChecked="{Binding ShowDiagnosticNotifications}" />
                                 <TextBlock Text="{DynamicResource LOCAS_NotifyDiagnosticsHelp}"
-                                           Style="{StaticResource HintText}"
-                                           Margin="22,8,0,0" />
+                                           Style="{StaticResource IndentedHintText}" />
                             </StackPanel>
                         </Expander>
                     </StackPanel>

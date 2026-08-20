@@ -41,13 +41,16 @@
     <sys:String x:Key="LOCAS_SystemDevices">Системные устройства</sys:String>
     <sys:String x:Key="LOCAS_NoSystemDevices">Windows не сообщил здесь ни об одном устройстве. Проверьте Playnite.log и не запускайте Playnite от имени администратора.</sys:String>
     <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">Отключённые или отсутствующие устройства Windows скрыты здесь, пока не появятся снова. Пользовательские имена, значки и видимость сохраняются.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevices">Показывать устройства, отключённые системой</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevicesHelp">Отключённые устройства нельзя использовать, пока их снова не включат в параметрах звука Windows.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Устройство</sys:String>
     <sys:String x:Key="LOCAS_Status">Состояние</sys:String>
     <sys:String x:Key="LOCAS_Battery">Заряд батареи</sys:String>
     <sys:String x:Key="LOCAS_Icon">Значок</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Пользовательская громкость</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">Пользовательская громкость</sys:String>
-    <sys:String x:Key="LOCAS_PlayniteName">Имя Playnite</sys:String>
+    <sys:String x:Key="LOCAS_PlayniteName">Пользовательское имя</sys:String>
+    <sys:String x:Key="LOCAS_CustomNameHelp">Необязательное короткое имя, отображаемое в меню Playnite и полноэкранном выборе. Оставьте пустым, чтобы использовать имя Windows.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Отображение в полноэкранном режиме</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Текст</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Текст и значок</sys:String>

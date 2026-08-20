@@ -28,14 +28,14 @@ changes to the extension.
 ## Last Known Stable State
 
 - Branch: `main`
-- Last release at the time this file was written: `v1.15.1`
-- Last release commit: see tag `v1.15.1`
+- Last release at the time this file was written: `v1.15.2`
+- Last release commit: see tag `v1.15.2`
 - Release URL:
-  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.15.1`
+  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.15.2`
 - Release package:
-  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_1.pext`
+  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_2.pext`
 - Public release asset SHA-256:
-  `FB2DE5F15A4210120D32654B37AD6A49A01021EF242791A822604E2ABA321419`
+  `ED3AA93CF56E8EB72CEF34EFEC8362375217A6E88F968197C5F825AEDB4CFBD7`
 - Main repo state before this handoff was created: clean and synced with
   `origin/main`.
 
@@ -116,21 +116,30 @@ changes.
 
 ## Package
 
-Use Playnite Toolbox from the local Playnite install.
-
-After a successful build, always pack the `.pext` into `dist\`. Do this at the end of implementation work, not only for GitHub releases.
+Use `package.ps1` from the repository root. It restores, cleans, builds with
+`dotnet`, then packs a `.pext` with Playnite Toolbox.
 
 ```powershell
-$outDir = ".\dist"
-New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-& C:\Playnite\Toolbox.exe pack .\bin\Release $outDir
+.\package.ps1
 ```
+
+Optional arguments:
+
+```powershell
+.\package.ps1 -Configuration Release -Version 1.15.2 -ToolboxPath C:\Playnite\Toolbox.exe
+```
+
+If `-Version` is omitted, the script reads it from `extension.yaml`. The package
+is written to `dist\vX.Y.Z\` and the SHA-256 hash is printed.
 
 Expected package naming pattern:
 
 ```text
 PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_X_Y_Z.pext
 ```
+
+Do this at the end of implementation work, not only for GitHub releases. The
+script is a local helper; it is not copied into the `.pext`.
 
 Before publishing, inspect the package contents when changing copied assets.
 The package should include runtime files such as the manifest, DLL/PDB,
@@ -171,7 +180,7 @@ When the user asks to "sube a GIT y genera release", do the complete flow:
    - visible About/version text in code/settings UI
    - any release notes or README references that mention the latest version
 2. Build Release.
-3. Package with `C:\Playnite\Toolbox.exe pack` into `dist\`.
+3. Package with `.\package.ps1`.
 4. Install into `C:\Playnite` only when Playnite is closed, or use the generated
    `.pext`.
 5. Validate:
@@ -201,14 +210,14 @@ git commit -m "Release Audio Switcher X.Y.Z"
 git push origin main
 git tag vX.Y.Z
 git push origin vX.Y.Z
-gh release create vX.Y.Z .\dist\PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_X_Y_Z.pext --title "Audio Switcher vX.Y.Z" --notes-file .\release-notes-X.Y.Z.md
+gh release create vX.Y.Z .\dist\vX.Y.Z\PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_X_Y_Z.pext --title "Audio Switcher vX.Y.Z" --notes-file .\release-notes-X.Y.Z.md
 ```
 
 After publishing:
 
 ```powershell
 gh release view vX.Y.Z --json tagName,targetCommitish,url,assets,publishedAt
-Get-FileHash .\dist\PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_X_Y_Z.pext -Algorithm SHA256
+Get-FileHash .\dist\vX.Y.Z\PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_X_Y_Z.pext -Algorithm SHA256
 ```
 
 If needed, download the public asset into `release-verification\vX.Y.Z` and

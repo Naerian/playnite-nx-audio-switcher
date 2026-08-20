@@ -42,13 +42,16 @@
     <sys:String x:Key="LOCAS_SystemDevices">Périphériques système</sys:String>
     <sys:String x:Key="LOCAS_NoSystemDevices">Windows n’a signalé aucun périphérique ici. Consultez Playnite.log et évitez d’exécuter Playnite en tant qu’administrateur.</sys:String>
     <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">Les périphériques Windows déconnectés ou absents restent masqués ici jusqu’à leur retour. Les noms, icônes et visibilités personnalisés sont conservés.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevices">Afficher les périphériques désactivés par le système</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevicesHelp">Les périphériques désactivés ne peuvent pas être utilisés tant qu’ils n’ont pas été réactivés dans les paramètres sonores de Windows.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">Périphérique</sys:String>
     <sys:String x:Key="LOCAS_Status">État</sys:String>
     <sys:String x:Key="LOCAS_Battery">Batterie</sys:String>
     <sys:String x:Key="LOCAS_Icon">Icône</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">Volume personnalisé</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">Volume personnalisé</sys:String>
-    <sys:String x:Key="LOCAS_PlayniteName">Nom Playnite</sys:String>
+    <sys:String x:Key="LOCAS_PlayniteName">Nom personnalisé</sys:String>
+    <sys:String x:Key="LOCAS_CustomNameHelp">Nom court facultatif affiché dans les menus Playnite et le sélecteur plein écran. Laissez vide pour conserver le nom Windows.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">Affichage plein écran</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">Texte</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Texte et icône</sys:String>

@@ -41,13 +41,16 @@
     <sys:String x:Key="LOCAS_SystemDevices">시스템 장치</sys:String>
     <sys:String x:Key="LOCAS_NoSystemDevices">Windows가 여기에 장치를 보고하지 않았습니다. Playnite.log를 확인하고 Playnite를 관리자 권한으로 실행하지 마세요.</sys:String>
     <sys:String x:Key="LOCAS_DisconnectedDevicesHidden">연결이 끊겼거나 없는 Windows 장치는 다시 나타날 때까지 여기에 표시되지 않습니다. 사용자 지정 이름, 아이콘, 표시 여부는 기억됩니다.</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevices">시스템에서 사용 안 함인 장치 표시</sys:String>
+    <sys:String x:Key="LOCAS_ShowDisabledSystemDevicesHelp">사용 안 함인 장치는 Windows 소리 설정에서 다시 사용할 때까지 쓸 수 없습니다.</sys:String>
     <sys:String x:Key="LOCAS_WindowsName">장치</sys:String>
     <sys:String x:Key="LOCAS_Status">상태</sys:String>
     <sys:String x:Key="LOCAS_Battery">배터리</sys:String>
     <sys:String x:Key="LOCAS_Icon">아이콘</sys:String>
     <sys:String x:Key="LOCAS_DefaultVolume">사용자 지정 볼륨</sys:String>
     <sys:String x:Key="LOCAS_DefaultInputVolume">사용자 지정 볼륨</sys:String>
-    <sys:String x:Key="LOCAS_PlayniteName">Playnite 이름</sys:String>
+    <sys:String x:Key="LOCAS_PlayniteName">사용자 지정 이름</sys:String>
+    <sys:String x:Key="LOCAS_CustomNameHelp">Playnite 메뉴와 전체 화면 선택기에 표시되는 선택적 짧은 이름입니다. 비워 두면 Windows 장치 이름을 사용합니다.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenDisplayMode">전체 화면 표시</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeText">텍스트</sys:String>
     <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">텍스트와 아이콘</sys:String>
