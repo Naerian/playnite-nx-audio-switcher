@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -30,11 +32,13 @@ namespace PlayniteAudioSwitcher
             DesktopTopPanelIconBox.ItemTemplate = iconTemplate;
             BatteryIndicatorIconBox.ItemTemplate = iconTemplate;
             AboutVersionText.Text = string.Format(
-                TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Version {0} | Narian",
+                TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Audio Switcher {0} · Narian",
                 GetInstalledVersion());
             DataContextChanged += (_, __) =>
             {
                 SubscribeLiveAudioGraph();
+                ApplyAppearancePreset();
+                BuildAppearancePresetChips();
                 RebuildDeviceRows();
                 UpdateOverview();
             };
@@ -44,6 +48,8 @@ namespace PlayniteAudioSwitcher
 
         private void OnLoaded(object sender, RoutedEventArgs args)
         {
+            ApplyAppearancePreset();
+            BuildAppearancePresetChips();
             ApplyPreferredWindowSize();
             AttachToHost();
             Dispatcher.BeginInvoke(new Action(AttachToHost), DispatcherPriority.Loaded);
@@ -52,6 +58,201 @@ namespace PlayniteAudioSwitcher
             Dispatcher.BeginInvoke(new Action(FillSelectedContentHosts), DispatcherPriority.ApplicationIdle);
             SubscribeLiveAudioGraph();
             RefreshOnLoad();
+        }
+
+        private void ApplyAppearancePreset()
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var preset = settings != null
+                ? settings.AppearancePreset
+                : SettingsAppearance.Midnight;
+            SettingsAppearance.Apply(this, preset);
+            RefreshAppearancePresetChips();
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var palette = SettingsAppearance.GetPalette(preset);
+                SettingsAppearance.ApplyHostChrome(this, palette);
+            }), DispatcherPriority.Loaded);
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var palette = SettingsAppearance.GetPalette(preset);
+                SettingsAppearance.ApplyHostChrome(this, palette);
+            }), DispatcherPriority.ApplicationIdle);
+        }
+
+        private void BuildAppearancePresetChips()
+        {
+            if (AppearancePresetChips == null)
+            {
+                return;
+            }
+
+            AppearancePresetChips.Children.Clear();
+            var settings = DataContext as AudioSwitcherSettings;
+            var options = settings != null ? settings.AppearancePresetOptions : null;
+            if (options == null)
+            {
+                return;
+            }
+
+            foreach (var option in options)
+            {
+                if (option == null || string.IsNullOrWhiteSpace(option.Value))
+                {
+                    continue;
+                }
+
+                var button = new Button
+                {
+                    Content = option.DisplayName,
+                    Tag = option.Value,
+                    MinHeight = 36,
+                    Height = 36,
+                    MinWidth = 88,
+                    Padding = new Thickness(12, 0, 12, 0),
+                    Margin = new Thickness(0, 0, 8, 8),
+                    Cursor = Cursors.Hand,
+                    Focusable = true,
+                    BorderThickness = new Thickness(1),
+                    FontSize = 14,
+                    Template = CreateAppearanceChipTemplate()
+                };
+                button.Click += AppearancePresetChip_OnClick;
+                button.MouseEnter += AppearancePresetChip_OnMouseEnter;
+                button.MouseLeave += AppearancePresetChip_OnMouseLeave;
+                AppearancePresetChips.Children.Add(button);
+            }
+
+            RefreshAppearancePresetChips();
+        }
+
+        private static ControlTemplate CreateAppearanceChipTemplate()
+        {
+            var template = new ControlTemplate(typeof(Button));
+            var border = new FrameworkElementFactory(typeof(Border));
+            border.Name = "Bd";
+            border.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
+            border.SetValue(Border.SnapsToDevicePixelsProperty, true);
+            border.SetBinding(Border.BackgroundProperty, new Binding("Background")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
+            });
+            border.SetBinding(Border.BorderBrushProperty, new Binding("BorderBrush")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
+            });
+            border.SetBinding(Border.BorderThicknessProperty, new Binding("BorderThickness")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
+            });
+            border.SetBinding(Border.PaddingProperty, new Binding("Padding")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
+            });
+            var presenter = new FrameworkElementFactory(typeof(ContentPresenter));
+            presenter.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            presenter.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
+            presenter.SetBinding(TextElement.ForegroundProperty, new Binding("Foreground")
+            {
+                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
+            });
+            border.AppendChild(presenter);
+            template.VisualTree = border;
+            return template;
+        }
+
+        private void AppearancePresetChip_OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            var button = sender as Button;
+            if (button == null || IsAppearanceChipSelected(button))
+            {
+                return;
+            }
+
+            var palette = GetCurrentAppearancePalette();
+            button.Background = new SolidColorBrush(palette.Hover);
+        }
+
+        private void AppearancePresetChip_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            var button = sender as Button;
+            if (button == null || IsAppearanceChipSelected(button))
+            {
+                return;
+            }
+
+            var palette = GetCurrentAppearancePalette();
+            button.Background = new SolidColorBrush(palette.BadgeBg);
+        }
+
+        private bool IsAppearanceChipSelected(Button button)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var selected = settings != null
+                ? SettingsAppearance.Normalize(settings.AppearancePreset)
+                : SettingsAppearance.Midnight;
+            return string.Equals(button.Tag as string, selected, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private SettingsAppearance.Palette GetCurrentAppearancePalette()
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var selected = settings != null
+                ? settings.AppearancePreset
+                : SettingsAppearance.Midnight;
+            return SettingsAppearance.GetPalette(selected);
+        }
+
+        private void AppearancePresetChip_OnClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var preset = button == null ? null : button.Tag as string;
+            var settings = DataContext as AudioSwitcherSettings;
+            if (settings == null || string.IsNullOrWhiteSpace(preset))
+            {
+                return;
+            }
+
+            settings.AppearancePreset = preset;
+            ApplyAppearancePreset();
+        }
+
+        private void RefreshAppearancePresetChips()
+        {
+            if (AppearancePresetChips == null)
+            {
+                return;
+            }
+
+            var settings = DataContext as AudioSwitcherSettings;
+            var selected = settings != null
+                ? SettingsAppearance.Normalize(settings.AppearancePreset)
+                : SettingsAppearance.Midnight;
+            var palette = SettingsAppearance.GetPalette(selected);
+            var accent = new SolidColorBrush(palette.Accent);
+            var accentOn = new SolidColorBrush(palette.AccentOn);
+            var badgeBg = new SolidColorBrush(palette.BadgeBg);
+            var text = new SolidColorBrush(palette.Text);
+            accent.Freeze();
+            accentOn.Freeze();
+            badgeBg.Freeze();
+            text.Freeze();
+
+            foreach (var child in AppearancePresetChips.Children)
+            {
+                var button = child as Button;
+                if (button == null)
+                {
+                    continue;
+                }
+
+                var isSelected = string.Equals(button.Tag as string, selected, StringComparison.OrdinalIgnoreCase);
+                button.Background = isSelected ? accent : badgeBg;
+                button.Foreground = isSelected ? accentOn : text;
+                button.BorderBrush = isSelected ? accent : new SolidColorBrush(palette.Border);
+                button.BorderThickness = new Thickness(1);
+                button.FontWeight = isSelected ? FontWeights.SemiBold : FontWeights.Normal;
+            }
         }
 
         private void SubscribeLiveAudioGraph()
@@ -584,35 +785,26 @@ namespace PlayniteAudioSwitcher
                 MinHeight = 0
             };
 
-            var root = new Grid();
-            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-            var top = new Grid { Margin = new Thickness(0, 0, 0, 16) };
-            top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-            var infoPanel = new StackPanel { Margin = new Thickness(0, 0, 16, 0) };
-            var nameText = new TextBlock
+            var root = new StackPanel();
+            var title = new TextBlock
             {
-                Style = TryFindResource("SummaryCardValue") as Style,
+                Style = TryFindResource("SummaryCardTitle") as Style,
                 TextWrapping = TextWrapping.Wrap,
-                Text = string.IsNullOrWhiteSpace(device.SettingsDisplayName)
-                    ? (string.IsNullOrWhiteSpace(device.Name) ? device.Id : device.Name)
-                    : device.SettingsDisplayName
+                Text = ResolveDeviceCardTitle(device)
             };
-            infoPanel.Children.Add(nameText);
+            root.Children.Add(new Border
+            {
+                Style = TryFindResource("SummaryTitleSeparator") as Style,
+                Child = title
+            });
 
-            var pills = new WrapPanel { Margin = new Thickness(0, 8, 0, 0) };
+            var pills = new WrapPanel { Margin = new Thickness(0, 0, 0, 16) };
             pills.Children.Add(CreateStatusPill(device));
             pills.Children.Add(CreateMetricPill(
                 ResourceText("LOCAS_Battery", "Battery"),
                 device.HasBattery ? device.BatteryLabel : "\u2014",
                 BatteryColorPalette.GetBrush(device)));
-            infoPanel.Children.Add(pills);
-            top.Children.Add(infoPanel);
-
-            var controlsPanel = new StackPanel { Margin = new Thickness(16, 0, 0, 0) };
+            root.Children.Add(pills);
 
             var visibleBox = new CheckBox
             {
@@ -623,7 +815,7 @@ namespace PlayniteAudioSwitcher
             visibleBox.SetResourceReference(ContentControl.ContentProperty, "LOCAS_Visible");
             visibleBox.Checked += (_, __) => device.IsVisible = true;
             visibleBox.Unchecked += (_, __) => device.IsVisible = false;
-            controlsPanel.Children.Add(visibleBox);
+            root.Children.Add(visibleBox);
 
             var iconPanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
             iconPanel.Children.Add(CreateFieldLabel("LOCAS_Icon"));
@@ -640,9 +832,9 @@ namespace PlayniteAudioSwitcher
                 device.IsIconSuggested = false;
             };
             iconPanel.Children.Add(iconBox);
-            controlsPanel.Children.Add(iconPanel);
+            root.Children.Add(iconPanel);
 
-            var defaultVolumePanel = new StackPanel();
+            var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
             defaultVolumePanel.Children.Add(CreateFieldLabel(defaultVolumeLabelResource));
             var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
             defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -698,11 +890,7 @@ namespace PlayniteAudioSwitcher
             defaultVolumeGrid.Children.Add(defaultVolumeSlider);
             defaultVolumeGrid.Children.Add(defaultVolumeValue);
             defaultVolumePanel.Children.Add(defaultVolumeGrid);
-            controlsPanel.Children.Add(defaultVolumePanel);
-
-            Grid.SetColumn(controlsPanel, 1);
-            top.Children.Add(controlsPanel);
-            root.Children.Add(top);
+            root.Children.Add(defaultVolumePanel);
 
             var customNamePanel = new StackPanel();
             customNamePanel.Children.Add(CreateFieldLabel("LOCAS_PlayniteName"));
@@ -718,11 +906,30 @@ namespace PlayniteAudioSwitcher
             };
             customNameHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_CustomNameHelp");
             customNamePanel.Children.Add(customNameHelp);
-            Grid.SetRow(customNamePanel, 1);
             root.Children.Add(customNamePanel);
 
             card.Child = root;
             return card;
+        }
+
+        private static string ResolveDeviceCardTitle(AudioDevice device)
+        {
+            if (device == null)
+            {
+                return string.Empty;
+            }
+
+            if (!string.IsNullOrWhiteSpace(device.Name))
+            {
+                return device.Name;
+            }
+
+            if (!string.IsNullOrWhiteSpace(device.SettingsDisplayName))
+            {
+                return device.SettingsDisplayName;
+            }
+
+            return device.Id ?? string.Empty;
         }
 
         private static TextBlock CreateFieldLabel(string resourceKey)
@@ -820,8 +1027,26 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            badge.SetResourceReference(Border.BorderBrushProperty, brushKey);
+            badge.BorderThickness = new Thickness(0);
+            badge.BorderBrush = Brushes.Transparent;
+            badge.Effect = null;
             badge.Opacity = opacity;
+
+            string backgroundKey;
+            if (string.Equals(brushKey, "PositiveRatingBrush", StringComparison.Ordinal))
+            {
+                backgroundKey = "Narian.BadgeSuccessBg";
+            }
+            else if (string.Equals(brushKey, "WarningBrush", StringComparison.Ordinal))
+            {
+                backgroundKey = "Narian.BadgeWarningBg";
+            }
+            else
+            {
+                backgroundKey = "Narian.BadgeMutedBg";
+            }
+
+            badge.SetResourceReference(Border.BackgroundProperty, backgroundKey);
         }
 
         private void RebuildGameProfileRows()

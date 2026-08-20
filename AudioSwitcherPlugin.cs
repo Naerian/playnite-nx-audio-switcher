@@ -547,7 +547,7 @@ namespace PlayniteAudioSwitcher
 
             batteryTopPanelItem.Visible = settings.ShowDesktopBatteryIndicator &&
                 Theme.ShouldShowDesktopIndicator;
-            batteryTopPanelItem.Title = Theme.CurrentDeviceName;
+            batteryTopPanelItem.Title = Theme.CurrentDeviceTooltip;
         }
 
         public override IEnumerable<SidebarItem> GetSidebarItems()

@@ -12,8 +12,13 @@
              VerticalAlignment="Stretch"
              FontSize="14"
              TextElement.FontSize="14"
-             TextElement.Foreground="{DynamicResource TextBrush}">
+             TextElement.Foreground="{DynamicResource TextBrush}"
+             Background="{DynamicResource Narian.Bg}">
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SettingsChrome.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         <Style x:Key="BodyText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="FontSize" Value="14" />
@@ -22,23 +27,25 @@
         <Style x:Key="SettingsToggleTitle" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
-        <Style x:Key="SectionHeaderText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource GlyphBrush}" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="20" />
-        </Style>
-        <Style x:Key="PageHeader" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
+        <Style x:Key="SectionHeaderBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Border}" />
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="Padding" Value="0,0,0,8" />
             <Setter Property="Margin" Value="0,0,0,8" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
+        <Style x:Key="PageHeader" TargetType="Border" BasedOn="{StaticResource SectionHeaderBorder}" />
+        <Style x:Key="SectionHeaderText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="20" />
+        </Style>
         <Style x:Key="HintText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource GlyphBrush}" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="Opacity" Value="0.78" />
+            <Setter Property="Opacity" Value="1" />
             <Setter Property="Margin" Value="0,8,0,16" />
         </Style>
         <Style x:Key="SectionSubtitleText" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
@@ -47,7 +54,7 @@
             <Setter Property="Margin" Value="0,0,0,16" />
         </Style>
         <Style x:Key="IndentedHintText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
-            <Setter Property="Margin" Value="24,8,0,16" />
+            <Setter Property="Margin" Value="0,8,0,16" />
         </Style>
         <Style x:Key="NoteText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
             <Setter Property="FontStyle" Value="Italic" />
@@ -70,6 +77,40 @@
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style x:Key="NarianPrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="Foreground" Value="{DynamicResource Narian.AccentOn}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Narian.AccentHover}" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Narian.AccentHover}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.92" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style x:Key="SliderValueText" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -89,46 +130,48 @@
         <Style x:Key="PageSection" TargetType="StackPanel">
             <Setter Property="Margin" Value="0,0,0,24" />
         </Style>
+        <Style x:Key="FieldGroup" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,24" />
+        </Style>
         <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
             <Setter Property="Margin" Value="0,0,0,4" />
         </Style>
         <Style x:Key="SettingsCard" TargetType="Border">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="16" />
             <Setter Property="Margin" Value="0,0,0,24" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="TextElement.Foreground" Value="{DynamicResource TextBrush}" />
         </Style>
         <Style x:Key="SummaryCard" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource PopupBackgroundBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
-            <Setter Property="BorderThickness" Value="4,1,1,1" />
-            <Setter Property="Padding" Value="16,16" />
-            <Setter Property="Margin" Value="0,0,0,24" />
+            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Margin" Value="0,0,0,16" />
             <Setter Property="CornerRadius" Value="4" />
             <Setter Property="MinHeight" Value="92" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
             <Setter Property="TextElement.Foreground" Value="{DynamicResource TextBrush}" />
         </Style>
         <Style x:Key="SummaryPill" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Background" Value="{DynamicResource Narian.BadgeBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Border}" />
+            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="8,2" />
+            <Setter Property="CornerRadius" Value="4" />
             <Setter Property="MinHeight" Value="22" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="TextElement.Foreground" Value="{DynamicResource TextBrush}" />
-            <Setter Property="TextElement.FontSize" Value="12" />
             <Style.Resources>
                 <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                     <Setter Property="FontSize" Value="12" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
                     <Setter Property="TextAlignment" Value="Center" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
                 </Style>
             </Style.Resources>
         </Style>
@@ -156,11 +199,12 @@
             <Setter Property="Margin" Value="0,0,16,0" />
         </Style>
         <Style x:Key="SummaryCardTitle" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
+            <Setter Property="Foreground" Value="{DynamicResource Narian.Accent}" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style x:Key="SummaryTitleSeparator" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Border}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="Padding" Value="0,0,0,8" />
             <Setter Property="Margin" Value="0,0,0,8" />
@@ -277,12 +321,12 @@
                         </DockPanel>
                         <ControlTemplate.Triggers>
                             <Trigger SourceName="HeaderChrome" Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
+                                <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource Narian.Hover}" />
                             </Trigger>
                             <Trigger Property="IsExpanded" Value="True">
                                 <Setter TargetName="ExpanderContent" Property="Visibility" Value="Visible" />
-                                <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
-                                <Setter TargetName="ExpanderAccent" Property="Fill" Value="{DynamicResource GlyphBrush}" />
+                                <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource Narian.Hover}" />
+                                <Setter TargetName="ExpanderAccent" Property="Fill" Value="{DynamicResource HighlightGlyphBrush}" />
                                 <Setter TargetName="ExpanderHint" Property="Visibility" Value="Collapsed" />
                                 <Setter TargetName="ExpanderArrow" Property="Data" Value="M6,15 L12,9 L18,15" />
                                 <Setter TargetName="ExpanderHeader" Property="TextElement.FontWeight" Value="SemiBold" />
@@ -301,6 +345,7 @@
             <Setter Property="Margin" Value="0,0,0,8" />
             <Setter Property="MinHeight" Value="44" />
             <Setter Property="ClipToBounds" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
@@ -315,14 +360,14 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="NavigationFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrushDark}" />
+                                <Setter TargetName="NavigationFill" Property="Fill" Value="{DynamicResource Narian.Hover}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="NavigationFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
-                                <Setter TargetName="NavigationAccent" Property="Fill" Value="{DynamicResource GlyphBrush}" />
+                                <Setter TargetName="NavigationFill" Property="Fill" Value="{DynamicResource Narian.Selected}" />
+                                <Setter TargetName="NavigationAccent" Property="Fill" Value="{DynamicResource Narian.Accent}" />
                                 <Setter TargetName="NavigationHeader" Property="TextElement.FontWeight" Value="SemiBold" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrushDark}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -343,15 +388,17 @@
                         <Grid KeyboardNavigation.TabNavigation="Local" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="268" />
-                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Border Background="{DynamicResource PopupBackgroundBrush}" CornerRadius="4"
-                                    Padding="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Border Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="4"
+                                    Padding="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    BorderThickness="0"
+                                    ClipToBounds="False">
                                 <DockPanel LastChildFill="True">
                                     <TextBlock DockPanel.Dock="Top" Text="{TemplateBinding Tag}"
-                                               Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="SemiBold"
-                                               Margin="8,4,8,12" TextWrapping="Wrap" />
+                                               Foreground="{DynamicResource Narian.Accent}" FontSize="14" FontWeight="SemiBold"
+                                               Margin="8,8,8,16" TextWrapping="Wrap" />
                                     <StackPanel x:Name="HeaderPanel" IsItemsHost="True" />
                                 </DockPanel>
                             </Border>
@@ -375,6 +422,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
             <Setter Property="ClipToBounds" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
@@ -382,18 +430,18 @@
                             <Rectangle x:Name="TabFill" RadiusX="4" RadiusY="4" Fill="Transparent" />
                             <ContentPresenter x:Name="Header" ContentSource="Header"
                                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                                              Margin="16,12"
+                                              Margin="16,8"
                                               TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TabFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrushDark}" />
+                                <Setter TargetName="TabFill" Property="Fill" Value="{DynamicResource Narian.Hover}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
+                                <Setter TargetName="TabFill" Property="Fill" Value="{DynamicResource Narian.Selected}" />
                                 <Setter TargetName="Header" Property="TextElement.FontWeight" Value="SemiBold" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrushDark}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Narian.Accent}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -415,8 +463,9 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Border Background="{DynamicResource PopupBackgroundBrush}" CornerRadius="4"
-                                    Padding="8" ClipToBounds="False"
+                            <Border Background="{DynamicResource ControlBackgroundBrush}" CornerRadius="4"
+                                    Padding="6" ClipToBounds="False"
+                                    BorderThickness="0"
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 <WrapPanel x:Name="HeaderPanel" IsItemsHost="True" />
                             </Border>
@@ -430,6 +479,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16,16">
@@ -448,6 +498,7 @@
                                 <DockPanel LastChildFill="True">
                                     <Button DockPanel.Dock="Right"
                                             Content="{DynamicResource LOCAS_OverviewRefresh}"
+                                            Style="{StaticResource NarianPrimaryButton}"
                                             MinWidth="130"
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Center"
@@ -460,6 +511,13 @@
                             </Border>
                             <TextBlock Text="{DynamicResource LOCAS_OverviewHelp}" Style="{StaticResource SectionSubtitleText}" />
                         </StackPanel>
+                        <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,24">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource LOCAS_AppearancePreset}" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="{DynamicResource LOCAS_AppearancePresetHelp}" Style="{StaticResource HintText}" Margin="0,0,0,8" />
+                                <WrapPanel x:Name="AppearancePresetChips" Orientation="Horizontal" />
+                            </StackPanel>
+                        </Border>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -572,19 +630,21 @@
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_OutputDevicesHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <TextBlock Text="{DynamicResource LOCAS_PreferredOutputDevice}" Style="{StaticResource FieldLabel}" />
                                     <ComboBox ItemsSource="{Binding PreferredPlaybackDeviceOptions}"
                                               DisplayMemberPath="SettingsDisplayName"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding PreferredOutputDeviceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                         <CheckBox Content="{DynamicResource LOCAS_ShowDisabledSystemDevices}"
                                                   IsChecked="{Binding ShowDisabledOutputDevices}"
                                                   Click="ShowDisabledSystemDevicesChanged" />
@@ -610,19 +670,21 @@
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_InputDevicesHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <TextBlock Text="{DynamicResource LOCAS_PreferredInputDevice}" Style="{StaticResource FieldLabel}" />
                                     <ComboBox ItemsSource="{Binding PreferredRecordingDeviceOptions}"
                                               DisplayMemberPath="SettingsDisplayName"
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding PreferredInputDeviceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" />
+                                    </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_DisconnectedDevicesHidden}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
-                                    <StackPanel Margin="0,0,0,24">
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                         <CheckBox Content="{DynamicResource LOCAS_ShowDisabledSystemDevices}"
                                                   IsChecked="{Binding ShowDisabledInputDevices}"
                                                   Click="ShowDisabledSystemDevicesChanged" />
@@ -663,6 +725,7 @@
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopIntegrationHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <CheckBox Content="{DynamicResource LOCAS_ShowDesktopAudioSwitcher}"
                                               IsChecked="{Binding ShowDesktopBatteryIndicator}" />
                                     <StackPanel Margin="24,16,0,0" IsEnabled="{Binding ShowDesktopBatteryIndicator}">
@@ -676,6 +739,7 @@
                                                   IsChecked="{Binding ColorDesktopIndicatorByBattery}" />
                                         <TextBlock Text="{DynamicResource LOCAS_ColorDesktopIndicatorByBatteryHelp}"
                                                    Style="{StaticResource HintText}" />
+                                    </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
@@ -695,6 +759,7 @@
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_QuickSwitchHelpAll}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <CheckBox Content="{DynamicResource LOCAS_EnableQuickSwitch}"
                                               IsChecked="{Binding QuickSwitchEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableQuickSwitchHelp}"
@@ -705,12 +770,14 @@
                                         <TextBlock Text="{DynamicResource LOCAS_QuickSwitchAllDevicesHelp}"
                                                    Style="{StaticResource HintText}" />
                                     </StackPanel>
+                                    </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_VolumeTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_VolumeHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <StackPanel Style="{StaticResource CompactSliderPanel}">
                                         <DockPanel>
                                             <TextBlock Text="{DynamicResource LOCAS_VolumeStep}" Style="{StaticResource SettingsToggleTitle}" />
@@ -725,16 +792,19 @@
                                                 Value="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}" />
                                         <TextBlock Text="{DynamicResource LOCAS_VolumeStepRange}" Style="{StaticResource SliderRangeText}" />
                                     </StackPanel>
+                                    </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_MediaSettingsTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_MediaGroupingHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <CheckBox Content="{DynamicResource LOCAS_ShowMediaSessionIcons}"
                                               IsChecked="{Binding ShowMediaSessionIcons}" />
                                     <TextBlock Text="{DynamicResource LOCAS_ShowMediaSessionIconsHelp}"
                                                Style="{StaticResource IndentedHintText}" />
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
@@ -759,6 +829,7 @@
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryRequiresIntegration}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource HintText}">
@@ -789,6 +860,7 @@
                                                      IsChecked="{Binding DesktopBatteryPercentageWithIconFallback, Mode=TwoWay}" />
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryPercentageFallbackHelp}"
                                                    Style="{StaticResource IndentedHintText}" />
+                                    </StackPanel>
                                     </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
@@ -841,6 +913,7 @@
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
                                               IsChecked="{Binding GameProfilesEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableGameProfilesHelp}"
@@ -850,6 +923,7 @@
                                                   IsChecked="{Binding RestoreDeviceAfterGameProfile}" />
                                         <TextBlock Text="{DynamicResource LOCAS_RestoreAfterGameHelp}"
                                                    Style="{StaticResource HintText}" />
+                                    </StackPanel>
                                     </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
@@ -1010,11 +1084,13 @@
                             </Border>
                             <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}" Style="{StaticResource SectionSubtitleText}" />
                         </StackPanel>
+                        <StackPanel Style="{StaticResource FieldGroup}">
                         <Button Content="{DynamicResource LOCAS_AudioSessionDiagnostics}"
                                 HorizontalAlignment="Left"
                                 MinWidth="220"
-                                Margin="0,0,0,24"
+                                Margin="0,0,0,0"
                                 Click="ExportAudioSessionDiagnostics" />
+                        </StackPanel>
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -1052,23 +1128,29 @@
                             </Border>
                             <TextBlock Text="{DynamicResource LOCAS_AboutDescription}" Style="{StaticResource SectionSubtitleText}" />
                         </StackPanel>
-                        <TextBlock x:Name="AboutVersionText" Style="{StaticResource BodyText}" FontWeight="SemiBold" Margin="0,0,0,16" />
-                        <StackPanel Style="{StaticResource PageSection}">
-                            <Border Style="{StaticResource PageHeader}">
-                                <TextBlock Text="{DynamicResource LOCAS_AboutPurposeTitle}" Style="{StaticResource SectionHeaderText}" />
-                            </Border>
-                        </StackPanel>
-                        <TextBlock Text="{DynamicResource LOCAS_AboutDevices}" Style="{StaticResource BodyText}" />
-                        <TextBlock Text="{DynamicResource LOCAS_AboutProfiles}" Style="{StaticResource BodyText}" Margin="0,16,0,0" />
-                        <TextBlock Text="{DynamicResource LOCAS_AboutIntegration}" Style="{StaticResource BodyText}" Margin="0,16,0,0" />
+                        <TextBlock x:Name="AboutVersionText"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,16" />
+
+                        <Border Style="{StaticResource SettingsCard}">
+                            <StackPanel>
+                                <Border Style="{StaticResource SectionHeaderBorder}">
+                                    <TextBlock Text="{DynamicResource LOCAS_AboutPurposeTitle}" Style="{StaticResource SectionHeaderText}" />
+                                </Border>
+                                <TextBlock Text="{DynamicResource LOCAS_AboutDevices}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                                <TextBlock Text="{DynamicResource LOCAS_AboutProfiles}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                                <TextBlock Text="{DynamicResource LOCAS_AboutIntegration}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
                         <Grid Margin="0,24,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <StackPanel Style="{StaticResource PageSection}">
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Style="{StaticResource PageSection}" Margin="0,0,0,16">
                                     <Border Style="{StaticResource PageHeader}">
                                         <TextBlock Text="{DynamicResource LOCAS_ProjectLinksTitle}" Style="{StaticResource SectionHeaderText}" />
                                     </Border>
@@ -1076,26 +1158,23 @@
                                 <WrapPanel>
                                     <Button Content="{DynamicResource LOCAS_OpenGitHub}"
                                             Tag="https://github.com/Naerian/playnite-nx-audio-switcher"
-                                            MinWidth="110"
-                                            HorizontalAlignment="Left"
+                                            MinWidth="100"
                                             Margin="0,0,8,8"
                                             Click="OpenExternalButton" />
                                     <Button Content="{DynamicResource LOCAS_OpenWiki}"
                                             Tag="https://github.com/Naerian/playnite-nx-audio-switcher/wiki"
-                                            MinWidth="110"
-                                            HorizontalAlignment="Left"
+                                            MinWidth="100"
                                             Margin="0,0,8,8"
                                             Click="OpenExternalButton" />
                                     <Button Content="{DynamicResource LOCAS_ReportIssue}"
                                             Tag="https://github.com/Naerian/playnite-nx-audio-switcher/issues/new"
-                                            MinWidth="150"
-                                            HorizontalAlignment="Left"
+                                            MinWidth="140"
                                             Margin="0,0,0,8"
                                             Click="OpenExternalButton" />
                                 </WrapPanel>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
-                                <StackPanel Style="{StaticResource PageSection}">
+                                <StackPanel Style="{StaticResource PageSection}" Margin="0,0,0,16">
                                     <Border Style="{StaticResource PageHeader}">
                                         <TextBlock Text="{DynamicResource LOCAS_SupportTitle}" Style="{StaticResource SectionHeaderText}" />
                                     </Border>
@@ -1104,6 +1183,7 @@
                                         Tag="https://ko-fi.com/naerian"
                                         HorizontalAlignment="Left"
                                         MinWidth="150"
+                                        Padding="16,8"
                                         Click="OpenExternalButton" />
                             </StackPanel>
                         </Grid>

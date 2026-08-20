@@ -1,4 +1,4 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
@@ -190,11 +190,11 @@
     <sys:String x:Key="LOCAS_SupportTitle">Support</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">If you find Audio Switcher useful and want to support its development, you can buy Narian a coffee on Ko-fi.</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">Support on Ko-fi</sys:String>
-    <sys:String x:Key="LOCAS_VersionAuthorFormat">Version {0} | Narian</sys:String>
-    <sys:String x:Key="LOCAS_ProjectLinksTitle">Project links</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Audio Switcher {0} · Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">Direct links</sys:String>
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
-    <sys:String x:Key="LOCAS_OpenWiki">Documentation</sys:String>
-    <sys:String x:Key="LOCAS_ReportIssue">Report a problem</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Wiki documentation</sys:String>
+    <sys:String x:Key="LOCAS_ReportIssue">Report an issue</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Configured profiles</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Review and edit every saved game profile. New profiles can be created from a game's Audio Switcher context menu.</sys:String>
     <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">No game profiles are configured.</sys:String>
@@ -257,6 +257,13 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">Show only the BatteryWidget icon.</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Show only the reported percentage in the BatteryWidget.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">These options control how battery information appears in Playnite's Desktop top bar. They do not change the Fullscreen BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
+    <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
+    <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>
+    <sys:String x:Key="LOCAS_PresetOcean">Ocean</sys:String>
+    <sys:String x:Key="LOCAS_PresetEmber">Ember</sys:String>
     <sys:String x:Key="LOCAS_NotePrefix">NOTE:</sys:String>
 </ResourceDictionary>
 

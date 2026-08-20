@@ -1,4 +1,4 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
@@ -187,13 +187,13 @@
     <sys:String x:Key="LOCAS_AboutDevices">Alterne dispositivos de reprodução e gravação do Windows pelo Playnite, escolha saídas e entradas preferidas opcionais, personalize nomes, ícones e visibilidade e aplique um volume personalizado quando um dispositivo ficar ativo.</sys:String>
     <sys:String x:Key="LOCAS_AboutProfiles">Crie perfis por jogo para saída, entrada, som espacial e volume da sessão do jogo. Os perfis podem usar um processo de áudio específico, substituir temporariamente as preferências globais e restaurar os dispositivos anteriores quando o jogo for fechado.</sys:String>
     <sys:String x:Key="LOCAS_AboutIntegration">Monitore a bateria de dispositivos compatíveis e use integrações para Desktop, Fullscreen e temas adaptadas ao controle para selecionar dispositivos e controlar volume e sessões de mídia. A disponibilidade da bateria depende dos dados expostos com segurança pelo Windows ou pelo hardware.</sys:String>
-    <sys:String x:Key="LOCAS_SupportTitle">Apoio</sys:String>
+    <sys:String x:Key="LOCAS_SupportTitle">Suporte</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">Se o Audio Switcher é útil para você e deseja apoiar o desenvolvimento, pode pagar um café para Narian no Ko-fi.</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">Apoiar no Ko-fi</sys:String>
-    <sys:String x:Key="LOCAS_VersionAuthorFormat">Versão {0} | Narian</sys:String>
-    <sys:String x:Key="LOCAS_ProjectLinksTitle">Links do projeto</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Audio Switcher {0} · Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">Links diretos</sys:String>
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
-    <sys:String x:Key="LOCAS_OpenWiki">Documentação</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Documentação Wiki</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">Relatar um problema</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Perfis configurados</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Revise e edite todos os perfis de jogo salvos. Novos perfis podem ser criados pelo menu de contexto do Audio Switcher em um jogo.</sys:String>
@@ -257,6 +257,13 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">Mostra apenas o ícone do BatteryWidget.</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Mostra apenas a porcentagem informada no BatteryWidget.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">Estas opções controlam como a bateria aparece na barra superior da Área de trabalho do Playnite. Elas não alteram o BatteryWidget de Tela cheia.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
+    <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
+    <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>
+    <sys:String x:Key="LOCAS_PresetOcean">Ocean</sys:String>
+    <sys:String x:Key="LOCAS_PresetEmber">Ember</sys:String>
     <sys:String x:Key="LOCAS_NotePrefix">NOTA:</sys:String>
 </ResourceDictionary>
 

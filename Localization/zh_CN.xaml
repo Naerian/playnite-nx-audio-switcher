@@ -1,4 +1,4 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="LOCAS_PluginName">Audio Switcher</sys:String>
@@ -189,10 +189,10 @@
     <sys:String x:Key="LOCAS_SupportTitle">支持</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupportHelp">如果 Audio Switcher 对你有帮助，并且你希望支持其开发，可以在 Ko-fi 上请 Narian 喝杯咖啡。</sys:String>
     <sys:String x:Key="LOCAS_KoFiSupport">在 Ko-fi 上支持</sys:String>
-    <sys:String x:Key="LOCAS_VersionAuthorFormat">版本 {0} | Narian</sys:String>
-    <sys:String x:Key="LOCAS_ProjectLinksTitle">项目链接</sys:String>
+    <sys:String x:Key="LOCAS_VersionAuthorFormat">Audio Switcher {0} · Narian</sys:String>
+    <sys:String x:Key="LOCAS_ProjectLinksTitle">直接链接</sys:String>
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
-    <sys:String x:Key="LOCAS_OpenWiki">文档</sys:String>
+    <sys:String x:Key="LOCAS_OpenWiki">Wiki 文档</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">报告问题</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">已配置的配置文件</sys:String>
     <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">查看并编辑所有已保存的游戏配置文件。可从游戏的 Audio Switcher 右键菜单创建新配置文件。</sys:String>
@@ -257,6 +257,13 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">仅显示 BatteryWidget 图标。</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">在 BatteryWidget 中仅显示报告的百分比。</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">这些选项控制电池信息在 Playnite 桌面顶栏中的显示方式。它们不会更改全屏 BatteryWidget。</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
+    <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
+    <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>
+    <sys:String x:Key="LOCAS_PresetOcean">Ocean</sys:String>
+    <sys:String x:Key="LOCAS_PresetEmber">Ember</sys:String>
     <sys:String x:Key="LOCAS_NotePrefix">注意：</sys:String>
 </ResourceDictionary>
 

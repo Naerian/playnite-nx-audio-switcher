@@ -49,6 +49,7 @@ namespace PlayniteAudioSwitcher
         private bool showDisabledInputDevices;
         private string batteryIndicatorDisplayMode = "IconAndPercentage";
         private string batteryIndicatorIcon = string.Empty;
+        private string appearancePreset = SettingsAppearance.Midnight;
 
         public AudioSwitcherSettings()
         {
@@ -97,6 +98,7 @@ namespace PlayniteAudioSwitcher
                     ? "IconAndPercentage"
                     : savedSettings.BatteryIndicatorDisplayMode;
                 BatteryIndicatorIcon = savedSettings.BatteryIndicatorIcon ?? string.Empty;
+                AppearancePreset = savedSettings.AppearancePreset;
             }
 
             DesktopTopPanelIcon = DesktopTopPanelIcon ?? string.Empty;
@@ -106,6 +108,7 @@ namespace PlayniteAudioSwitcher
             DesktopBatteryDisplayMode = string.IsNullOrWhiteSpace(DesktopBatteryDisplayMode)
                 ? "IconAndPercentage"
                 : DesktopBatteryDisplayMode;
+            AppearancePreset = SettingsAppearance.Normalize(AppearancePreset);
 
             MigrateFavoritesToAliases();
             ClearLegacyFavoriteSettings();
@@ -607,6 +610,31 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref batteryIndicatorIcon, value);
         }
 
+        public string AppearancePreset
+        {
+            get => appearancePreset;
+            set
+            {
+                var normalized = SettingsAppearance.Normalize(value);
+                if (string.Equals(appearancePreset, normalized, System.StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                SetValue(ref appearancePreset, normalized);
+            }
+        }
+
+        [DontSerialize]
+        public List<AppearancePresetOption> AppearancePresetOptions => new List<AppearancePresetOption>
+        {
+            new AppearancePresetOption { Value = SettingsAppearance.Midnight, DisplayName = plugin?.Loc("LOCAS_PresetMidnight") ?? "Midnight" },
+            new AppearancePresetOption { Value = SettingsAppearance.Paper, DisplayName = plugin?.Loc("LOCAS_PresetPaper") ?? "Paper" },
+            new AppearancePresetOption { Value = SettingsAppearance.Oled, DisplayName = plugin?.Loc("LOCAS_PresetOled") ?? "OLED" },
+            new AppearancePresetOption { Value = SettingsAppearance.Ocean, DisplayName = plugin?.Loc("LOCAS_PresetOcean") ?? "Ocean" },
+            new AppearancePresetOption { Value = SettingsAppearance.Ember, DisplayName = plugin?.Loc("LOCAS_PresetEmber") ?? "Ember" }
+        };
+
         private static string MigrateDesktopBatteryDisplayMode(string value)
         {
             return string.Equals(value, "PercentageOnly", System.StringComparison.OrdinalIgnoreCase)
@@ -904,6 +932,7 @@ namespace PlayniteAudioSwitcher
             ShowDisabledInputDevices = editingClone.ShowDisabledInputDevices;
             BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
             BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
+            AppearancePreset = editingClone.AppearancePreset;
             AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
             editingClone = null;
             RefreshDevices();
@@ -1028,7 +1057,8 @@ namespace PlayniteAudioSwitcher
                 ShowDisabledOutputDevices = ShowDisabledOutputDevices,
                 ShowDisabledInputDevices = ShowDisabledInputDevices,
                 BatteryIndicatorDisplayMode = BatteryIndicatorDisplayMode,
-                BatteryIndicatorIcon = BatteryIndicatorIcon
+                BatteryIndicatorIcon = BatteryIndicatorIcon,
+                AppearancePreset = AppearancePreset
             };
 
             clone.AvailableGameProfiles = AvailableGameProfiles.Select(profile => profile.Clone()).ToList();

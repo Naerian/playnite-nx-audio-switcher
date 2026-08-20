@@ -34,6 +34,7 @@ namespace PlayniteAudioSwitcher
         private bool shouldShowDesktopIndicator;
         private Brush desktopIndicatorBatteryBrush;
         private bool useDesktopBatteryColor;
+        private string currentDeviceTooltip;
         private bool hasDevices;
         private string currentInputDeviceId;
         private string currentInputDeviceName;
@@ -386,6 +387,12 @@ namespace PlayniteAudioSwitcher
         {
             get => useDesktopBatteryColor;
             private set => SetValue(ref useDesktopBatteryColor, value);
+        }
+
+        public string CurrentDeviceTooltip
+        {
+            get => currentDeviceTooltip;
+            private set => SetValue(ref currentDeviceTooltip, value);
         }
 
         public bool HasDevices
@@ -961,6 +968,7 @@ namespace PlayniteAudioSwitcher
                 !string.Equals(mode, "PercentageOnly", StringComparison.OrdinalIgnoreCase);
             ShowBatteryIndicatorPercentage = !string.Equals(mode, "IconOnly", StringComparison.OrdinalIgnoreCase);
             ShouldShowBatteryIndicator = HasCurrentDeviceBattery || plugin.Settings?.HideBatteryIndicatorWhenUnavailable != true;
+            UpdateCurrentDeviceTooltip();
         }
 
         private void RefreshDesktopIndicator()
@@ -986,6 +994,14 @@ namespace PlayniteAudioSwitcher
                 IsCurrentDeviceBatteryCharging);
             UseDesktopBatteryColor = plugin.Settings?.ColorDesktopIndicatorByBattery == true &&
                 HasCurrentDeviceBattery;
+            UpdateCurrentDeviceTooltip();
+        }
+
+        private void UpdateCurrentDeviceTooltip()
+        {
+            CurrentDeviceTooltip = HasCurrentDeviceBattery && !string.IsNullOrWhiteSpace(CurrentDeviceBatteryLabel)
+                ? $"{CurrentDeviceName}: {CurrentDeviceBatteryLabel}"
+                : (CurrentDeviceName ?? string.Empty);
         }
 
         private void SetCurrentInputDeviceBattery(AudioDevice device)

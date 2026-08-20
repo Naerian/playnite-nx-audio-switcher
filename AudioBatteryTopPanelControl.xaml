@@ -4,36 +4,8 @@
                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                             xmlns:playnite="clr-namespace:Playnite.SDK.Controls;assembly=Playnite.SDK"
                             Focusable="False">
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-        <StackPanel.ToolTip>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding CurrentDeviceName}" />
-                <TextBlock Text=": ">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasCurrentDeviceBattery}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <TextBlock Text="{Binding CurrentDeviceBatteryPercent, StringFormat={}{0}%}">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasCurrentDeviceBattery}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </StackPanel>
-        </StackPanel.ToolTip>
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                ToolTip="{Binding CurrentDeviceTooltip}">
         <Viewbox Width="20" Height="20">
             <Viewbox.Style>
                 <Style TargetType="Viewbox">
