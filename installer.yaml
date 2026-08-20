@@ -1,5 +1,11 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.15.4
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-20
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.15.4/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_4.pext
+    Changelog:
+      - Kept sidebar and top tab labels readable on light HoverBrush themes by switching selected and hovered text to TextBrushDark.
   - Version: 1.15.3
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-20
