@@ -16,8 +16,13 @@ namespace PlayniteAudioSwitcher
         private static readonly Guid MmDeviceEnumeratorClsid = new Guid("BCDE0395-E52F-467C-8E3D-C4579291692E");
         private static readonly Guid PolicyConfigClientClsid = new Guid("870AF99C-171D-4F9E-AF0D-E63DF40C2BC9");
         private readonly object batteryCacheLock = new object();
+        private readonly object notificationLock = new object();
         private readonly AudioDeviceBatteryReader batteryReader = new AudioDeviceBatteryReader();
         private IReadOnlyDictionary<Guid, AudioDeviceBatteryInfo> batteryByContainerId = new Dictionary<Guid, AudioDeviceBatteryInfo>();
+        private IMMDeviceEnumerator notificationEnumerator;
+        private AudioEndpointNotificationClient notificationClient;
+
+        public event EventHandler EndpointTopologyChanged;
 
         public IReadOnlyList<AudioDevice> GetPlaybackDevices()
         {
@@ -63,6 +68,76 @@ namespace PlayniteAudioSwitcher
             }
 
             return refreshed.Count;
+        }
+
+        public void StartEndpointNotifications()
+        {
+            lock (notificationLock)
+            {
+                if (notificationEnumerator != null)
+                {
+                    return;
+                }
+
+                AudioEndpointNotificationClient client = null;
+                IMMDeviceEnumerator enumerator = null;
+                try
+                {
+                    client = new AudioEndpointNotificationClient(RaiseEndpointTopologyChanged);
+                    enumerator = CreateComInstance<IMMDeviceEnumerator>(MmDeviceEnumeratorClsid);
+                    Marshal.ThrowExceptionForHR(enumerator.RegisterEndpointNotificationCallback(client));
+                    notificationClient = client;
+                    notificationEnumerator = enumerator;
+                }
+                catch
+                {
+                    if (enumerator != null && client != null)
+                    {
+                        try
+                        {
+                            enumerator.UnregisterEndpointNotificationCallback(client);
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                    ReleaseDistinctComObjects(enumerator);
+                    throw;
+                }
+            }
+        }
+
+        public void StopEndpointNotifications()
+        {
+            lock (notificationLock)
+            {
+                if (notificationEnumerator != null && notificationClient != null)
+                {
+                    try
+                    {
+                        notificationEnumerator.UnregisterEndpointNotificationCallback(notificationClient);
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                ReleaseDistinctComObjects(notificationEnumerator);
+                notificationEnumerator = null;
+                notificationClient = null;
+            }
+        }
+
+        private void RaiseEndpointTopologyChanged()
+        {
+            try
+            {
+                EndpointTopologyChanged?.Invoke(this, EventArgs.Empty);
+            }
+            catch
+            {
+            }
         }
 
         public IReadOnlyList<string> GetBatteryDiagnostics()
@@ -1302,10 +1377,74 @@ namespace PlayniteAudioSwitcher
             int GetDevice([MarshalAs(UnmanagedType.LPWStr)] string id, out IMMDevice device);
 
             [PreserveSig]
-            int RegisterEndpointNotificationCallback(IntPtr client);
+            int RegisterEndpointNotificationCallback(
+                [MarshalAs(UnmanagedType.Interface)] IMMNotificationClient client);
 
             [PreserveSig]
-            int UnregisterEndpointNotificationCallback(IntPtr client);
+            int UnregisterEndpointNotificationCallback(
+                [MarshalAs(UnmanagedType.Interface)] IMMNotificationClient client);
+        }
+
+        [ComImport]
+        [Guid("7991EEC9-7E89-4D85-8390-6C703CEC60C0")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IMMNotificationClient
+        {
+            [PreserveSig]
+            int OnDeviceStateChanged([MarshalAs(UnmanagedType.LPWStr)] string deviceId, DeviceState newState);
+
+            [PreserveSig]
+            int OnDeviceAdded([MarshalAs(UnmanagedType.LPWStr)] string deviceId);
+
+            [PreserveSig]
+            int OnDeviceRemoved([MarshalAs(UnmanagedType.LPWStr)] string deviceId);
+
+            [PreserveSig]
+            int OnDefaultDeviceChanged(EDataFlow flow, ERole role, [MarshalAs(UnmanagedType.LPWStr)] string defaultDeviceId);
+
+            [PreserveSig]
+            int OnPropertyValueChanged([MarshalAs(UnmanagedType.LPWStr)] string deviceId, PropertyKey key);
+        }
+
+        private sealed class AudioEndpointNotificationClient : IMMNotificationClient
+        {
+            private readonly Action changed;
+
+            public AudioEndpointNotificationClient(Action changed)
+            {
+                this.changed = changed;
+            }
+
+            public int OnDeviceStateChanged(string deviceId, DeviceState newState)
+            {
+                changed?.Invoke();
+                return 0;
+            }
+
+            public int OnDeviceAdded(string deviceId)
+            {
+                changed?.Invoke();
+                return 0;
+            }
+
+            public int OnDeviceRemoved(string deviceId)
+            {
+                changed?.Invoke();
+                return 0;
+            }
+
+            public int OnDefaultDeviceChanged(EDataFlow flow, ERole role, string defaultDeviceId)
+            {
+                changed?.Invoke();
+                return 0;
+            }
+
+            public int OnPropertyValueChanged(string deviceId, PropertyKey key)
+            {
+                // Peak meters and volume keys fire continuously. Ignore them so the UI
+                // does not rebuild on every meter tick.
+                return 0;
+            }
         }
 
         [ComImport]

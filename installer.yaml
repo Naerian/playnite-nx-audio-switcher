@@ -1,5 +1,14 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.15.3
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-20
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.15.3/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_3.pext
+    Changelog:
+      - Subscribed to Windows Core Audio endpoint changes so Overview, Fullscreen, and the Desktop indicator update when devices are added, removed, enabled, or become the default, without applying preferred devices again.
+      - Removed leftover Favorite A/B and Fullscreen-only-favorites settings after migrating them to custom device names.
+      - Colored status badges for Spatial Sound and device Windows state now use the same theme brush for text and border.
+      - Updated the English and Spanish Wiki documentation.
   - Version: 1.15.2
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-20

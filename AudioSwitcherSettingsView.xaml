@@ -31,7 +31,7 @@
             <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="Padding" Value="0,0,0,8" />
-            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="Margin" Value="0,0,0,8" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
         </Style>
         <Style x:Key="HintText" TargetType="TextBlock">
@@ -39,14 +39,15 @@
             <Setter Property="FontSize" Value="12" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Opacity" Value="0.78" />
-            <Setter Property="Margin" Value="0,8,0,8" />
+            <Setter Property="Margin" Value="0,8,0,16" />
         </Style>
-        <Style x:Key="SectionSubtitleText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+        <Style x:Key="SectionSubtitleText" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
             <Setter Property="FontStyle" Value="Italic" />
-            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="Opacity" Value="0.78" />
+            <Setter Property="Margin" Value="0,0,0,16" />
         </Style>
         <Style x:Key="IndentedHintText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
-            <Setter Property="Margin" Value="22,8,0,8" />
+            <Setter Property="Margin" Value="24,8,0,16" />
         </Style>
         <Style x:Key="NoteText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
             <Setter Property="FontStyle" Value="Italic" />
@@ -57,6 +58,18 @@
             <Setter Property="Opacity" Value="1" />
             <Setter Property="FontWeight" Value="Normal" />
             <Setter Property="FontStyle" Value="Italic" />
+        </Style>
+        <Style x:Key="IconSquareButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="MinWidth" Value="32" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="MaxWidth" Value="32" />
+            <Setter Property="MaxHeight" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style x:Key="SliderValueText" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -91,7 +104,7 @@
             <Setter Property="Background" Value="{DynamicResource PopupBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource HighlightGlyphBrush}" />
             <Setter Property="BorderThickness" Value="4,1,1,1" />
-            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="Padding" Value="16,16" />
             <Setter Property="Margin" Value="0,0,0,24" />
             <Setter Property="CornerRadius" Value="4" />
             <Setter Property="MinHeight" Value="92" />
@@ -122,15 +135,17 @@
         <Style x:Key="StatusPill" TargetType="Border" BasedOn="{StaticResource SummaryPill}">
             <Setter Property="Margin" Value="8,0,0,0" />
         </Style>
+        <Style x:Key="DeviceStatusPill" TargetType="Border" BasedOn="{StaticResource SummaryPill}">
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
         <Style x:Key="CapabilityPill" TargetType="Border" BasedOn="{StaticResource SummaryPill}">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="Padding" Value="6,1" />
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="Opacity" Value="0.92" />
         </Style>
-        <Style x:Key="SummaryMetricPill" TargetType="Border" BasedOn="{StaticResource CapabilityPill}">
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="BorderBrush" Value="Transparent" />
-        </Style>
+        <Style x:Key="SummaryMetricPill" TargetType="Border" BasedOn="{StaticResource CapabilityPill}" />
         <Style x:Key="DeviceCard" TargetType="Border" BasedOn="{StaticResource SummaryCard}">
             <Setter Property="Margin" Value="0" />
             <Setter Property="MinHeight" Value="0" />
@@ -165,49 +180,6 @@
         <Style x:Key="TabHeaderLabel" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="TextWrapping" Value="NoWrap" />
-        </Style>
-        <Style x:Key="PreviewActionButton" TargetType="Button">
-            <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="36" />
-            <Setter Property="Padding" Value="12,6" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Background" Value="{DynamicResource ControlBackgroundBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource GlyphBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="PreviewButtonBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
-                                Padding="{TemplateBinding Padding}"
-                                SnapsToDevicePixels="True">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              TextElement.Foreground="{TemplateBinding Foreground}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="PreviewButtonBorder" Property="Background" Value="{DynamicResource HoverBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="PreviewButtonBorder" Property="Opacity" Value="0.86" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.5" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
         <Style x:Key="ExpanderHeaderButton" TargetType="ToggleButton">
             <Setter Property="Background" Value="Transparent" />
@@ -254,38 +226,52 @@
                                                Fill="{DynamicResource ControlBackgroundBrush}" />
                                     <Rectangle x:Name="ExpanderAccent" Width="4" HorizontalAlignment="Left"
                                                RadiusX="4" RadiusY="4" Fill="Transparent" />
-                                    <ToggleButton Style="{StaticResource ExpanderHeaderButton}"
-                                                  Foreground="{DynamicResource TextBrush}"
-                                                  IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Margin="16,10,8,10" VerticalAlignment="Center">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <ToggleButton Style="{StaticResource ExpanderHeaderButton}"
+                                                      Foreground="{DynamicResource TextBrush}"
+                                                      IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                            <Grid Margin="16,8,8,8" VerticalAlignment="Center">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
                                                 <ContentPresenter x:Name="ExpanderHeader" ContentSource="Header"
                                                                   RecognizesAccessKey="True"
+                                                                  HorizontalAlignment="Stretch"
                                                                   TextElement.Foreground="{DynamicResource TextBrush}" />
-                                                <TextBlock x:Name="ExpanderHint"
+                                                <TextBlock x:Name="ExpanderHint" Grid.Row="1"
                                                            Text="{DynamicResource LOCAS_ExpandSectionHint}"
-                                                           Style="{StaticResource HintText}" FontSize="12"
-                                                           Margin="0,3,0,0" />
-                                            </StackPanel>
-                                            <Border x:Name="ExpanderChevron" Grid.Column="1" Width="32" Height="32"
-                                                    CornerRadius="4" VerticalAlignment="Center" Margin="0,0,12,0"
-                                                    BorderBrush="{DynamicResource GlyphBrush}" BorderThickness="1">
-                                                <TextBlock x:Name="ExpanderArrow"
-                                                           FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
-                                                           Text="&#xE70D;" FontSize="14"
-                                                           Foreground="{DynamicResource TextBrush}"
-                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                        </Grid>
-                                    </ToggleButton>
+                                                           Style="{StaticResource HintText}"
+                                                           Margin="0,4,0,0" />
+                                            </Grid>
+                                        </ToggleButton>
+                                        <Button x:Name="ExpanderChevron" Grid.Column="1"
+                                                Style="{StaticResource IconSquareButton}"
+                                                VerticalAlignment="Center"
+                                                Click="ExpanderChevronButton_OnClick">
+                                            <Viewbox Width="16" Height="16" Stretch="Uniform"
+                                                     HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Viewbox.RenderTransform>
+                                                    <TranslateTransform X="-1" Y="-1" />
+                                                </Viewbox.RenderTransform>
+                                                <Canvas Width="24" Height="24">
+                                                    <Path x:Name="ExpanderArrow"
+                                                          Data="M6,9 L12,15 L18,9"
+                                                          Stroke="{DynamicResource TextBrush}" StrokeThickness="2"
+                                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                                                </Canvas>
+                                            </Viewbox>
+                                        </Button>
+                                    </Grid>
                                 </Grid>
                             </Border>
-                            <Border x:Name="ExpanderContent" Visibility="Collapsed" Padding="16,14,8,12"
-                                    TextElement.Foreground="{DynamicResource TextBrush}">
+                            <Border x:Name="ExpanderContent" Visibility="Collapsed" Padding="16,16,8,16"
+                                    TextElement.Foreground="{DynamicResource TextBrush}"
+                                    TextElement.FontSize="14">
                                 <ContentPresenter HorizontalAlignment="Stretch" />
                             </Border>
                         </DockPanel>
@@ -298,7 +284,7 @@
                                 <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource HoverBrush}" />
                                 <Setter TargetName="ExpanderAccent" Property="Fill" Value="{DynamicResource GlyphBrush}" />
                                 <Setter TargetName="ExpanderHint" Property="Visibility" Value="Collapsed" />
-                                <Setter TargetName="ExpanderArrow" Property="Text" Value="&#xE70E;" />
+                                <Setter TargetName="ExpanderArrow" Property="Data" Value="M6,15 L12,9 L18,15" />
                                 <Setter TargetName="ExpanderHeader" Property="TextElement.FontWeight" Value="SemiBold" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -313,7 +299,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="Margin" Value="0,0,0,8" />
             <Setter Property="MinHeight" Value="44" />
             <Setter Property="ClipToBounds" Value="False" />
             <Setter Property="Template">
@@ -325,7 +311,7 @@
                                        RadiusX="4" RadiusY="4" Fill="Transparent" />
                             <ContentPresenter x:Name="NavigationHeader" ContentSource="Header"
                                               HorizontalAlignment="Left" VerticalAlignment="Center"
-                                              Margin="16,12,16,12"
+                                              Margin="16,8,16,8"
                                               TextElement.Foreground="{DynamicResource TextBrush}" />
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -356,7 +342,7 @@
                         <Grid KeyboardNavigation.TabNavigation="Local" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="268" />
-                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="24" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Border Background="{DynamicResource PopupBackgroundBrush}" CornerRadius="4"
@@ -383,7 +369,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="MinWidth" Value="148" />
             <Setter Property="MinHeight" Value="44" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -428,7 +414,7 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Border Background="{DynamicResource PopupBackgroundBrush}" CornerRadius="4"
-                                    Padding="6" ClipToBounds="False"
+                                    Padding="8" ClipToBounds="False"
                                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 <WrapPanel x:Name="HeaderPanel" IsItemsHost="True" />
                             </Border>
@@ -444,7 +430,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16,14">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16,16">
         <TabControl x:Name="RootTabs" Style="{StaticResource TopTabs}" SelectionChanged="RootTabsSelectionChanged">
             <TabItem>
                 <TabItem.Header>
@@ -454,13 +440,12 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,4,8,16">
+                    <StackPanel Margin="8,8,8,16">
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <DockPanel LastChildFill="True">
                                     <Button DockPanel.Dock="Right"
                                             Content="{DynamicResource LOCAS_OverviewRefresh}"
-                                            Style="{StaticResource PreviewActionButton}"
                                             MinWidth="130"
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Center"
@@ -578,7 +563,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_OutputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -591,7 +576,7 @@
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding PreferredOutputDeviceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" />
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -616,7 +601,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -629,7 +614,7 @@
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding PreferredInputDeviceId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <TextBlock Text="{DynamicResource LOCAS_PreferredDeviceHelp}" Style="{StaticResource HintText}" />
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SystemDevices}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -669,7 +654,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_DesktopIntegrationTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -678,7 +663,7 @@
                                     </StackPanel>
                                     <CheckBox Content="{DynamicResource LOCAS_ShowDesktopAudioSwitcher}"
                                               IsChecked="{Binding ShowDesktopBatteryIndicator}" />
-                                    <StackPanel Margin="22,16,0,0" IsEnabled="{Binding ShowDesktopBatteryIndicator}">
+                                    <StackPanel Margin="24,16,0,0" IsEnabled="{Binding ShowDesktopBatteryIndicator}">
                                         <TextBlock Text="{DynamicResource LOCAS_DesktopIcon}" Style="{StaticResource FieldLabel}" />
                                         <ComboBox x:Name="DesktopTopPanelIconBox"
                                                   ItemsSource="{Binding BatteryIconOptions}"
@@ -701,7 +686,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
@@ -712,13 +697,13 @@
                                               IsChecked="{Binding QuickSwitchEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableQuickSwitchHelp}"
                                                Style="{StaticResource IndentedHintText}" />
-                                    <StackPanel Margin="22,0,0,0" IsEnabled="{Binding QuickSwitchEnabled}">
+                                    <StackPanel Margin="24,0,0,0" IsEnabled="{Binding QuickSwitchEnabled}">
                                         <CheckBox Content="{DynamicResource LOCAS_QuickSwitchAllDevices}"
                                                   IsChecked="{Binding QuickSwitchAllDevices}" />
                                         <TextBlock Text="{DynamicResource LOCAS_QuickSwitchAllDevicesHelp}"
                                                    Style="{StaticResource HintText}" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_VolumeTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -738,7 +723,7 @@
                                                 Value="{Binding VolumeStepPercent, UpdateSourceTrigger=PropertyChanged}" />
                                         <TextBlock Text="{DynamicResource LOCAS_VolumeStepRange}" Style="{StaticResource SliderRangeText}" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_MediaSettingsTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -759,7 +744,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -835,8 +820,7 @@
                                               SelectedValuePath="Id"
                                               SelectedValue="{Binding BatteryIndicatorIcon}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIconHelp}"
-                                               Style="{StaticResource HintText}"
-                                               Margin="0,8,0,0" />
+                                               Style="{StaticResource HintText}" />
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
@@ -848,7 +832,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -859,13 +843,13 @@
                                               IsChecked="{Binding GameProfilesEnabled}" />
                                     <TextBlock Text="{DynamicResource LOCAS_EnableGameProfilesHelp}"
                                                Style="{StaticResource IndentedHintText}" />
-                                    <StackPanel Margin="22,0,0,0" IsEnabled="{Binding GameProfilesEnabled}">
+                                    <StackPanel Margin="24,0,0,0" IsEnabled="{Binding GameProfilesEnabled}">
                                         <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
                                                   IsChecked="{Binding RestoreDeviceAfterGameProfile}" />
                                         <TextBlock Text="{DynamicResource LOCAS_RestoreAfterGameHelp}"
                                                    Style="{StaticResource HintText}" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}" Margin="0,16,0,24">
+                                    <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
@@ -887,7 +871,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="24,18,24,24">
+                                <StackPanel Margin="8,8,8,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -900,7 +884,7 @@
                                                Style="{StaticResource IndentedHintText}" />
                                     <StackPanel IsEnabled="{Binding SpatialSoundIntegrationEnabled}">
                                         <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolPath}" Style="{StaticResource FieldLabel}" />
-                                        <Grid Margin="0,0,0,8">
+                                        <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
@@ -912,28 +896,25 @@
                                                      Margin="0,0,8,0" />
                                             <Button Grid.Column="1"
                                                     Content="{DynamicResource LOCAS_Browse}"
-                                                    Style="{StaticResource PreviewActionButton}"
                                                     MinWidth="90"
                                                     HorizontalAlignment="Left"
                                                     Margin="0,0,8,0"
                                                     Click="BrowseSpatialSoundToolPath" />
                                             <Button Grid.Column="2"
                                                     Content="{DynamicResource LOCAS_Test}"
-                                                    Style="{StaticResource PreviewActionButton}"
                                                     MinWidth="80"
                                                     HorizontalAlignment="Left"
                                                     Click="TestSpatialSoundToolPath" />
                                         </Grid>
-                                        <TextBlock x:Name="SpatialSoundToolStatus" Style="{StaticResource HintText}" Margin="0,8,0,0" />
+                                        <TextBlock x:Name="SpatialSoundToolStatus" Style="{StaticResource HintText}" />
                                     </StackPanel>
-                                    <TextBlock Style="{StaticResource NoteText}" Margin="0,24,0,8">
+                                    <TextBlock Style="{StaticResource NoteText}" Margin="0,24,0,0">
                                         <Run FontWeight="SemiBold" Text="{DynamicResource LOCAS_NotePrefix}" />
                                         <Run Text=" " />
                                         <Run Text="{DynamicResource LOCAS_SpatialSoundNotBundled}" />
                                     </TextBlock>
                                     <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolInfo}"
-                                               Style="{StaticResource NoteText}"
-                                               Margin="0,8,0,8" />
+                                               Style="{StaticResource NoteText}" />
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="0,0,16,0">
                                             <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_view.html" RequestNavigate="OpenExternalLink">SoundVolumeView</Hyperlink>
@@ -957,7 +938,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,4,8,16">
+                    <StackPanel Margin="8,8,8,16">
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <TextBlock Text="{DynamicResource LOCAS_NotificationsTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -1014,7 +995,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,4,8,16">
+                    <StackPanel Margin="8,8,8,16">
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <TextBlock Text="{DynamicResource LOCAS_MaintenanceTab}" Style="{StaticResource SectionHeaderText}" />
@@ -1028,7 +1009,6 @@
                             <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}" Style="{StaticResource SectionSubtitleText}" />
                         </StackPanel>
                         <Button Content="{DynamicResource LOCAS_AudioSessionDiagnostics}"
-                                Style="{StaticResource PreviewActionButton}"
                                 HorizontalAlignment="Left"
                                 MinWidth="220"
                                 Margin="0,0,0,24"
@@ -1041,13 +1021,11 @@
                         </StackPanel>
                         <WrapPanel>
                             <Button Content="{DynamicResource LOCAS_ExportSettingsBackup}"
-                                    Style="{StaticResource PreviewActionButton}"
                                     MinWidth="180"
                                     HorizontalAlignment="Left"
                                     Margin="0,0,8,8"
                                     Click="ExportSettingsBackup" />
                             <Button Content="{DynamicResource LOCAS_ImportSettingsBackup}"
-                                    Style="{StaticResource PreviewActionButton}"
                                     MinWidth="180"
                                     HorizontalAlignment="Left"
                                     Margin="0,0,0,8"
@@ -1065,7 +1043,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,4,8,16">
+                    <StackPanel Margin="8,8,8,16">
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <TextBlock Text="{DynamicResource LOCAS_AboutTab}" Style="{StaticResource SectionHeaderText}" />
@@ -1084,7 +1062,7 @@
                         <Grid Margin="0,24,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="24" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <StackPanel>
@@ -1096,21 +1074,18 @@
                                 <WrapPanel>
                                     <Button Content="{DynamicResource LOCAS_OpenGitHub}"
                                             Tag="https://github.com/Naerian/playnite-nx-audio-switcher"
-                                            Style="{StaticResource PreviewActionButton}"
                                             MinWidth="110"
                                             HorizontalAlignment="Left"
                                             Margin="0,0,8,8"
                                             Click="OpenExternalButton" />
                                     <Button Content="{DynamicResource LOCAS_OpenWiki}"
                                             Tag="https://github.com/Naerian/playnite-nx-audio-switcher/wiki"
-                                            Style="{StaticResource PreviewActionButton}"
                                             MinWidth="110"
                                             HorizontalAlignment="Left"
                                             Margin="0,0,8,8"
                                             Click="OpenExternalButton" />
                                     <Button Content="{DynamicResource LOCAS_ReportIssue}"
                                             Tag="https://github.com/Naerian/playnite-nx-audio-switcher/issues/new"
-                                            Style="{StaticResource PreviewActionButton}"
                                             MinWidth="150"
                                             HorizontalAlignment="Left"
                                             Margin="0,0,0,8"
@@ -1125,10 +1100,8 @@
                                 </StackPanel>
                                 <Button Content="{DynamicResource LOCAS_KoFiSupport}"
                                         Tag="https://ko-fi.com/naerian"
-                                        Style="{StaticResource PreviewActionButton}"
                                         HorizontalAlignment="Left"
                                         MinWidth="150"
-                                        Padding="16,7"
                                         Click="OpenExternalButton" />
                             </StackPanel>
                         </Grid>

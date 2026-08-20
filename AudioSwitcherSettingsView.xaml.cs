@@ -21,6 +21,7 @@ namespace PlayniteAudioSwitcher
     {
         private ScrollViewer hostScrollViewer;
         private Window hostWindow;
+        private AudioSwitcherPlugin subscribedPlugin;
 
         public AudioSwitcherSettingsView()
         {
@@ -33,6 +34,7 @@ namespace PlayniteAudioSwitcher
                 GetInstalledVersion());
             DataContextChanged += (_, __) =>
             {
+                SubscribeLiveAudioGraph();
                 RebuildDeviceRows();
                 UpdateOverview();
             };
@@ -48,7 +50,38 @@ namespace PlayniteAudioSwitcher
             Dispatcher.BeginInvoke(new Action(AttachToHost), DispatcherPriority.ApplicationIdle);
             Dispatcher.BeginInvoke(new Action(FillSelectedContentHosts), DispatcherPriority.Loaded);
             Dispatcher.BeginInvoke(new Action(FillSelectedContentHosts), DispatcherPriority.ApplicationIdle);
+            SubscribeLiveAudioGraph();
             RefreshOnLoad();
+        }
+
+        private void SubscribeLiveAudioGraph()
+        {
+            UnsubscribeLiveAudioGraph();
+            if (DataContext is AudioSwitcherSettings settings && settings.Plugin != null)
+            {
+                subscribedPlugin = settings.Plugin;
+                subscribedPlugin.LiveAudioGraphChanged += OnLiveAudioGraphChanged;
+            }
+        }
+
+        private void UnsubscribeLiveAudioGraph()
+        {
+            if (subscribedPlugin != null)
+            {
+                subscribedPlugin.LiveAudioGraphChanged -= OnLiveAudioGraphChanged;
+                subscribedPlugin = null;
+            }
+        }
+
+        private void OnLiveAudioGraphChanged(object sender, EventArgs args)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(new Action(UpdateOverview));
+                return;
+            }
+
+            UpdateOverview();
         }
 
         private async void RefreshOnLoad()
@@ -68,6 +101,7 @@ namespace PlayniteAudioSwitcher
 
         private void OnUnloaded(object sender, RoutedEventArgs args)
         {
+            UnsubscribeLiveAudioGraph();
             DetachFromHost();
         }
 
@@ -115,6 +149,24 @@ namespace PlayniteAudioSwitcher
         private void RootTabsSelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             Dispatcher.BeginInvoke(new Action(FillSelectedContentHosts), DispatcherPriority.Loaded);
+        }
+
+        private void ExpanderChevronButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            for (var parent = VisualTreeHelper.GetParent(sender as DependencyObject);
+                 parent != null;
+                 parent = VisualTreeHelper.GetParent(parent))
+            {
+                var expander = parent as Expander;
+                if (expander == null)
+                {
+                    continue;
+                }
+
+                expander.IsExpanded = !expander.IsExpanded;
+                e.Handled = true;
+                return;
+            }
         }
 
         private void FillSelectedContentHosts()
@@ -348,6 +400,18 @@ namespace PlayniteAudioSwitcher
             OverviewSpatialSoundText.Text = spatialEnabled
                 ? GetSpatialSoundToolStatus()
                 : ResourceText("LOCAS_SpatialOff", "Off");
+            if (!spatialEnabled)
+            {
+                ApplyStatusBadgeAppearance(OverviewSpatialSoundPill, "GlyphBrush", 0.65);
+            }
+            else if (IsSpatialSoundToolReady())
+            {
+                ApplyStatusBadgeAppearance(OverviewSpatialSoundPill, "PositiveRatingBrush");
+            }
+            else
+            {
+                ApplyStatusBadgeAppearance(OverviewSpatialSoundPill, "WarningBrush");
+            }
 
             try
             {
@@ -485,12 +549,8 @@ namespace PlayniteAudioSwitcher
                     Text = ResourceText(
                         "LOCAS_NoSystemDevices",
                         "Windows did not report any devices here. Check Playnite.log and avoid running Playnite as Administrator."),
-                    FontSize = 12,
-                    Opacity = 0.78,
-                    TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(0, 8, 0, 0)
+                    Style = TryFindResource("HintText") as Style
                 };
-                empty.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
                 panel.Children.Add(empty);
                 return;
             }
@@ -528,7 +588,7 @@ namespace PlayniteAudioSwitcher
             root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            var top = new Grid { Margin = new Thickness(0, 0, 0, 12) };
+            var top = new Grid { Margin = new Thickness(0, 0, 0, 16) };
             top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             top.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
@@ -544,9 +604,7 @@ namespace PlayniteAudioSwitcher
             infoPanel.Children.Add(nameText);
 
             var pills = new WrapPanel { Margin = new Thickness(0, 8, 0, 0) };
-            pills.Children.Add(CreateMetricPill(
-                ResourceText("LOCAS_Status", "Status"),
-                device.StatusDisplayName ?? "\u2014"));
+            pills.Children.Add(CreateStatusPill(device));
             pills.Children.Add(CreateMetricPill(
                 ResourceText("LOCAS_Battery", "Battery"),
                 device.HasBattery ? device.BatteryLabel : "\u2014",
@@ -560,7 +618,7 @@ namespace PlayniteAudioSwitcher
             {
                 IsChecked = device.IsVisible,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 12)
+                Margin = new Thickness(0, 0, 0, 16)
             };
             visibleBox.SetResourceReference(ContentControl.ContentProperty, "LOCAS_Visible");
             visibleBox.Checked += (_, __) => device.IsVisible = true;
@@ -584,7 +642,7 @@ namespace PlayniteAudioSwitcher
             iconPanel.Children.Add(iconBox);
             controlsPanel.Children.Add(iconPanel);
 
-            var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 4, 0, 0) };
+            var defaultVolumePanel = new StackPanel();
             defaultVolumePanel.Children.Add(CreateFieldLabel(defaultVolumeLabelResource));
             var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
             defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -700,6 +758,72 @@ namespace PlayniteAudioSwitcher
             };
         }
 
+        private Border CreateStatusPill(AudioDevice device)
+        {
+            var status = string.IsNullOrWhiteSpace(device.StatusDisplayName)
+                ? "\u2014"
+                : device.StatusDisplayName;
+            var text = new TextBlock
+            {
+                Text = $"{ResourceText("LOCAS_Status", "Status")}: {status}"
+            };
+            var badge = new Border
+            {
+                Style = TryFindResource("DeviceStatusPill") as Style,
+                Child = text
+            };
+
+            var brushKey = "GlyphBrush";
+            var opacity = 0.65;
+            if (device.State == AudioEndpointState.Active)
+            {
+                brushKey = "PositiveRatingBrush";
+                opacity = 1.0;
+            }
+            else if (device.State == AudioEndpointState.Disabled)
+            {
+                brushKey = "WarningBrush";
+                opacity = 1.0;
+            }
+
+            ApplyStatusBadgeAppearance(text, brushKey, opacity);
+            return badge;
+        }
+
+        private static void ApplyStatusBadgeAppearance(TextBlock textBlock, string brushKey, double opacity = 1.0)
+        {
+            if (textBlock == null || string.IsNullOrWhiteSpace(brushKey))
+            {
+                return;
+            }
+
+            textBlock.SetResourceReference(TextBlock.ForegroundProperty, brushKey);
+            textBlock.Opacity = 1.0;
+
+            var badge = textBlock.Parent as Border;
+            if (badge == null)
+            {
+                for (var parent = VisualTreeHelper.GetParent(textBlock);
+                     parent != null;
+                     parent = VisualTreeHelper.GetParent(parent))
+                {
+                    badge = parent as Border;
+                    if (badge != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (badge == null)
+            {
+                return;
+            }
+
+            badge.SetResourceReference(Border.BorderBrushProperty, brushKey);
+            badge.Opacity = opacity;
+        }
+
         private void RebuildGameProfileRows()
         {
             if (GameProfileRowsPanel == null || NoGameProfilesText == null || !(DataContext is AudioSwitcherSettings settings))
@@ -742,7 +866,7 @@ namespace PlayniteAudioSwitcher
             var removeButton = CreatePreviewButton("LOCAS_RemoveProfile");
             removeButton.MinWidth = 90;
             removeButton.HorizontalAlignment = HorizontalAlignment.Right;
-            removeButton.Margin = new Thickness(12, 0, 0, 0);
+            removeButton.Margin = new Thickness(8, 0, 0, 0);
             removeButton.Click += (_, __) =>
             {
                 var confirmed = settings.Plugin != null
@@ -917,10 +1041,7 @@ namespace PlayniteAudioSwitcher
             processSection.Children.Add(processGrid);
             var processHelp = new TextBlock
             {
-                FontSize = 12,
-                TextWrapping = TextWrapping.Wrap,
-                Opacity = 0.78,
-                Margin = new Thickness(0, 8, 0, 0)
+                Style = TryFindResource("HintText") as Style
             };
             processHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_AudioProcessHelp");
             processSection.Children.Add(processHelp);
@@ -940,7 +1061,7 @@ namespace PlayniteAudioSwitcher
                     Stretch = Stretch.Uniform,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Top,
-                    Margin = new Thickness(0, 0, 14, 0)
+                    Margin = new Thickness(0, 0, 16, 0)
                 };
                 layout.Children.Add(image);
                 Grid.SetColumn(content, 1);
@@ -980,17 +1101,14 @@ namespace PlayniteAudioSwitcher
 
         private Button CreatePreviewButton(string contentResource)
         {
-            var button = new Button
-            {
-                Style = TryFindResource("PreviewActionButton") as Style
-            };
+            var button = new Button();
             button.SetResourceReference(ContentControl.ContentProperty, contentResource);
             return button;
         }
 
         private static FrameworkElement CreateProfileField(string labelResource, FrameworkElement control, int column)
         {
-            var panel = new StackPanel { Margin = new Thickness(0, 0, column == 3 ? 0 : 10, 0) };
+            var panel = new StackPanel { Margin = new Thickness(0, 0, column == 3 ? 0 : 8, 0) };
             var label = CreateFieldLabel(labelResource);
             panel.Children.Add(label);
             panel.Children.Add(control);
@@ -1067,6 +1185,19 @@ namespace PlayniteAudioSwitcher
             }
 
             SpatialSoundToolStatus.Text = GetSpatialSoundToolStatus();
+        }
+
+        private bool IsSpatialSoundToolReady()
+        {
+            var path = (DataContext as AudioSwitcherSettings)?.SpatialSoundToolPath;
+            if (string.IsNullOrWhiteSpace(path) || !IoFile.Exists(path))
+            {
+                return false;
+            }
+
+            var fileName = IoPath.GetFileName(path);
+            return string.Equals(fileName, "SoundVolumeView.exe", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(fileName, "svcl.exe", StringComparison.OrdinalIgnoreCase);
         }
 
         private string GetSpatialSoundToolStatus()

@@ -28,14 +28,14 @@ changes to the extension.
 ## Last Known Stable State
 
 - Branch: `main`
-- Last release at the time this file was written: `v1.15.2`
-- Last release commit: see tag `v1.15.2`
+- Last release at the time this file was written: `v1.15.3`
+- Last release commit: see tag `v1.15.3`
 - Release URL:
-  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.15.2`
+  `https://github.com/Naerian/playnite-nx-audio-switcher/releases/tag/v1.15.3`
 - Release package:
-  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_2.pext`
+  `PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_15_3.pext`
 - Public release asset SHA-256:
-  `ED3AA93CF56E8EB72CEF34EFEC8362375217A6E88F968197C5F825AEDB4CFBD7`
+  `375FB5A3FEF341F07772DBA24BC28B4D8F8B27F6E8F93A31173A040CB5E21A19`
 - Main repo state before this handoff was created: clean and synced with
   `origin/main`.
 
@@ -126,7 +126,7 @@ Use `package.ps1` from the repository root. It restores, cleans, builds with
 Optional arguments:
 
 ```powershell
-.\package.ps1 -Configuration Release -Version 1.15.2 -ToolboxPath C:\Playnite\Toolbox.exe
+.\package.ps1 -Configuration Release -Version 1.15.3 -ToolboxPath C:\Playnite\Toolbox.exe
 ```
 
 If `-Version` is omitted, the script reads it from `extension.yaml`. The package

@@ -46,6 +46,7 @@ namespace PlayniteAudioSwitcher
         private readonly Dictionary<string, IReadOnlyList<string>> mediaSourceSessionIds = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
         private DispatcherTimer mediaSessionDiscoveryTimer;
         private DispatcherTimer deviceBatteryTimer;
+        private DispatcherTimer endpointTopologyTimer;
         private bool isMediaSessionDiscoveryRunning;
         private Task deviceBatteryRefreshTask;
         private string lastMediaSessionDiscoverySignature;
@@ -107,6 +108,8 @@ namespace PlayniteAudioSwitcher
         }
 
         public AudioSwitcherSettings Settings => settings;
+
+        internal event EventHandler LiveAudioGraphChanged;
 
         private string MenuRoot => "@Audio Switcher";
 
@@ -557,6 +560,21 @@ namespace PlayniteAudioSwitcher
             ApplyPreferredDevices();
             StartMediaSessionDiscovery();
             StartDeviceBatteryDiscovery();
+            StartEndpointTopologyWatch();
+        }
+
+        public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
+        {
+            StopEndpointTopologyWatch();
+            if (mediaSessionDiscoveryTimer != null)
+            {
+                mediaSessionDiscoveryTimer.Stop();
+            }
+
+            if (deviceBatteryTimer != null)
+            {
+                deviceBatteryTimer.Stop();
+            }
         }
 
         internal void ApplyPreferredDevices()
@@ -679,6 +697,103 @@ namespace PlayniteAudioSwitcher
             catch (Exception ex)
             {
                 logger.Warn(ex, "Failed to refresh optional audio device battery information.");
+            }
+        }
+
+        private void StartEndpointTopologyWatch()
+        {
+            AudioDevices.EndpointTopologyChanged -= OnEndpointTopologyChanged;
+            AudioDevices.EndpointTopologyChanged += OnEndpointTopologyChanged;
+            try
+            {
+                AudioDevices.StartEndpointNotifications();
+                logger.Info("Audio Switcher is listening for Windows Core Audio endpoint changes.");
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Could not subscribe to Core Audio endpoint notifications. Device lists will keep refreshing on demand.");
+            }
+        }
+
+        private void StopEndpointTopologyWatch()
+        {
+            AudioDevices.EndpointTopologyChanged -= OnEndpointTopologyChanged;
+            if (endpointTopologyTimer != null)
+            {
+                endpointTopologyTimer.Stop();
+            }
+
+            try
+            {
+                AudioDevices.StopEndpointNotifications();
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to unsubscribe from Core Audio endpoint notifications.");
+            }
+        }
+
+        private void OnEndpointTopologyChanged(object sender, EventArgs args)
+        {
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null)
+            {
+                return;
+            }
+
+            if (dispatcher.CheckAccess())
+            {
+                ScheduleEndpointTopologyRefresh();
+                return;
+            }
+
+            dispatcher.BeginInvoke(new Action(ScheduleEndpointTopologyRefresh), DispatcherPriority.Background);
+        }
+
+        private void ScheduleEndpointTopologyRefresh()
+        {
+            if (endpointTopologyTimer == null)
+            {
+                endpointTopologyTimer = new DispatcherTimer(DispatcherPriority.Background)
+                {
+                    Interval = TimeSpan.FromMilliseconds(400)
+                };
+                endpointTopologyTimer.Tick += EndpointTopologyTimer_Tick;
+            }
+
+            endpointTopologyTimer.Stop();
+            endpointTopologyTimer.Start();
+        }
+
+        private void EndpointTopologyTimer_Tick(object sender, EventArgs args)
+        {
+            endpointTopologyTimer?.Stop();
+            ApplyEndpointTopologyRefresh();
+        }
+
+        private void ApplyEndpointTopologyRefresh()
+        {
+            try
+            {
+                if (settings?.IsEditing != true)
+                {
+                    settings?.RefreshDevices();
+                }
+
+                Theme?.Refresh();
+                RefreshBatteryTopPanelItem();
+                activeThemeSelectorList?.Refresh();
+                foreach (var inputList in activeInputDeviceLists.ToList())
+                {
+                    inputList.Refresh();
+                }
+
+                LiveAudioGraphChanged?.Invoke(this, EventArgs.Empty);
+                _ = RefreshDeviceBatteriesAsync();
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to apply a Core Audio endpoint change.");
             }
         }
 

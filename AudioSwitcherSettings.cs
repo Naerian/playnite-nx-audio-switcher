@@ -17,9 +17,9 @@ namespace PlayniteAudioSwitcher
         private List<AudioDeviceAlias> deviceAliases = new List<AudioDeviceAlias>();
         private List<AudioDeviceAlias> inputDeviceAliases = new List<AudioDeviceAlias>();
         private string favoriteDeviceAId;
-        private string favoriteDeviceAName = "Favorito A";
+        private string favoriteDeviceAName;
         private string favoriteDeviceBId;
-        private string favoriteDeviceBName = "Favorito B";
+        private string favoriteDeviceBName;
         private string preferredOutputDeviceId = string.Empty;
         private string preferredInputDeviceId = string.Empty;
         private string deviceDisplayMode = "TextAndIcon";
@@ -31,7 +31,6 @@ namespace PlayniteAudioSwitcher
         private bool showGameProfileNotifications = true;
         private bool showSpatialSoundNotifications = true;
         private bool showDiagnosticNotifications = true;
-        private bool fullscreenOnlyFavorites = true;
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
         private bool showMediaSessionIcons = true;
@@ -71,7 +70,6 @@ namespace PlayniteAudioSwitcher
                 PreferredInputDeviceId = savedSettings.PreferredInputDeviceId;
                 DeviceDisplayMode = string.IsNullOrWhiteSpace(savedSettings.DeviceDisplayMode) ? "TextAndIcon" : savedSettings.DeviceDisplayMode;
                 ShowNotifications = savedSettings.ShowNotifications;
-                FullscreenOnlyFavorites = savedSettings.FullscreenOnlyFavorites;
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
                 QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
                 ShowMediaSessionIcons = savedSettings.ShowMediaSessionIcons;
@@ -110,6 +108,7 @@ namespace PlayniteAudioSwitcher
                 : DesktopBatteryDisplayMode;
 
             MigrateFavoritesToAliases();
+            ClearLegacyFavoriteSettings();
             RefreshDevices();
         }
 
@@ -151,6 +150,9 @@ namespace PlayniteAudioSwitcher
             get => inputDeviceAliases;
             set => SetValue(ref inputDeviceAliases, value ?? new List<AudioDeviceAlias>());
         }
+
+        [DontSerialize]
+        internal bool IsEditing => editingClone != null;
 
         public string PreferredOutputDeviceId
         {
@@ -308,12 +310,6 @@ namespace PlayniteAudioSwitcher
         {
             get => showDiagnosticNotifications;
             set => SetValue(ref showDiagnosticNotifications, value);
-        }
-
-        public bool FullscreenOnlyFavorites
-        {
-            get => fullscreenOnlyFavorites;
-            set => SetValue(ref fullscreenOnlyFavorites, value);
         }
 
         public bool QuickSwitchEnabled
@@ -878,10 +874,6 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            FavoriteDeviceAId = editingClone.FavoriteDeviceAId;
-            FavoriteDeviceAName = editingClone.FavoriteDeviceAName;
-            FavoriteDeviceBId = editingClone.FavoriteDeviceBId;
-            FavoriteDeviceBName = editingClone.FavoriteDeviceBName;
             DeviceAliases = editingClone.DeviceAliases;
             InputDeviceAliases = editingClone.InputDeviceAliases;
             PreferredOutputDeviceId = editingClone.PreferredOutputDeviceId;
@@ -895,7 +887,6 @@ namespace PlayniteAudioSwitcher
             ShowGameProfileNotifications = editingClone.ShowGameProfileNotifications;
             ShowSpatialSoundNotifications = editingClone.ShowSpatialSoundNotifications;
             ShowDiagnosticNotifications = editingClone.ShowDiagnosticNotifications;
-            FullscreenOnlyFavorites = editingClone.FullscreenOnlyFavorites;
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
             QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
             ShowMediaSessionIcons = editingClone.ShowMediaSessionIcons;
@@ -914,6 +905,7 @@ namespace PlayniteAudioSwitcher
             BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
             BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
             AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
+            editingClone = null;
             RefreshDevices();
         }
 
@@ -929,6 +921,7 @@ namespace PlayniteAudioSwitcher
             plugin.ApplyPreferredDevices();
             plugin.ApplyDefaultVolumeForCurrentDevice();
             plugin.ApplyDefaultInputVolumeForCurrentDevice();
+            editingClone = null;
         }
 
         public bool VerifySettings(out List<string> errors)
@@ -963,6 +956,14 @@ namespace PlayniteAudioSwitcher
             AddAliasIfMissing(FavoriteDeviceBId, FavoriteDeviceBName);
         }
 
+        private void ClearLegacyFavoriteSettings()
+        {
+            favoriteDeviceAId = null;
+            favoriteDeviceAName = null;
+            favoriteDeviceBId = null;
+            favoriteDeviceBName = null;
+        }
+
         private void AddAliasIfMissing(string deviceId, string customName)
         {
             if (string.IsNullOrWhiteSpace(deviceId) ||
@@ -984,10 +985,6 @@ namespace PlayniteAudioSwitcher
         {
             var clone = new AudioSwitcherSettings
             {
-                FavoriteDeviceAId = FavoriteDeviceAId,
-                FavoriteDeviceAName = FavoriteDeviceAName,
-                FavoriteDeviceBId = FavoriteDeviceBId,
-                FavoriteDeviceBName = FavoriteDeviceBName,
                 DeviceAliases = DeviceAliases.Select(a => new AudioDeviceAlias
                 {
                     DeviceId = a.DeviceId,
@@ -1015,7 +1012,6 @@ namespace PlayniteAudioSwitcher
                 ShowGameProfileNotifications = ShowGameProfileNotifications,
                 ShowSpatialSoundNotifications = ShowSpatialSoundNotifications,
                 ShowDiagnosticNotifications = ShowDiagnosticNotifications,
-                FullscreenOnlyFavorites = FullscreenOnlyFavorites,
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,
                 ShowMediaSessionIcons = ShowMediaSessionIcons,
