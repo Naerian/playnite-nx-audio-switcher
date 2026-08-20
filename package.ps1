@@ -1,27 +1,38 @@
 param(
     [string]$Configuration = "Release",
-    [string]$Version,
+    [string]$Version = "",
     [string]$ToolboxPath = "C:\Playnite\Toolbox.exe"
 )
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $project = Join-Path $root "PlayniteAudioSwitcher.csproj"
-$manifest = Join-Path $root "extension.yaml"
-
-if ([string]::IsNullOrWhiteSpace($Version)) {
-    $manifestText = Get-Content -Raw -LiteralPath $manifest
-    if ($manifestText -notmatch '(?m)^Version:\s*(.+?)\s*$') {
-        throw "Could not read Version from extension.yaml"
-    }
-
-    $Version = $Matches[1].Trim().Trim("'`"")
-}
+$extensionYaml = Join-Path $root "extension.yaml"
 
 if (-not (Test-Path -LiteralPath $project)) {
     throw "Project file was not found at $project"
 }
 
+if (-not (Test-Path -LiteralPath $ToolboxPath)) {
+    throw "Playnite Toolbox was not found at $ToolboxPath"
+}
+
+$manifestVersion = (
+    Select-String -LiteralPath $extensionYaml -Pattern '^\s*Version:\s*(.+)\s*$' |
+        Select-Object -First 1
+).Matches[0].Groups[1].Value.Trim().Trim("'`"")
+if ([string]::IsNullOrWhiteSpace($manifestVersion)) {
+    throw "Could not read Version from extension.yaml"
+}
+
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    $Version = $manifestVersion
+}
+elseif (-not [string]::Equals($Version, $manifestVersion, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Version '$Version' does not match extension.yaml ($manifestVersion). Update extension.yaml first."
+}
+
+Write-Host "Building Audio Switcher $Version ($Configuration)..."
 dotnet restore $project
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet restore failed with exit code $LASTEXITCODE"
@@ -37,19 +48,60 @@ if ($LASTEXITCODE -ne 0) {
     throw "dotnet build failed with exit code $LASTEXITCODE"
 }
 
-if (-not (Test-Path -LiteralPath $ToolboxPath)) {
-    throw "Playnite Toolbox was not found at $ToolboxPath"
+$build = Join-Path $root "bin\$Configuration"
+$required = @(
+    (Join-Path $build "PlayniteAudioSwitcher.dll"),
+    (Join-Path $build "extension.yaml"),
+    (Join-Path $build "README.md"),
+    (Join-Path $build "Localization"),
+    (Join-Path $build "Icons"),
+    (Join-Path $build "media"),
+    (Join-Path $build "Examples")
+)
+foreach ($path in $required) {
+    if (-not (Test-Path -LiteralPath $path)) {
+        throw "Missing build output: $path"
+    }
 }
 
-$source = Join-Path $root "bin\$Configuration"
-$output = Join-Path $root "dist\v$Version"
-New-Item -ItemType Directory -Path $output -Force | Out-Null
-& $ToolboxPath pack $source $output
-if ($LASTEXITCODE -ne 0) {
-    throw "Playnite Toolbox pack failed with exit code $LASTEXITCODE"
+# Pack from a clean TEMP stage. Never leave a stage folder inside dist/.
+$stage = Join-Path $env:TEMP "playnite-audio-switcher-pext-stage"
+$dist = Join-Path $root "dist"
+$distVersion = Join-Path $dist $Version
+if (Test-Path -LiteralPath $stage) {
+    Remove-Item -LiteralPath $stage -Recurse -Force
+}
+New-Item -ItemType Directory -Path $stage | Out-Null
+if (-not (Test-Path -LiteralPath $dist)) {
+    New-Item -ItemType Directory -Path $dist | Out-Null
+}
+if (Test-Path -LiteralPath $distVersion) {
+    Remove-Item -LiteralPath $distVersion -Recurse -Force
+}
+New-Item -ItemType Directory -Path $distVersion | Out-Null
+
+Copy-Item -LiteralPath (Join-Path $build "PlayniteAudioSwitcher.dll") -Destination $stage
+$pdb = Join-Path $build "PlayniteAudioSwitcher.pdb"
+if (Test-Path -LiteralPath $pdb) {
+    Copy-Item -LiteralPath $pdb -Destination $stage
+}
+Copy-Item -LiteralPath (Join-Path $build "extension.yaml") -Destination $stage
+Copy-Item -LiteralPath (Join-Path $build "README.md") -Destination $stage
+Copy-Item -LiteralPath (Join-Path $build "Localization") -Destination $stage -Recurse
+Copy-Item -LiteralPath (Join-Path $build "Icons") -Destination $stage -Recurse
+Copy-Item -LiteralPath (Join-Path $build "media") -Destination $stage -Recurse
+Copy-Item -LiteralPath (Join-Path $build "Examples") -Destination $stage -Recurse
+
+& $ToolboxPath pack $stage $distVersion
+$packExit = $LASTEXITCODE
+Remove-Item -LiteralPath $stage -Recurse -Force
+if ($packExit -ne 0) {
+    throw "Playnite Toolbox pack failed with exit code $packExit"
 }
 
-$package = Get-ChildItem -LiteralPath $output -Filter '*.pext' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$package = Get-ChildItem -LiteralPath $distVersion -Filter '*.pext' |
+    Sort-Object LastWriteTime -Descending |
+    Select-Object -First 1
 if (-not $package) {
     throw "Playnite Toolbox did not create a .pext package."
 }
