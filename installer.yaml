@@ -5,10 +5,16 @@ Packages:
     ReleaseDate: 2026-08-20
     PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.16.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_16_0.pext
     Changelog:
-      - Added plugin-owned settings chrome with Midnight, Paper, OLED, Ocean, and Ember color presets.
-      - Matched the About tab to Metadata AI, with GitHub, Wiki, issue, and Ko-fi links.
-      - Presented Devices as summary-style cards titled with the Windows device name.
-      - Kept the Desktop top-bar tooltip consistent by using the same battery-aware text for Playnite's Title and the indicator hover.
+      - "Redesigned settings with the shared Narian chrome: own background, text, borders, accents, inputs, buttons, tabs, navigation, badges, and scrollbars instead of relying on the Playnite theme for contrast."
+      - "Added five appearance presets (Midnight, Paper, OLED, Ocean, Ember) so layout structure stays fixed while colors change."
+      - "Unified type and spacing scale (20/14/12 type, 4/8/16/24 spacing, radius 4, control height 36)."
+      - "Forms sit flat on the page background with section headers; elevated cards are reserved for Overview summary tiles, Devices, and the About narrative."
+      - "Overview and Devices card title underlines now use the same border color as the card."
+      - "Unified controls: TextBox, PasswordBox, and ComboBox share height and padding; ComboBoxes open from the full control area; badges are neutral or status-tinted without shadows."
+      - "About tab now matches Metadata AI, with GitHub, Wiki, issue, and Ko-fi links."
+      - "Devices are summary-style cards titled with the Windows device name, then visibility, icon, custom volume, and Playnite alias."
+      - "Kept the Desktop top-bar tooltip consistent by using the same battery-aware text for Playnite's Title and the indicator hover."
+      - "Updated the settings UI guide for keeping the Narian design system aligned with other plugins."
   - Version: 1.15.4
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-20
