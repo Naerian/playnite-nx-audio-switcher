@@ -1,5 +1,14 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.17.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-08-21
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.17.0/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_17_0.pext
+    Changelog:
+      - "Added a first-time setup assistant for preferred output/input devices, Desktop top-bar access, and Fullscreen quick switch, with reopen from Advanced and the main menu."
+      - "Moved Maintenance under Advanced, next to Initial setup."
+      - "Clarified device-card controls: Show in Audio Switcher, plus hints for visibility, icon, and custom volume."
+      - "Packaged .pext files are now written to dist/<version>/ instead of dist/v<version>/."
   - Version: 1.16.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-08-20

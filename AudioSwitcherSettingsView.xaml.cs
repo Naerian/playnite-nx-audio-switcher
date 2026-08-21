@@ -806,18 +806,25 @@ namespace PlayniteAudioSwitcher
                 BatteryColorPalette.GetBrush(device)));
             root.Children.Add(pills);
 
+            var visiblePanel = new StackPanel();
             var visibleBox = new CheckBox
             {
                 IsChecked = device.IsVisible,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 16)
+                VerticalAlignment = VerticalAlignment.Center
             };
             visibleBox.SetResourceReference(ContentControl.ContentProperty, "LOCAS_Visible");
             visibleBox.Checked += (_, __) => device.IsVisible = true;
             visibleBox.Unchecked += (_, __) => device.IsVisible = false;
-            root.Children.Add(visibleBox);
+            visiblePanel.Children.Add(visibleBox);
+            var visibleHelp = new TextBlock
+            {
+                Style = TryFindResource("IndentedHintText") as Style ?? TryFindResource("HintText") as Style
+            };
+            visibleHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_VisibleHelp");
+            visiblePanel.Children.Add(visibleHelp);
+            root.Children.Add(visiblePanel);
 
-            var iconPanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
+            var iconPanel = new StackPanel();
             iconPanel.Children.Add(CreateFieldLabel("LOCAS_Icon"));
             var iconBox = new ComboBox
             {
@@ -832,9 +839,15 @@ namespace PlayniteAudioSwitcher
                 device.IsIconSuggested = false;
             };
             iconPanel.Children.Add(iconBox);
+            var iconHelp = new TextBlock
+            {
+                Style = TryFindResource("HintText") as Style
+            };
+            iconHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_IconHelp");
+            iconPanel.Children.Add(iconHelp);
             root.Children.Add(iconPanel);
 
-            var defaultVolumePanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
+            var defaultVolumePanel = new StackPanel();
             defaultVolumePanel.Children.Add(CreateFieldLabel(defaultVolumeLabelResource));
             var defaultVolumeGrid = new Grid { VerticalAlignment = VerticalAlignment.Center };
             defaultVolumeGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -890,6 +903,12 @@ namespace PlayniteAudioSwitcher
             defaultVolumeGrid.Children.Add(defaultVolumeSlider);
             defaultVolumeGrid.Children.Add(defaultVolumeValue);
             defaultVolumePanel.Children.Add(defaultVolumeGrid);
+            var defaultVolumeHelp = new TextBlock
+            {
+                Style = TryFindResource("HintText") as Style
+            };
+            defaultVolumeHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_DefaultVolumeHelp");
+            defaultVolumePanel.Children.Add(defaultVolumeHelp);
             root.Children.Add(defaultVolumePanel);
 
             var customNamePanel = new StackPanel();
@@ -1390,6 +1409,11 @@ namespace PlayniteAudioSwitcher
         private void ExportAudioSessionDiagnostics(object sender, RoutedEventArgs e)
         {
             (DataContext as AudioSwitcherSettings)?.ExportAudioSessionDiagnostics();
+        }
+
+        private void OpenSetupWizardClick(object sender, RoutedEventArgs e)
+        {
+            (DataContext as AudioSwitcherSettings)?.Plugin?.OpenSetupWizard();
         }
 
         private void ExportSettingsBackup(object sender, RoutedEventArgs e)

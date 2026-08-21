@@ -50,6 +50,10 @@ namespace PlayniteAudioSwitcher
         private string batteryIndicatorDisplayMode = "IconAndPercentage";
         private string batteryIndicatorIcon = string.Empty;
         private string appearancePreset = SettingsAppearance.Midnight;
+        private bool setupWizardCompleted;
+        private int settingsSchemaVersion;
+
+        public const int CurrentSettingsSchemaVersion = 1;
 
         public AudioSwitcherSettings()
         {
@@ -99,6 +103,8 @@ namespace PlayniteAudioSwitcher
                     : savedSettings.BatteryIndicatorDisplayMode;
                 BatteryIndicatorIcon = savedSettings.BatteryIndicatorIcon ?? string.Empty;
                 AppearancePreset = savedSettings.AppearancePreset;
+                SetupWizardCompleted = savedSettings.SetupWizardCompleted;
+                SettingsSchemaVersion = savedSettings.SettingsSchemaVersion;
             }
 
             DesktopTopPanelIcon = DesktopTopPanelIcon ?? string.Empty;
@@ -110,6 +116,7 @@ namespace PlayniteAudioSwitcher
                 : DesktopBatteryDisplayMode;
             AppearancePreset = SettingsAppearance.Normalize(AppearancePreset);
 
+            MigrateSettings(savedSettings != null);
             MigrateFavoritesToAliases();
             ClearLegacyFavoriteSettings();
             RefreshDevices();
@@ -625,6 +632,18 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public bool SetupWizardCompleted
+        {
+            get => setupWizardCompleted;
+            set => SetValue(ref setupWizardCompleted, value);
+        }
+
+        public int SettingsSchemaVersion
+        {
+            get => settingsSchemaVersion;
+            set => SetValue(ref settingsSchemaVersion, value);
+        }
+
         [DontSerialize]
         public List<AppearancePresetOption> AppearancePresetOptions => new List<AppearancePresetOption>
         {
@@ -634,6 +653,21 @@ namespace PlayniteAudioSwitcher
             new AppearancePresetOption { Value = SettingsAppearance.Ocean, DisplayName = plugin?.Loc("LOCAS_PresetOcean") ?? "Ocean" },
             new AppearancePresetOption { Value = SettingsAppearance.Ember, DisplayName = plugin?.Loc("LOCAS_PresetEmber") ?? "Ember" }
         };
+
+        private void MigrateSettings(bool hadSavedSettings)
+        {
+            var originalSchema = SettingsSchemaVersion;
+            if (hadSavedSettings && originalSchema < CurrentSettingsSchemaVersion)
+            {
+                // Existing installs already configured; don't force the first-run wizard.
+                SetupWizardCompleted = true;
+            }
+
+            if (SettingsSchemaVersion < CurrentSettingsSchemaVersion)
+            {
+                SettingsSchemaVersion = CurrentSettingsSchemaVersion;
+            }
+        }
 
         private static string MigrateDesktopBatteryDisplayMode(string value)
         {
@@ -933,6 +967,8 @@ namespace PlayniteAudioSwitcher
             BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
             BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
             AppearancePreset = editingClone.AppearancePreset;
+            SetupWizardCompleted = editingClone.SetupWizardCompleted;
+            SettingsSchemaVersion = editingClone.SettingsSchemaVersion;
             AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
             editingClone = null;
             RefreshDevices();
@@ -1058,11 +1094,48 @@ namespace PlayniteAudioSwitcher
                 ShowDisabledInputDevices = ShowDisabledInputDevices,
                 BatteryIndicatorDisplayMode = BatteryIndicatorDisplayMode,
                 BatteryIndicatorIcon = BatteryIndicatorIcon,
-                AppearancePreset = AppearancePreset
+                AppearancePreset = AppearancePreset,
+                SetupWizardCompleted = SetupWizardCompleted,
+                SettingsSchemaVersion = SettingsSchemaVersion
             };
 
             clone.AvailableGameProfiles = AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
             return clone;
+        }
+
+        public SetupWizardDraft CreateWizardDraft()
+        {
+            return new SetupWizardDraft
+            {
+                PreferredOutputDeviceId = PreferredOutputDeviceId ?? string.Empty,
+                PreferredInputDeviceId = PreferredInputDeviceId ?? string.Empty,
+                ShowDesktopBatteryIndicator = ShowDesktopBatteryIndicator,
+                QuickSwitchEnabled = QuickSwitchEnabled,
+                SetupWizardCompleted = SetupWizardCompleted
+            };
+        }
+
+        public void ApplyWizardDraft(SetupWizardDraft draft)
+        {
+            if (draft == null)
+            {
+                return;
+            }
+
+            PreferredOutputDeviceId = draft.PreferredOutputDeviceId ?? string.Empty;
+            PreferredInputDeviceId = draft.PreferredInputDeviceId ?? string.Empty;
+            ShowDesktopBatteryIndicator = draft.ShowDesktopBatteryIndicator;
+            QuickSwitchEnabled = draft.QuickSwitchEnabled;
+            SetupWizardCompleted = true;
+            SettingsSchemaVersion = CurrentSettingsSchemaVersion;
+        }
+
+        internal void RefreshEditingCloneAfterExternalChange()
+        {
+            if (editingClone != null)
+            {
+                editingClone = Clone();
+            }
         }
 
         private List<AudioDevice> RefreshDeviceList(

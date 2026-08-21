@@ -282,6 +282,12 @@ namespace PlayniteAudioSwitcher
                 },
                 new MainMenuItem
                 {
+                    MenuSection = MenuRoot,
+                    Description = Loc("LOCAS_MenuSetupWizard"),
+                    Action = _ => OpenSetupWizard()
+                },
+                new MainMenuItem
+                {
                     MenuSection = $"{MenuRoot}|{Loc("LOCAS_MenuTools")}",
                     Description = Loc("LOCAS_AudioSessionDiagnostics"),
                     Action = _ => ExportAudioSessionDiagnostics()
@@ -561,6 +567,86 @@ namespace PlayniteAudioSwitcher
             StartMediaSessionDiscovery();
             StartDeviceBatteryDiscovery();
             StartEndpointTopologyWatch();
+            TryOfferFirstRunSetupWizard();
+        }
+
+        public void OpenSetupWizard()
+        {
+            if (PlayniteApi.ApplicationInfo.Mode != ApplicationMode.Desktop)
+            {
+                PlayniteApi.Dialogs.ShowMessage(
+                    Loc("LOCAS_SetupWizardDesktopOnly"),
+                    Loc("LOCAS_SetupWizardTitle"));
+                return;
+            }
+
+            if (settings == null)
+            {
+                return;
+            }
+
+            var draft = settings.CreateWizardDraft();
+            var window = new SetupWizardWindow(this, draft);
+            var owner = PlayniteApi.Dialogs.GetCurrentAppWindow();
+            if (owner != null)
+            {
+                window.Owner = owner;
+            }
+
+            SettingsAppearance.ApplyWindow(window, settings.AppearancePreset);
+            var result = window.ShowDialog();
+            if (result == true)
+            {
+                ApplyWizardDraft(draft);
+                PlayniteApi.Dialogs.ShowMessage(
+                    Loc("LOCAS_SetupWizardSaved"),
+                    Loc("LOCAS_SetupWizardTitle"));
+                return;
+            }
+
+            settings.SetupWizardCompleted = true;
+            settings.SettingsSchemaVersion = AudioSwitcherSettings.CurrentSettingsSchemaVersion;
+            SavePluginSettings(settings);
+            settings.RefreshEditingCloneAfterExternalChange();
+        }
+
+        private void TryOfferFirstRunSetupWizard()
+        {
+            try
+            {
+                if (settings == null || settings.SetupWizardCompleted)
+                {
+                    return;
+                }
+
+                if (PlayniteApi.ApplicationInfo.Mode != ApplicationMode.Desktop)
+                {
+                    return;
+                }
+
+                Application.Current?.Dispatcher?.BeginInvoke(
+                    new Action(OpenSetupWizard),
+                    DispatcherPriority.ApplicationIdle);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Failed to offer the first-run setup wizard.");
+            }
+        }
+
+        private void ApplyWizardDraft(SetupWizardDraft draft)
+        {
+            if (draft == null || settings == null)
+            {
+                return;
+            }
+
+            settings.ApplyWizardDraft(draft);
+            SavePluginSettings(settings);
+            ApplyPreferredDevices();
+            RefreshBatteryTopPanelItem();
+            Theme?.Refresh();
+            settings.RefreshEditingCloneAfterExternalChange();
         }
 
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
