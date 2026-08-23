@@ -39,7 +39,7 @@ namespace PlayniteAudioSwitcher
         private bool spatialSoundIntegrationEnabled;
         private string spatialSoundToolPath;
         private string currentSpatialSoundMode;
-        private int volumeStepPercent = 5;
+        private int volumeStepPercent = 2;
         private bool showDesktopBatteryIndicator;
         private bool colorDesktopIndicatorByBattery = true;
         private string desktopTopPanelIcon;
@@ -89,7 +89,7 @@ namespace PlayniteAudioSwitcher
                 ShowGameProfileNotifications = savedSettings.ShowGameProfileNotifications;
                 ShowSpatialSoundNotifications = savedSettings.ShowSpatialSoundNotifications;
                 ShowDiagnosticNotifications = savedSettings.ShowDiagnosticNotifications;
-                VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 5 : savedSettings.VolumeStepPercent;
+                VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 2 : savedSettings.VolumeStepPercent;
                 ShowDesktopBatteryIndicator = savedSettings.ShowDesktopBatteryIndicator;
                 ColorDesktopIndicatorByBattery = savedSettings.ColorDesktopIndicatorByBattery;
                 DesktopTopPanelIcon = savedSettings.DesktopTopPanelIcon ?? savedSettings.BatteryIndicatorIcon ?? string.Empty;
