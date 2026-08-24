@@ -21,12 +21,18 @@ namespace PlayniteAudioSwitcher
 {
     public partial class AudioSwitcherSettingsView : UserControl
     {
+        private readonly bool themeStandaloneWindow;
         private ScrollViewer hostScrollViewer;
         private Window hostWindow;
         private AudioSwitcherPlugin subscribedPlugin;
 
-        public AudioSwitcherSettingsView()
+        public AudioSwitcherSettingsView() : this(false)
         {
+        }
+
+        public AudioSwitcherSettingsView(bool themeStandaloneWindow)
+        {
+            this.themeStandaloneWindow = themeStandaloneWindow;
             InitializeComponent();
             var iconTemplate = CreateIconTemplate();
             DesktopTopPanelIconBox.ItemTemplate = iconTemplate;
@@ -67,17 +73,13 @@ namespace PlayniteAudioSwitcher
                 ? settings.AppearancePreset
                 : SettingsAppearance.Midnight;
             SettingsAppearance.Apply(this, preset);
+
+            if (themeStandaloneWindow)
+            {
+                SettingsAppearance.ApplyWindow(Window.GetWindow(this), preset);
+            }
+
             RefreshAppearancePresetChips();
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var palette = SettingsAppearance.GetPalette(preset);
-                SettingsAppearance.ApplyHostChrome(this, palette);
-            }), DispatcherPriority.Loaded);
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var palette = SettingsAppearance.GetPalette(preset);
-                SettingsAppearance.ApplyHostChrome(this, palette);
-            }), DispatcherPriority.ApplicationIdle);
         }
 
         private void BuildAppearancePresetChips()

@@ -51,6 +51,7 @@ namespace PlayniteAudioSwitcher
         private Task deviceBatteryRefreshTask;
         private string lastMediaSessionDiscoverySignature;
         private TopPanelItem batteryTopPanelItem;
+        private bool openingStandaloneSettings;
         private string lastPreferredPlaybackDecision = "Not evaluated in this process.";
         private string lastPreferredRecordingDecision = "Not evaluated in this process.";
 
@@ -188,7 +189,21 @@ namespace PlayniteAudioSwitcher
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
-            return new AudioSwitcherSettingsView();
+            return new AudioSwitcherSettingsView(openingStandaloneSettings);
+        }
+
+        private bool OpenStandaloneSettingsView()
+        {
+            openingStandaloneSettings = true;
+
+            try
+            {
+                return OpenSettingsView();
+            }
+            finally
+            {
+                openingStandaloneSettings = false;
+            }
         }
 
         internal List<GameAudioProfileEntry> GetGameProfileEntries()
@@ -536,7 +551,7 @@ namespace PlayniteAudioSwitcher
                 batteryTopPanelItem = new TopPanelItem
                 {
                     Icon = new AudioBatteryTopPanelControl(this),
-                    Activated = () => PlayniteApi.MainView.OpenPluginSettings(Id)
+                    Activated = () => OpenStandaloneSettingsView()
                 };
             }
 
@@ -1573,7 +1588,7 @@ namespace PlayniteAudioSwitcher
             if (switchDevices.Count < 2)
             {
                 ShowMessage(Loc("LOCAS_NeedTwoSwitchDevices"));
-                OpenSettingsView();
+                OpenStandaloneSettingsView();
                 return;
             }
 

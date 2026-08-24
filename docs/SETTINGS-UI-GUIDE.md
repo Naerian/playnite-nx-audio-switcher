@@ -12,7 +12,7 @@ Sistema visual unificado para paneles de configuración de plugins Narian. Chrom
 
 1. **Chrome propio.** El panel pinta fondo, texto, bordes, acentos, inputs, botones, tabs, nav, cards, badges y scrollbar.
 2. **Estructura fija, color variable.** Tipografía, espaciado, radios y tamaños de control son iguales en todos los presets. Solo cambian los colores.
-3. **El host no debe asomar.** El root del settings view rellena el área del diálogo. Un preset oscuro no deja ver el tema claro de Playnite detrás (ni al revés). Best-effort: pintar también fondo de ventana host y botones Guardar/Cancelar del pie.
+3. **El tema pertenece al plugin.** El root del settings view rellena su área y aplica el preset solo a su propio `UserControl`. La ventana y los botones Guardar/Cancelar de Playnite conservan el tema del host.
 4. **Presets solo de color.** Midnight · Paper · OLED · Ocean · Ember. Persistidos en settings (`AppearancePreset`).
 5. **Default:** Midnight (hasta detectar tema claro del host y sugerir Paper).
 
@@ -361,7 +361,7 @@ Fila de chips en Overview (o equivalente):
 - Hint: colores únicamente; type/spacing/tamaños fijos.
 - Persistencia: `AppearancePreset` en settings del plugin.
 - Aplicación: `SettingsAppearance.Apply(root, preset)` al cargar y al cambiar chip.
-- Host chrome (best-effort): fondo de ventana, DWM title bar, Save/Cancel del diálogo.
+- La ventana host de Complementos y sus botones no se modifican.
 
 ---
 
@@ -369,7 +369,7 @@ Fila de chips en Overview (o equivalente):
 
 | Pieza | Rol |
 | --- | --- |
-| `SettingsAppearance.cs` | Paletas, `Apply`, override de brushes, host chrome |
+| `SettingsAppearance.cs` | Paletas, `Apply` limitado al `UserControl`, override de brushes y `ApplyWindow` explícito |
 | `SettingsChrome.xaml` | Estilos implícitos: TextBox, PasswordBox, ComboBox, Button, CheckBox, Radio, ListBox, ScrollBar + brushes default Midnight |
 | `*SettingsView.xaml` | Layout, cards, tabs, nav, badges; merged dictionary → SettingsChrome |
 | Setting `AppearancePreset` | Persistencia |
@@ -379,7 +379,7 @@ Patrón al abrir settings:
 1. `InitializeComponent`
 2. `SettingsAppearance.Apply(this, settings.AppearancePreset)`
 3. Construir chips de preset y refrescar selección
-4. Best-effort `ApplyHostChrome`
+4. Solo para una ventana independiente conocida: `SettingsAppearance.ApplyWindow(Window.GetWindow(this), preset)`
 
 Compilar con Framework MSBuild (`package.ps1` / `C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe`), no asumir `dotnet build` para net462.
 
@@ -425,7 +425,7 @@ No modifica juegos; solo configuración.
 - [ ] Badges: neutros `BadgeBg`; estado con `Badge*Bg` + foreground semántico; sin sombra
 - [ ] ScrollBar del preset
 - [ ] Appearance chips + `AppearancePreset` persistido
-- [ ] Host chrome best-effort (ventana + Save/Cancel)
+- [ ] El host de Complementos no cambia; las ventanas independientes usan `ApplyWindow` mediante un indicador explícito
 - [ ] Hints alineados a la izquierda
 - [ ] Sin pelear con estilos globales de Playnite (overrides en el ResourceDictionary del view)
 
