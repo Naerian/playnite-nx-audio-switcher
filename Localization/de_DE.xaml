@@ -256,7 +256,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Prozent anstelle des Symbols anzeigen</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Wenn kein Akkustand gemeldet wird, erscheint das konfigurierte Symbol wieder als Alternative.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen-Akkuwidget</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Konfiguriere das BatteryWidget kompatibler Fullscreen-Themes unabhängig von Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Konfiguriere, wie das BatteryWidget den Akkustand in kompatiblen Fullscreen-Themes anzeigt. Anzeigemodi sind unabhängig von Desktop; das Symbol folgt dem Desktop-Titelleistensymbol.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">Das Widget-Symbol verwendet das Desktop-Audio-Switcher-Symbol: feste Auswahl, aktives Gerätesymbol oder Standard-Lautsprecher als Fallback.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">In der Desktop-Kopfleiste anzeigen</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Fullscreen-Widget ohne gemeldeten Akkustand ausblenden</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Anzeige</sys:String>

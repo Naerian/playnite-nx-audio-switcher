@@ -888,12 +888,7 @@
                                                  IsChecked="{Binding FullscreenBatteryPercentageOnly, Mode=TwoWay}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryDisplayPercentageOnlyHelp}"
                                                Style="{StaticResource IndentedHintText}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIcon}" Style="{StaticResource FieldLabel}" />
-                                    <ComboBox x:Name="BatteryIndicatorIconBox"
-                                              ItemsSource="{Binding BatteryIconOptions}"
-                                              SelectedValuePath="Id"
-                                              SelectedValue="{Binding BatteryIndicatorIcon}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorIconHelp}"
+                                    <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryIconFollowsDesktopHelp}"
                                                Style="{StaticResource HintText}" />
                                 </StackPanel>
                             </ScrollViewer>

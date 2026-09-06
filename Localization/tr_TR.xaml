@@ -254,7 +254,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Simge yerine yüzdeyi göster</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Pil bildirilmezse yapılandırılmış simge alternatif olarak geri gelir.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen pil widget'ı</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Uyumlu Fullscreen temalarının BatteryWidget'ını Desktop'tan bağımsız yapılandırın.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Uyumlu Fullscreen temalarında BatteryWidget’ın pili nasıl gösterdiğini yapılandırın. Görünüm modları Desktop’tan bağımsızdır; simge Desktop üst çubuk simgesini izler.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">Widget simgesi Desktop Audio Switcher simgesini kullanır: sabit seçim, etkin aygıt simgesi veya yedek olarak varsayılan hoparlör.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Pil göstergesi</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Desktop üst çubuğu ve Fullscreen tema widget'ı için pil bilgilerini ayrı ayrı yapılandırın.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Desktop üst çubuğunda göster</sys:String>

@@ -241,7 +241,7 @@
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">Not present</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">Unavailable</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Battery indicator</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Configure battery information independently for the Desktop top bar and the Fullscreen theme widget.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Configure battery display modes for the Desktop top bar and the Fullscreen theme widget. Both use the same icon source.</sys:String>
     <sys:String x:Key="LOCAS_DesktopIntegrationTitle">Desktop top-bar integration</sys:String>
     <sys:String x:Key="LOCAS_DesktopIntegrationHelp">Keep Audio Switcher accessible from Playnite's Desktop top bar. Hovering shows the active output device and clicking opens the plugin settings.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Show Audio Switcher in Playnite's Desktop top bar</sys:String>
@@ -256,7 +256,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Show percentage instead of the icon</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">When no battery is reported, the configured icon returns as a fallback.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen battery widget</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configure the BatteryWidget used by compatible Fullscreen themes independently from Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configure how the BatteryWidget shows battery data in compatible Fullscreen themes. Display modes are independent from Desktop; the icon follows the Desktop top-bar icon.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">The widget icon uses the Desktop Audio Switcher icon: a fixed choice, the active device icon, or the default speaker as fallback.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Show in the Desktop top bar</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Hide the Fullscreen widget when no battery is reported</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Display</sys:String>

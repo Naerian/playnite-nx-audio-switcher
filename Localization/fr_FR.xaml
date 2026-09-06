@@ -256,7 +256,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Afficher le pourcentage à la place de l’icône</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Si aucune batterie n’est signalée, l’icône configurée réapparaît comme solution de repli.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Widget de batterie Fullscreen</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configurez le BatteryWidget des thèmes Fullscreen compatibles indépendamment de Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configurez l’affichage de la batterie du BatteryWidget dans les thèmes Fullscreen compatibles. Les modes d’affichage sont indépendants de Desktop ; l’icône suit celle de la barre supérieure Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">L’icône du widget utilise l’icône Audio Switcher de Desktop : choix fixe, icône du périphérique actif, ou haut-parleur par défaut en secours.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Afficher dans la barre supérieure de Desktop</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Masquer le widget Fullscreen si aucune batterie n'est signalée</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Affichage</sys:String>

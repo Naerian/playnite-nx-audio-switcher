@@ -36,7 +36,6 @@ namespace PlayniteAudioSwitcher
             InitializeComponent();
             var iconTemplate = CreateIconTemplate();
             DesktopTopPanelIconBox.ItemTemplate = iconTemplate;
-            BatteryIndicatorIconBox.ItemTemplate = iconTemplate;
             AboutVersionText.Text = string.Format(
                 TryFindResource("LOCAS_VersionAuthorFormat") as string ?? "Audio Switcher {0} · Narian",
                 GetInstalledVersion());

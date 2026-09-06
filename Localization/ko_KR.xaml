@@ -254,7 +254,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">아이콘 대신 백분율 표시</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">배터리가 보고되지 않으면 설정된 아이콘이 대안으로 다시 표시됩니다.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen 배터리 위젯</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">호환되는 Fullscreen 테마의 BatteryWidget을 데스크톱과 별도로 설정합니다.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">호환 Fullscreen 테마에서 BatteryWidget이 배터리를 표시하는 방식을 구성합니다. 표시 모드는 데스크톱과 별개이며, 아이콘은 데스크톱 상단 바 아이콘을 따릅니다.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">위젯 아이콘은 데스크톱 Audio Switcher 아이콘을 사용합니다: 고정 선택, 활성 장치 아이콘, 또는 기본 스피커(대체).</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">배터리 표시기</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHelp">데스크톱 상단 표시줄과 Fullscreen 테마 위젯의 배터리 정보를 각각 설정합니다.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Desktop 상단 표시줄에 표시</sys:String>

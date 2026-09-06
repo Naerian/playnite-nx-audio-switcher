@@ -965,7 +965,8 @@ namespace PlayniteAudioSwitcher
             ShowDisabledOutputDevices = editingClone.ShowDisabledOutputDevices;
             ShowDisabledInputDevices = editingClone.ShowDisabledInputDevices;
             BatteryIndicatorDisplayMode = editingClone.BatteryIndicatorDisplayMode;
-            BatteryIndicatorIcon = editingClone.BatteryIndicatorIcon;
+            // Kept for settings compatibility; Fullscreen now follows DesktopTopPanelIcon.
+            BatteryIndicatorIcon = editingClone.DesktopTopPanelIcon;
             AppearancePreset = editingClone.AppearancePreset;
             SetupWizardCompleted = editingClone.SetupWizardCompleted;
             SettingsSchemaVersion = editingClone.SettingsSchemaVersion;
@@ -978,6 +979,8 @@ namespace PlayniteAudioSwitcher
         {
             DeviceAliases = PersistAliases(AvailablePlaybackDevices, DeviceAliases);
             InputDeviceAliases = PersistAliases(AvailableRecordingDevices, InputDeviceAliases);
+            // Keep serialized BatteryIndicatorIcon aligned with the shared Desktop icon source.
+            BatteryIndicatorIcon = DesktopTopPanelIcon ?? string.Empty;
 
             plugin.ReplaceGameProfiles(AvailableGameProfiles);
 

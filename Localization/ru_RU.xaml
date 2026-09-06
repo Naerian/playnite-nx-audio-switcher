@@ -254,7 +254,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Показывать процент вместо значка</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Если батарея не определяется, настроенный значок снова используется как запасной.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Виджет батареи Fullscreen</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Настройте BatteryWidget совместимых тем Fullscreen независимо от Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Настройте отображение батареи BatteryWidget в совместимых темах Fullscreen. Режимы отображения независимы от Desktop; значок следует значку верхней панели Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">Значок виджета использует значок Audio Switcher Desktop: фиксированный выбор, значок активного устройства или стандартный динамик как запасной вариант.</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Индикатор батареи</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Настройте данные батареи отдельно для панели Desktop и виджета темы Fullscreen.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Показывать в верхней панели Desktop</sys:String>

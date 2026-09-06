@@ -6,4 +6,5 @@ dist/
 *.nupkg
 *.pext
 *.zip
+.release-notes.md
 .vs/

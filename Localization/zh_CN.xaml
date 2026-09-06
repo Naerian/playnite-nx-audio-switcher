@@ -254,7 +254,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">用百分比替代图标</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">未报告电池信息时，将恢复显示所配置的图标。</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">全屏电池小组件</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">独立于桌面配置兼容全屏主题使用的 BatteryWidget。</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">兼容全屏主题中 BatteryWidget 的电量显示方式可在此配置。显示模式与桌面独立；图标跟随桌面顶栏图标。</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">小组件图标使用桌面 Audio Switcher 图标：固定选择、当前设备图标，或默认扬声器作为回退。</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">电池指示器</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorHelp">分别配置桌面顶部栏和全屏主题小组件的电池信息。</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">在桌面模式顶部栏显示</sys:String>

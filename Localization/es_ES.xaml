@@ -241,7 +241,7 @@
     <sys:String x:Key="LOCAS_DeviceStatusNotPresent">No presente</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusUnavailable">No disponible</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorTitle">Indicador de batería</sys:String>
-    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Configura por separado la información de batería de la barra superior de Desktop y del widget para temas Fullscreen.</sys:String>
+    <sys:String x:Key="LOCAS_BatteryIndicatorHelp">Configura los modos de visualización de batería para la barra superior de Desktop y el widget Fullscreen. Ambos usan la misma fuente de icono.</sys:String>
     <sys:String x:Key="LOCAS_DesktopIntegrationTitle">Integración en la barra superior de la vista de escritorio</sys:String>
     <sys:String x:Key="LOCAS_DesktopIntegrationHelp">Mantén Audio Switcher accesible desde la barra superior de la vista de escritorio de Playnite. Al pasar el ratón se muestra la salida activa y al pulsar se abre la configuración.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopAudioSwitcher">Mostrar Audio Switcher en la barra superior de la vista de escritorio de Playnite</sys:String>
@@ -256,7 +256,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Mostrar porcentaje en lugar del icono</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">Cuando no se informa de batería, vuelve a mostrarse el icono configurado como alternativa.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Widget de batería de la vista de pantalla completa</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configura el BatteryWidget utilizado por los temas Fullscreen compatibles de forma independiente a Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configura cómo el BatteryWidget muestra la batería en temas Fullscreen compatibles. Los modos de visualización son independientes de Desktop; el icono sigue el de la barra superior de Desktop.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">El icono del widget usa el icono de Audio Switcher de Desktop: una elección fija, el icono del dispositivo activo o el altavoz predeterminado como respaldo.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Mostrar en la barra superior de Playnite en la vista de escritorio</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Ocultar el widget de la vista en pantalla completa de Playnite, si se usa, si no se informa de batería por parte del dispositivo activo</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Visualización</sys:String>

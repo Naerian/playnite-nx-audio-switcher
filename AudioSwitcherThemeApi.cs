@@ -958,10 +958,7 @@ namespace PlayniteAudioSwitcher
 
         private void RefreshBatteryIndicator()
         {
-            var indicatorIcon = plugin.Settings?.BatteryIndicatorIcon;
-            BatteryIndicatorIconGeometry = string.IsNullOrWhiteSpace(indicatorIcon)
-                ? plugin.GetCurrentDeviceIconGeometry()
-                : plugin.GetIconGeometry(indicatorIcon);
+            BatteryIndicatorIconGeometry = ResolveSharedIndicatorIconGeometry();
             BatteryIndicatorLabel = HasCurrentDeviceBattery ? CurrentDeviceBatteryLabel : "—";
             var mode = plugin.Settings?.BatteryIndicatorDisplayMode ?? "IconAndPercentage";
             ShowBatteryIndicatorIcon = BatteryIndicatorIconGeometry != null &&
@@ -973,10 +970,7 @@ namespace PlayniteAudioSwitcher
 
         private void RefreshDesktopIndicator()
         {
-            var indicatorIcon = plugin.Settings?.DesktopTopPanelIcon;
-            DesktopIndicatorIconGeometry = string.IsNullOrWhiteSpace(indicatorIcon)
-                ? plugin.GetCurrentDeviceIconGeometry()
-                : plugin.GetIconGeometry(indicatorIcon);
+            DesktopIndicatorIconGeometry = ResolveSharedIndicatorIconGeometry();
 
             var mode = plugin.Settings?.DesktopBatteryDisplayMode ?? "IconAndPercentage";
             var percentageWithFallback = string.Equals(
@@ -995,6 +989,14 @@ namespace PlayniteAudioSwitcher
             UseDesktopBatteryColor = plugin.Settings?.ColorDesktopIndicatorByBattery == true &&
                 HasCurrentDeviceBattery;
             UpdateCurrentDeviceTooltip();
+        }
+
+        private Geometry ResolveSharedIndicatorIconGeometry()
+        {
+            var indicatorIcon = plugin.Settings?.DesktopTopPanelIcon;
+            return string.IsNullOrWhiteSpace(indicatorIcon)
+                ? plugin.GetCurrentDeviceIconGeometry()
+                : plugin.GetIconGeometry(indicatorIcon);
         }
 
         private void UpdateCurrentDeviceTooltip()
