@@ -28,6 +28,8 @@ namespace PlayniteAudioSwitcher
         private readonly object mediaSourceSessionIdsLock = new object();
         private readonly Dictionary<Guid, AudioDevice> previousDevicesByGame = new Dictionary<Guid, AudioDevice>();
         private readonly Dictionary<Guid, AudioDevice> previousInputDevicesByGame = new Dictionary<Guid, AudioDevice>();
+        private readonly Dictionary<Guid, string> previousSpatialSoundModeByGame = new Dictionary<Guid, string>();
+        private readonly Dictionary<Guid, Dictionary<uint, float>> previousGameSessionVolumesByGame = new Dictionary<Guid, Dictionary<uint, float>>();
         private readonly Dictionary<Guid, HashSet<uint>> audioSessionBaselineByGame = new Dictionary<Guid, HashSet<uint>>();
         private AudioSwitcherSettings settings;
         private GameAudioProfileStore gameProfiles;
@@ -411,19 +413,22 @@ namespace PlayniteAudioSwitcher
                     });
                 }
 
-                foreach (var mode in settings.SpatialSoundModeOptions)
+                if (settings.SpatialSoundIntegrationEnabled)
                 {
-                    var modeId = mode.Id;
-                    items.Add(new GameMenuItem
+                    foreach (var mode in settings.SpatialSoundModeOptions)
                     {
-                        MenuSection = $"{root}|{Loc("LOCAS_SpatialSoundTitle")}",
-                        Description = GetCheckedMenuText(mode.Name, string.Equals(currentProfile?.SpatialSoundMode ?? string.Empty, modeId ?? string.Empty, StringComparison.OrdinalIgnoreCase)),
-                        Action = _ =>
+                        var modeId = mode.Id;
+                        items.Add(new GameMenuItem
                         {
-                            gameProfiles.SetSpatialSoundMode(game, modeId);
-                            ShowGameProfileInfoMessage($"{game.Name}: {mode.Name}");
-                        }
-                    });
+                            MenuSection = $"{root}|{Loc("LOCAS_SpatialSoundTitle")}",
+                            Description = GetCheckedMenuText(mode.Name, string.Equals(currentProfile?.SpatialSoundMode ?? string.Empty, modeId ?? string.Empty, StringComparison.OrdinalIgnoreCase)),
+                            Action = _ =>
+                            {
+                                gameProfiles.SetSpatialSoundMode(game, modeId);
+                                ShowGameProfileInfoMessage($"{game.Name}: {mode.Name}");
+                            }
+                        });
+                    }
                 }
 
                 AddGameVolumeProfileMenuItems(items, root, game, currentProfile);
@@ -518,21 +523,25 @@ namespace PlayniteAudioSwitcher
 
             if (args.Name == "MediaSessionList")
             {
+                EnsureMediaSessionDiscoveryStarted();
                 return new AudioMediaSessionListControl(this);
             }
 
             if (args.Name == "MediaVolumeSlider")
             {
+                EnsureMediaSessionDiscoveryStarted();
                 return new AudioMediaVolumeSliderControl(this);
             }
 
             if (args.Name == "MediaWidget")
             {
+                EnsureMediaSessionDiscoveryStarted();
                 return new AudioMediaWidgetControl(this);
             }
 
             if (args.Name == "MediaMixer")
             {
+                EnsureMediaSessionDiscoveryStarted();
                 return new AudioMediaMixerControl(this);
             }
 
@@ -579,7 +588,6 @@ namespace PlayniteAudioSwitcher
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
             ApplyPreferredDevices();
-            StartMediaSessionDiscovery();
             StartDeviceBatteryDiscovery();
             StartEndpointTopologyWatch();
             TryOfferFirstRunSetupWizard();
@@ -891,11 +899,43 @@ namespace PlayniteAudioSwitcher
 
                 LiveAudioGraphChanged?.Invoke(this, EventArgs.Empty);
                 _ = RefreshDeviceBatteriesAsync();
+                TryReapplyPreferredDevicesAfterHotplug();
             }
             catch (Exception ex)
             {
                 logger.Warn(ex, "Failed to apply a Core Audio endpoint change.");
             }
+        }
+
+        private void TryReapplyPreferredDevicesAfterHotplug()
+        {
+            if (settings == null || IsGameAudioProfileSessionActive())
+            {
+                return;
+            }
+
+            var hasPreferredOutput = !string.IsNullOrWhiteSpace(settings.PreferredOutputDeviceId);
+            var hasPreferredInput = !string.IsNullOrWhiteSpace(settings.PreferredInputDeviceId);
+            if (!hasPreferredOutput && !hasPreferredInput)
+            {
+                return;
+            }
+
+            ApplyPreferredDevices();
+        }
+
+        private bool IsGameAudioProfileSessionActive()
+        {
+            return activeGameId != null ||
+                previousDevicesByGame.Count > 0 ||
+                previousInputDevicesByGame.Count > 0 ||
+                previousSpatialSoundModeByGame.Count > 0 ||
+                previousGameSessionVolumesByGame.Count > 0;
+        }
+
+        internal void EnsureMediaSessionDiscoveryStarted()
+        {
+            StartMediaSessionDiscovery();
         }
 
         private void StartMediaSessionDiscovery()
@@ -1003,12 +1043,27 @@ namespace PlayniteAudioSwitcher
                     }
                 }
 
-                if (ApplySpatialSoundMode(profile.SpatialSoundMode, false))
+                if (!string.IsNullOrWhiteSpace(profile.SpatialSoundMode) &&
+                    settings.SpatialSoundIntegrationEnabled)
                 {
-                    var spatialName = GetSpatialSoundModeDisplayName(profile.SpatialSoundMode);
-                    if (!string.IsNullOrWhiteSpace(spatialName))
+                    if (!previousSpatialSoundModeByGame.ContainsKey(args.Game.Id))
                     {
-                        appliedParts.Add(spatialName);
+                        previousSpatialSoundModeByGame[args.Game.Id] = string.IsNullOrWhiteSpace(settings.CurrentSpatialSoundMode)
+                            ? "Off"
+                            : settings.CurrentSpatialSoundMode;
+                    }
+
+                    if (ApplySpatialSoundMode(profile.SpatialSoundMode, false))
+                    {
+                        var spatialName = GetSpatialSoundModeDisplayName(profile.SpatialSoundMode);
+                        if (!string.IsNullOrWhiteSpace(spatialName))
+                        {
+                            appliedParts.Add(spatialName);
+                        }
+                    }
+                    else
+                    {
+                        previousSpatialSoundModeByGame.Remove(args.Game.Id);
                     }
                 }
 
@@ -1070,26 +1125,87 @@ namespace PlayniteAudioSwitcher
                 Theme?.Refresh();
             }
 
-            if (!settings.RestoreDeviceAfterGameProfile || args.Game == null)
+            if (args.Game == null)
             {
                 return;
             }
 
-            if (previousDevicesByGame.TryGetValue(args.Game.Id, out var previousDevice))
+            previousDevicesByGame.TryGetValue(args.Game.Id, out var previousDevice);
+            previousDevicesByGame.Remove(args.Game.Id);
+            previousInputDevicesByGame.TryGetValue(args.Game.Id, out var previousInputDevice);
+            previousInputDevicesByGame.Remove(args.Game.Id);
+            previousSpatialSoundModeByGame.TryGetValue(args.Game.Id, out var previousSpatialMode);
+            previousSpatialSoundModeByGame.Remove(args.Game.Id);
+            previousGameSessionVolumesByGame.TryGetValue(args.Game.Id, out var previousVolumes);
+            previousGameSessionVolumesByGame.Remove(args.Game.Id);
+
+            if (!settings.RestoreDeviceAfterGameProfile)
             {
-                previousDevicesByGame.Remove(args.Game.Id);
-                if (previousDevice != null)
+                return;
+            }
+
+            if (previousDevice != null)
+            {
+                SetDevice(previousDevice.Id, GetDeviceDisplayName(previousDevice), false);
+            }
+
+            if (previousInputDevice != null)
+            {
+                SetInputDevice(previousInputDevice.Id, GetInputDeviceDisplayName(previousInputDevice), false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(previousSpatialMode) &&
+                settings.SpatialSoundIntegrationEnabled)
+            {
+                ApplySpatialSoundMode(previousSpatialMode, false);
+            }
+
+            RestoreProcessVolumes(previousVolumes);
+        }
+
+        private Dictionary<uint, float> CaptureProcessVolumes(IEnumerable<uint> processIds)
+        {
+            var volumes = new Dictionary<uint, float>();
+            foreach (var processId in processIds ?? Enumerable.Empty<uint>())
+            {
+                if (processId == 0 || volumes.ContainsKey(processId))
                 {
-                    SetDevice(previousDevice.Id, GetDeviceDisplayName(previousDevice), false);
+                    continue;
+                }
+
+                try
+                {
+                    var state = AudioDevices.GetProcessVolume(new[] { processId });
+                    if (state != null && state.IsAvailable)
+                    {
+                        volumes[processId] = state.Volume;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, $"Failed to capture session volume for process {processId}.");
                 }
             }
 
-            if (previousInputDevicesByGame.TryGetValue(args.Game.Id, out var previousInputDevice))
+            return volumes;
+        }
+
+        private void RestoreProcessVolumes(Dictionary<uint, float> previousVolumes)
+        {
+            if (previousVolumes == null || previousVolumes.Count == 0)
             {
-                previousInputDevicesByGame.Remove(args.Game.Id);
-                if (previousInputDevice != null)
+                return;
+            }
+
+            foreach (var pair in previousVolumes)
+            {
+                try
                 {
-                    SetInputDevice(previousInputDevice.Id, GetInputDeviceDisplayName(previousInputDevice), false);
+                    AudioDevices.SetProcessVolumes(new[] { pair.Key }, pair.Value);
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex, $"Failed to restore session volume for process {pair.Key}.");
                 }
             }
         }
@@ -1122,15 +1238,24 @@ namespace PlayniteAudioSwitcher
                             processId,
                             baseline,
                             configuredAudioProcessName);
-                        if (targetProcessIds.Count > 0 && AudioDevices.SetProcessVolumes(targetProcessIds, normalizedVolume))
+                        if (targetProcessIds.Count > 0)
                         {
-                            Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
+                            var previousVolumes = CaptureProcessVolumes(targetProcessIds);
+                            if (AudioDevices.SetProcessVolumes(targetProcessIds, normalizedVolume))
                             {
-                                activeGameAudioSessionProcessIds = targetProcessIds;
-                                Theme?.Refresh();
-                                ShowGameProfileAppliedMessage(gameName, new[] { $"{Loc("LOCAS_GameVolumeTitle")} {volumePercent}%" });
-                            }));
-                            return;
+                                Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
+                                {
+                                    activeGameAudioSessionProcessIds = targetProcessIds;
+                                    if (previousVolumes.Count > 0)
+                                    {
+                                        previousGameSessionVolumesByGame[gameId] = previousVolumes;
+                                    }
+
+                                    Theme?.Refresh();
+                                    ShowGameProfileAppliedMessage(gameName, new[] { $"{Loc("LOCAS_GameVolumeTitle")} {volumePercent}%" });
+                                }));
+                                return;
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -1582,7 +1707,7 @@ namespace PlayniteAudioSwitcher
         {
             var switchDevices = SafeGetDevices()
                 .Where(a => a.IsVisible)
-                .Where(a => settings.QuickSwitchAllDevices || settings.HasCustomName(a.Id))
+                .Where(a => settings.QuickSwitchAllDevices || settings.IsIncludedInQuickSwitch(a.Id))
                 .OrderBy(a => a.EffectiveName)
                 .ToList();
             if (switchDevices.Count < 2)

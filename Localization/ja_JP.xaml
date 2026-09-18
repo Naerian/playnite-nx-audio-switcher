@@ -28,7 +28,6 @@
     <sys:String x:Key="LOCAS_OutputTab">出力</sys:String>
     <sys:String x:Key="LOCAS_InputTab">入力</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">フルスクリーン</sys:String>
-    <sys:String x:Key="LOCAS_CustomNamesTitle">カスタム名</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Playnite から使用したい各出力に分かりやすい名前を入力します。カスタム名のないデバイスも完全なセレクターには表示されます。</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">出力デバイス</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesHelp">出力デバイスの名前、アイコン、表示状態、任意の既定音量を設定します。</sys:String>
@@ -53,14 +52,7 @@
     <sys:String x:Key="LOCAS_DefaultVolumeHelp">When enabled, Audio Switcher applies this volume after switching to the device. Leave unchecked to keep the current Windows volume.</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">カスタム名</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Playnite のメニューとフルスクリーンのセレクターに表示される任意の短い名前です。空欄のままにすると Windows のデバイス名が使われます。</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenDisplayMode">フルスクリーン表示</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeText">テキスト</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">テキストとアイコン</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeIcon">アイコンのみ</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenPreferredDevice">フルスクリーンの優先デバイス</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">フルスクリーンのクイック切り替えを有効化 (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_ShowOnlyCustom">フルスクリーンのクイックメニューにカスタムデバイスのみ表示</sys:String>
-    <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Playnite がフルスクリーンで起動したとき優先デバイスを適用</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">ゲーム固有プロファイル終了後に以前のデバイスを復元</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">ゲームプロファイル</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">ゲームのコンテキストメニューから出力デバイスと入力デバイスを割り当てます。ゲーム起動時に Audio Switcher が自動でそれらのデバイスへ切り替えられます。</sys:String>
@@ -75,7 +67,6 @@
     <sys:String x:Key="LOCAS_NotifyMute">ミュート / ミュート解除の変更</sys:String>
     <sys:String x:Key="LOCAS_NotifyGameProfile">ゲームプロファイルの変更</sys:String>
     <sys:String x:Key="LOCAS_NotifySpatialSound">空間オーディオの変更</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchHelp">クイック切り替えはカスタム名のあるデバイスを順に切り替えます。使用するには少なくとも 2 つのデバイスを設定してください。</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">出力をクイック切り替え</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">オーディオデバイスを更新</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">出力デバイスを選択</sys:String>
@@ -83,7 +74,6 @@
     <sys:String x:Key="LOCAS_GameAudioDefault">ゲーム音声: 既定</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">ゲーム音声</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">ゲーム音声プロファイル</sys:String>
-    <sys:String x:Key="LOCAS_UseDefaultDevice">既定デバイスを使用</sys:String>
     <sys:String x:Key="LOCAS_DefaultAudio">既定の音声</sys:String>
     <sys:String x:Key="LOCAS_AudioProfileFailed">オーディオプロファイルに失敗しました</sys:String>
     <sys:String x:Key="LOCAS_UsePreferred">優先を使用</sys:String>
@@ -103,7 +93,6 @@
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">クイック切り替えはアクティブな出力デバイスを順に切り替えます。</sys:String>
     <sys:String x:Key="LOCAS_AudioDevices">オーディオデバイス</sys:String>
     <sys:String x:Key="LOCAS_DefaultDevice">既定デバイス</sys:String>
-    <sys:String x:Key="LOCAS_DefaultDeviceHelp">Playnite がフルスクリーンモードで開くたびに、このデバイスが使用されます。</sys:String>
     <sys:String x:Key="LOCAS_CurrentDevice">現在</sys:String>
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">切り替えには少なくとも 2 つのアクティブなオーディオデバイスが必要です。</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Windows が既定のオーディオ出力として使用する出力デバイスを選択します。</sys:String>
@@ -111,6 +100,8 @@
     <sys:String x:Key="LOCAS_DeviceIcon">デバイス アイコン</sys:String>
     <sys:String x:Key="LOCAS_Visible">Audio Switcher に表示</sys:String>
     <sys:String x:Key="LOCAS_VisibleHelp">When unchecked, this device is hidden from menus, quick switch, and selectors. It remains available in Windows.</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitch">Include in quick switch</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitchHelp">When Fullscreen quick switch is set to cycle a subset of devices, only checked devices are included. Devices with a custom name stay included until you change this.</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">オーディオデバイス</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">既定</sys:String>
     <sys:String x:Key="LOCAS_ResetGameProfile">ゲームプロファイルをリセット</sys:String>

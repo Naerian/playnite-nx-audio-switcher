@@ -29,7 +29,6 @@
     <sys:String x:Key="LOCAS_InputTab">Entrada</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Tela cheia</sys:String>
     <sys:String x:Key="LOCAS_DesktopTab">Desktop</sys:String>
-    <sys:String x:Key="LOCAS_CustomNamesTitle">Nomes personalizados</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Digite um nome simples para cada saída que você quer usar pelo Playnite. Dispositivos sem nome personalizado ainda aparecerão no seletor completo.</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">Dispositivos de saída</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesHelp">Configure nomes, ícones, visibilidade e volume padrão opcional dos dispositivos de saída.</sys:String>
@@ -54,14 +53,7 @@
     <sys:String x:Key="LOCAS_DefaultVolumeHelp">When enabled, Audio Switcher applies this volume after switching to the device. Leave unchecked to keep the current Windows volume.</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Nome personalizado</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Nome curto opcional exibido nos menus do Playnite e no seletor em tela cheia. Deixe em branco para usar o nome do Windows.</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenDisplayMode">Exibição em tela cheia</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeText">Texto</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Texto e ícone</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeIcon">Somente ícone</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenPreferredDevice">Dispositivo preferido em tela cheia</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">Ativar troca rápida em tela cheia (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_ShowOnlyCustom">Mostrar apenas dispositivos personalizados no menu rápido em tela cheia</sys:String>
-    <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Aplicar o dispositivo preferido quando o Playnite iniciar em tela cheia</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Restaurar o dispositivo anterior após encerrar um perfil específico de jogo</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Perfis de jogo</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Atribua dispositivos de saída e entrada pelo menu de contexto de um jogo. Quando o jogo iniciar, o Audio Switcher pode alternar automaticamente para esses dispositivos.</sys:String>
@@ -76,7 +68,6 @@
     <sys:String x:Key="LOCAS_NotifyMute">Mudo / reativar som</sys:String>
     <sys:String x:Key="LOCAS_NotifyGameProfile">Alterações de perfil de jogo</sys:String>
     <sys:String x:Key="LOCAS_NotifySpatialSound">Alterações de Som Espacial</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchHelp">A troca rápida alterna entre dispositivos com nomes personalizados. Configure pelo menos dois dispositivos para usá-la.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Troca rápida de saída</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Atualizar dispositivos de áudio</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Escolher dispositivo de saída</sys:String>
@@ -84,7 +75,6 @@
     <sys:String x:Key="LOCAS_GameAudioDefault">Áudio do jogo: padrão</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Áudio do jogo</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Perfil de áudio do jogo</sys:String>
-    <sys:String x:Key="LOCAS_UseDefaultDevice">Usar dispositivo padrão</sys:String>
     <sys:String x:Key="LOCAS_DefaultAudio">áudio padrão</sys:String>
     <sys:String x:Key="LOCAS_AudioProfileFailed">Falha no perfil de áudio</sys:String>
     <sys:String x:Key="LOCAS_UsePreferred">Usar preferido</sys:String>
@@ -104,7 +94,6 @@
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">A troca rápida alterna entre dispositivos de saída ativos.</sys:String>
     <sys:String x:Key="LOCAS_AudioDevices">Dispositivos de áudio</sys:String>
     <sys:String x:Key="LOCAS_DefaultDevice">Dispositivo padrão</sys:String>
-    <sys:String x:Key="LOCAS_DefaultDeviceHelp">Este dispositivo será usado sempre que o Playnite abrir em modo tela cheia.</sys:String>
     <sys:String x:Key="LOCAS_CurrentDevice">atual</sys:String>
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">São necessários pelo menos dois dispositivos de áudio ativos para alternar.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Escolha o dispositivo de saída que o Windows usará como saída de áudio padrão.</sys:String>
@@ -112,6 +101,8 @@
     <sys:String x:Key="LOCAS_DeviceIcon">Ícone do dispositivo</sys:String>
     <sys:String x:Key="LOCAS_Visible">Mostrar no Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_VisibleHelp">When unchecked, this device is hidden from menus, quick switch, and selectors. It remains available in Windows.</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitch">Include in quick switch</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitchHelp">When Fullscreen quick switch is set to cycle a subset of devices, only checked devices are included. Devices with a custom name stay included until you change this.</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Dispositivo de áudio</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Padrão</sys:String>
     <sys:String x:Key="LOCAS_ResetGameProfile">Redefinir perfil do jogo</sys:String>

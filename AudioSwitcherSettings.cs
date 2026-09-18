@@ -22,7 +22,6 @@ namespace PlayniteAudioSwitcher
         private string favoriteDeviceBName;
         private string preferredOutputDeviceId = string.Empty;
         private string preferredInputDeviceId = string.Empty;
-        private string deviceDisplayMode = "TextAndIcon";
         private bool showNotifications = true;
         private bool showOutputDeviceNotifications = true;
         private bool showInputDeviceNotifications = true;
@@ -53,7 +52,7 @@ namespace PlayniteAudioSwitcher
         private bool setupWizardCompleted;
         private int settingsSchemaVersion;
 
-        public const int CurrentSettingsSchemaVersion = 1;
+        public const int CurrentSettingsSchemaVersion = 2;
 
         public AudioSwitcherSettings()
         {
@@ -73,7 +72,6 @@ namespace PlayniteAudioSwitcher
                 InputDeviceAliases = savedSettings.InputDeviceAliases ?? new List<AudioDeviceAlias>();
                 PreferredOutputDeviceId = savedSettings.PreferredOutputDeviceId;
                 PreferredInputDeviceId = savedSettings.PreferredInputDeviceId;
-                DeviceDisplayMode = string.IsNullOrWhiteSpace(savedSettings.DeviceDisplayMode) ? "TextAndIcon" : savedSettings.DeviceDisplayMode;
                 ShowNotifications = savedSettings.ShowNotifications;
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
                 QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
@@ -179,12 +177,6 @@ namespace PlayniteAudioSwitcher
         private static string NormalizePreferredDeviceId(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? string.Empty : value;
-        }
-
-        public string DeviceDisplayMode
-        {
-            get => deviceDisplayMode;
-            set => SetValue(ref deviceDisplayMode, value);
         }
 
         [DontSerialize]
@@ -806,6 +798,24 @@ namespace PlayniteAudioSwitcher
             return !string.IsNullOrWhiteSpace(GetCustomName(deviceId));
         }
 
+        public bool IsIncludedInQuickSwitch(string deviceId)
+        {
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                return false;
+            }
+
+            var alias = DeviceAliases.FirstOrDefault(a =>
+                string.Equals(a.DeviceId, deviceId, System.StringComparison.OrdinalIgnoreCase));
+            if (alias?.IncludeInQuickSwitch.HasValue == true)
+            {
+                return alias.IncludeInQuickSwitch.Value;
+            }
+
+            // Backward compatible default: custom Playnite names were the previous quick-switch pool.
+            return HasCustomName(deviceId);
+        }
+
         public string SuggestIconForDevice(string deviceName, bool isInput)
         {
             var text = (deviceName ?? string.Empty).ToLowerInvariant();
@@ -940,7 +950,6 @@ namespace PlayniteAudioSwitcher
             InputDeviceAliases = editingClone.InputDeviceAliases;
             PreferredOutputDeviceId = editingClone.PreferredOutputDeviceId;
             PreferredInputDeviceId = editingClone.PreferredInputDeviceId;
-            DeviceDisplayMode = editingClone.DeviceDisplayMode;
             ShowNotifications = editingClone.ShowNotifications;
             ShowOutputDeviceNotifications = editingClone.ShowOutputDeviceNotifications;
             ShowInputDeviceNotifications = editingClone.ShowInputDeviceNotifications;
@@ -1059,6 +1068,7 @@ namespace PlayniteAudioSwitcher
                     CustomName = a.CustomName,
                     Icon = a.Icon,
                     IsVisible = a.IsVisible,
+                    IncludeInQuickSwitch = a.IncludeInQuickSwitch,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 }).ToList(),
                 InputDeviceAliases = InputDeviceAliases.Select(a => new AudioDeviceAlias
@@ -1067,11 +1077,11 @@ namespace PlayniteAudioSwitcher
                     CustomName = a.CustomName,
                     Icon = a.Icon,
                     IsVisible = a.IsVisible,
+                    IncludeInQuickSwitch = a.IncludeInQuickSwitch,
                     DefaultVolumePercent = a.DefaultVolumePercent
                 }).ToList(),
                 PreferredOutputDeviceId = PreferredOutputDeviceId,
                 PreferredInputDeviceId = PreferredInputDeviceId,
-                DeviceDisplayMode = DeviceDisplayMode,
                 ShowNotifications = ShowNotifications,
                 ShowOutputDeviceNotifications = ShowOutputDeviceNotifications,
                 ShowInputDeviceNotifications = ShowInputDeviceNotifications,
@@ -1163,6 +1173,7 @@ namespace PlayniteAudioSwitcher
                             device.CustomName = SanitizeCustomName(alias.CustomName);
                             device.Icon = alias.Icon;
                             device.IsVisible = alias.IsVisible != false;
+                            device.IncludeInQuickSwitch = alias.IncludeInQuickSwitch;
                             device.DefaultVolumePercent = alias.DefaultVolumePercent;
                         }
 
@@ -1262,6 +1273,7 @@ namespace PlayniteAudioSwitcher
                 (!string.IsNullOrWhiteSpace(SanitizeCustomName(device.CustomName)) ||
                     !device.IsIconSuggested && !string.IsNullOrWhiteSpace(device.Icon) ||
                     !device.IsVisible ||
+                    device.IncludeInQuickSwitch.HasValue ||
                     device.DefaultVolumePercent.HasValue);
         }
 
@@ -1271,6 +1283,7 @@ namespace PlayniteAudioSwitcher
                 (!string.IsNullOrWhiteSpace(SanitizeCustomName(alias.CustomName)) ||
                     !string.IsNullOrWhiteSpace(alias.Icon) ||
                     alias.IsVisible == false ||
+                    alias.IncludeInQuickSwitch.HasValue ||
                     alias.DefaultVolumePercent.HasValue);
         }
 
@@ -1282,6 +1295,7 @@ namespace PlayniteAudioSwitcher
                 CustomName = SanitizeCustomName(device.CustomName),
                 Icon = ResolveIconId(device.IsIconSuggested ? null : device.Icon),
                 IsVisible = device.IsVisible ? (bool?)null : false,
+                IncludeInQuickSwitch = device.IncludeInQuickSwitch,
                 DefaultVolumePercent = device.DefaultVolumePercent
             };
         }
@@ -1294,6 +1308,7 @@ namespace PlayniteAudioSwitcher
                 CustomName = SanitizeCustomName(alias.CustomName),
                 Icon = ResolveIconId(alias.Icon),
                 IsVisible = alias.IsVisible,
+                IncludeInQuickSwitch = alias.IncludeInQuickSwitch,
                 DefaultVolumePercent = alias.DefaultVolumePercent
             };
         }
@@ -1345,6 +1360,7 @@ namespace PlayniteAudioSwitcher
                 Icon = device.Icon,
                 IsIconSuggested = device.IsIconSuggested,
                 IsVisible = device.IsVisible,
+                IncludeInQuickSwitch = device.IncludeInQuickSwitch,
                 DefaultVolumePercent = device.DefaultVolumePercent,
                 BatteryPercent = device.BatteryPercent,
                 IsBatteryCharging = device.IsBatteryCharging,

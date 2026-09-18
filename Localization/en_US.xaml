@@ -29,7 +29,6 @@
     <sys:String x:Key="LOCAS_InputTab">Input</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Fullscreen</sys:String>
     <sys:String x:Key="LOCAS_DesktopTab">Desktop</sys:String>
-    <sys:String x:Key="LOCAS_CustomNamesTitle">Custom names</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Enter a simple name for each output you want to use from Playnite. Devices without a custom name will still appear in the full selector.</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">Output devices</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesHelp">Configure output device names, icons, visibility and optional default volume.</sys:String>
@@ -54,15 +53,8 @@
     <sys:String x:Key="LOCAS_DefaultVolumeHelp">When enabled, Audio Switcher applies this volume after switching to the device. Leave unchecked to keep the current Windows volume.</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Custom name</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Optional short name shown in Playnite menus and the Fullscreen selector. Leave empty to keep the Windows device name.</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenDisplayMode">Fullscreen display</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeText">Text</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Text and icon</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeIcon">Icon only</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenPreferredDevice">Preferred Fullscreen device</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">Enable Fullscreen quick switch (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_ShowOnlyCustom">Show only custom devices in the Fullscreen quick menu</sys:String>
-    <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Apply preferred device when Playnite starts in Fullscreen</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGame">Restore previous device after a game-specific profile stops</sys:String>
+    <sys:String x:Key="LOCAS_RestoreAfterGame">Restore previous audio settings after a game-specific profile stops</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Game profiles</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Assign output and input devices from a game's context menu. When the game starts, Audio Switcher can switch to those devices automatically.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfiles">Apply game-specific audio profiles when games start</sys:String>
@@ -76,7 +68,6 @@
     <sys:String x:Key="LOCAS_NotifyMute">Mute / unmute changes</sys:String>
     <sys:String x:Key="LOCAS_NotifyGameProfile">Game profile changes</sys:String>
     <sys:String x:Key="LOCAS_NotifySpatialSound">Spatial Sound changes</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchHelp">Quick switch cycles through devices with custom names. Configure at least two devices to use it.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Quick switch output</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Refresh audio devices</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Choose output device</sys:String>
@@ -84,7 +75,6 @@
     <sys:String x:Key="LOCAS_GameAudioDefault">Game audio: default</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Game audio</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Game audio profile</sys:String>
-    <sys:String x:Key="LOCAS_UseDefaultDevice">Use default device</sys:String>
     <sys:String x:Key="LOCAS_DefaultAudio">default audio</sys:String>
     <sys:String x:Key="LOCAS_AudioProfileFailed">Audio profile failed</sys:String>
     <sys:String x:Key="LOCAS_UsePreferred">Use preferred</sys:String>
@@ -104,7 +94,6 @@
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Quick switch cycles through active output devices.</sys:String>
     <sys:String x:Key="LOCAS_AudioDevices">Audio devices</sys:String>
     <sys:String x:Key="LOCAS_DefaultDevice">Default device</sys:String>
-    <sys:String x:Key="LOCAS_DefaultDeviceHelp">This device will be used every time Playnite opens in Fullscreen mode.</sys:String>
     <sys:String x:Key="LOCAS_CurrentDevice">current</sys:String>
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">At least two active audio devices are required to switch.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Choose the output device Windows will use as the default audio output.</sys:String>
@@ -112,6 +101,8 @@
     <sys:String x:Key="LOCAS_DeviceIcon">Device icon</sys:String>
     <sys:String x:Key="LOCAS_Visible">Show in Audio Switcher</sys:String>
     <sys:String x:Key="LOCAS_VisibleHelp">When unchecked, this device is hidden from menus, quick switch, and selectors. It remains available in Windows.</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitch">Include in quick switch</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitchHelp">When Fullscreen quick switch is set to cycle a subset of devices, only checked devices are included. Devices with a custom name stay included until you change this.</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Audio device</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Default</sys:String>
     <sys:String x:Key="LOCAS_ResetGameProfile">Reset game profile</sys:String>
@@ -269,12 +260,12 @@
     <sys:String x:Key="LOCAS_BatteryIndicatorHiddenHelp">This option only affects the Fullscreen BatteryWidget.</sys:String>
     <sys:String x:Key="LOCAS_ExpandSectionHint">Expand to configure this section.</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitchHelp">Cycle visible output devices from Fullscreen with Back + RB.</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchAllDevicesHelp">When this is off, quick switch only includes devices with a custom Playnite name.</sys:String>
+    <sys:String x:Key="LOCAS_QuickSwitchAllDevicesHelp">When this is off, quick switch only includes devices marked for quick switch in Devices (by default, those with a custom Playnite name).</sys:String>
     <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Keep the configured icon in the Desktop top bar and do not show a battery percentage.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Show the configured icon and the reported battery percentage together.</sys:String>
     <sys:String x:Key="LOCAS_EnableGameProfilesHelp">When a game starts, Audio Switcher can apply its saved output, input, Spatial Sound, and volume profile.</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">After a profiled game closes, restore the output and input devices that were active before it started.</sys:String>
+    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">After a profiled game closes, restore the previous output/input devices, Spatial Sound mode, and game session volume when those were changed by the profile.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher calls the selected NirSoft tool. The tools are not bundled or downloaded.</sys:String>
     <sys:String x:Key="LOCAS_ShowNotificationHelp">Choose which informational notifications Audio Switcher shows. Important errors are always shown.</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Show a notification when the default playback device changes.</sys:String>

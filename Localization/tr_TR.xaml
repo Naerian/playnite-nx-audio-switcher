@@ -28,7 +28,6 @@
     <sys:String x:Key="LOCAS_OutputTab">Çıkış</sys:String>
     <sys:String x:Key="LOCAS_InputTab">Giriş</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">Tam ekran</sys:String>
-    <sys:String x:Key="LOCAS_CustomNamesTitle">Özel adlar</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">Playnite içinden kullanmak istediğiniz her çıkış için basit bir ad girin. Özel adı olmayan aygıtlar tam seçicide yine görünür.</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">Çıkış aygıtları</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesHelp">Çıkış aygıtı adlarını, simgelerini, görünürlüğünü ve isteğe bağlı varsayılan ses düzeyini yapılandırın.</sys:String>
@@ -53,14 +52,7 @@
     <sys:String x:Key="LOCAS_DefaultVolumeHelp">When enabled, Audio Switcher applies this volume after switching to the device. Leave unchecked to keep the current Windows volume.</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">Özel ad</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Playnite menülerinde ve Tam ekran seçicide gösterilen isteğe bağlı kısa ad. Windows aygıt adını kullanmak için boş bırakın.</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenDisplayMode">Tam ekran görünümü</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeText">Metin</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">Metin ve simge</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeIcon">Yalnızca simge</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenPreferredDevice">Tercih edilen tam ekran aygıtı</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">Tam ekranda hızlı geçişi etkinleştir (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_ShowOnlyCustom">Tam ekran hızlı menüsünde yalnızca özel aygıtları göster</sys:String>
-    <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Playnite tam ekranda açıldığında tercih edilen aygıtı uygula</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">Oyuna özel profil durduktan sonra önceki aygıtı geri yükle</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Oyun profilleri</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Bir oyunun bağlam menüsünden çıkış ve giriş aygıtları atayın. Oyun başladığında Audio Switcher otomatik olarak bu aygıtlara geçebilir.</sys:String>
@@ -75,7 +67,6 @@
     <sys:String x:Key="LOCAS_NotifyMute">Sesi kapatma / açma değişiklikleri</sys:String>
     <sys:String x:Key="LOCAS_NotifyGameProfile">Oyun profili değişiklikleri</sys:String>
     <sys:String x:Key="LOCAS_NotifySpatialSound">Uzamsal Ses değişiklikleri</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchHelp">Hızlı geçiş, özel adları olan aygıtlar arasında dolaşır. Kullanmak için en az iki aygıt yapılandırın.</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">Çıkışı hızlı değiştir</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">Ses aygıtlarını yenile</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">Çıkış aygıtını seç</sys:String>
@@ -83,7 +74,6 @@
     <sys:String x:Key="LOCAS_GameAudioDefault">Oyun sesi: varsayılan</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">Oyun sesi</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">Oyun ses profili</sys:String>
-    <sys:String x:Key="LOCAS_UseDefaultDevice">Varsayılan aygıtı kullan</sys:String>
     <sys:String x:Key="LOCAS_DefaultAudio">varsayılan ses</sys:String>
     <sys:String x:Key="LOCAS_AudioProfileFailed">Ses profili başarısız oldu</sys:String>
     <sys:String x:Key="LOCAS_UsePreferred">Tercih edileni kullan</sys:String>
@@ -103,7 +93,6 @@
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">Hızlı geçiş etkin çıkış aygıtları arasında dolaşır.</sys:String>
     <sys:String x:Key="LOCAS_AudioDevices">Ses aygıtları</sys:String>
     <sys:String x:Key="LOCAS_DefaultDevice">Varsayılan aygıt</sys:String>
-    <sys:String x:Key="LOCAS_DefaultDeviceHelp">Bu aygıt, Playnite her tam ekran modunda açıldığında kullanılır.</sys:String>
     <sys:String x:Key="LOCAS_CurrentDevice">geçerli</sys:String>
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">Geçiş yapmak için en az iki etkin ses aygıtı gerekir.</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">Windows'un varsayılan ses çıkışı olarak kullanacağı çıkış aygıtını seçin.</sys:String>
@@ -111,6 +100,8 @@
     <sys:String x:Key="LOCAS_DeviceIcon">Aygıt simgesi</sys:String>
     <sys:String x:Key="LOCAS_Visible">Audio Switcher'da göster</sys:String>
     <sys:String x:Key="LOCAS_VisibleHelp">When unchecked, this device is hidden from menus, quick switch, and selectors. It remains available in Windows.</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitch">Include in quick switch</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitchHelp">When Fullscreen quick switch is set to cycle a subset of devices, only checked devices are included. Devices with a custom name stay included until you change this.</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">Ses aygıtı</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">Varsayılan</sys:String>
     <sys:String x:Key="LOCAS_ResetGameProfile">Oyun profilini sıfırla</sys:String>

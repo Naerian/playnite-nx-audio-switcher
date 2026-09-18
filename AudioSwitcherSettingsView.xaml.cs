@@ -723,8 +723,8 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            BuildDeviceRows(DeviceRowsPanel, settings.AvailablePlaybackDevices, settings, "LOCAS_DefaultVolume");
-            BuildDeviceRows(InputDeviceRowsPanel, settings.AvailableRecordingDevices, settings, "LOCAS_DefaultInputVolume");
+            BuildDeviceRows(DeviceRowsPanel, settings.AvailablePlaybackDevices, settings, "LOCAS_DefaultVolume", true);
+            BuildDeviceRows(InputDeviceRowsPanel, settings.AvailableRecordingDevices, settings, "LOCAS_DefaultInputVolume", false);
             RebuildGameProfileRows();
         }
 
@@ -739,7 +739,12 @@ namespace PlayniteAudioSwitcher
             RebuildDeviceRows();
         }
 
-        private void BuildDeviceRows(StackPanel panel, IEnumerable<AudioDevice> devices, AudioSwitcherSettings settings, string defaultVolumeLabelResource)
+        private void BuildDeviceRows(
+            StackPanel panel,
+            IEnumerable<AudioDevice> devices,
+            AudioSwitcherSettings settings,
+            string defaultVolumeLabelResource,
+            bool showQuickSwitchOption)
         {
             panel.Children.Clear();
 
@@ -767,7 +772,8 @@ namespace PlayniteAudioSwitcher
                     deviceList[index],
                     settings,
                     defaultVolumeLabelResource,
-                    index));
+                    index,
+                    showQuickSwitchOption));
             }
 
             panel.Children.Add(grid);
@@ -777,7 +783,8 @@ namespace PlayniteAudioSwitcher
             AudioDevice device,
             AudioSwitcherSettings settings,
             string defaultVolumeLabelResource,
-            int index)
+            int index,
+            bool showQuickSwitchOption)
         {
             var card = new Border
             {
@@ -824,6 +831,27 @@ namespace PlayniteAudioSwitcher
             visibleHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_VisibleHelp");
             visiblePanel.Children.Add(visibleHelp);
             root.Children.Add(visiblePanel);
+
+            if (showQuickSwitchOption)
+            {
+                var quickSwitchPanel = new StackPanel();
+                var quickSwitchBox = new CheckBox
+                {
+                    IsChecked = ResolveIncludeInQuickSwitch(device),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                quickSwitchBox.SetResourceReference(ContentControl.ContentProperty, "LOCAS_IncludeInQuickSwitch");
+                quickSwitchBox.Checked += (_, __) => device.IncludeInQuickSwitch = true;
+                quickSwitchBox.Unchecked += (_, __) => device.IncludeInQuickSwitch = false;
+                quickSwitchPanel.Children.Add(quickSwitchBox);
+                var quickSwitchHelp = new TextBlock
+                {
+                    Style = TryFindResource("IndentedHintText") as Style ?? TryFindResource("HintText") as Style
+                };
+                quickSwitchHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_IncludeInQuickSwitchHelp");
+                quickSwitchPanel.Children.Add(quickSwitchHelp);
+                root.Children.Add(quickSwitchPanel);
+            }
 
             var iconPanel = new StackPanel();
             iconPanel.Children.Add(CreateFieldLabel("LOCAS_Icon"));
@@ -930,6 +958,21 @@ namespace PlayniteAudioSwitcher
 
             card.Child = root;
             return card;
+        }
+
+        private static bool ResolveIncludeInQuickSwitch(AudioDevice device)
+        {
+            if (device == null)
+            {
+                return false;
+            }
+
+            if (device.IncludeInQuickSwitch.HasValue)
+            {
+                return device.IncludeInQuickSwitch.Value;
+            }
+
+            return !string.IsNullOrWhiteSpace(AudioSwitcherSettings.SanitizeCustomName(device.CustomName));
         }
 
         private static string ResolveDeviceCardTitle(AudioDevice device)

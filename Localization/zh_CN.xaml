@@ -28,7 +28,6 @@
     <sys:String x:Key="LOCAS_OutputTab">输出</sys:String>
     <sys:String x:Key="LOCAS_InputTab">输入</sys:String>
     <sys:String x:Key="LOCAS_FullscreenTab">全屏</sys:String>
-    <sys:String x:Key="LOCAS_CustomNamesTitle">自定义名称</sys:String>
     <sys:String x:Key="LOCAS_CustomNamesHelp">为要从 Playnite 使用的每个输出输入一个简单名称。没有自定义名称的设备仍会显示在完整选择器中。</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesTitle">输出设备</sys:String>
     <sys:String x:Key="LOCAS_OutputDevicesHelp">配置输出设备名称、图标、可见性以及可选的默认音量。</sys:String>
@@ -53,14 +52,7 @@
     <sys:String x:Key="LOCAS_DefaultVolumeHelp">When enabled, Audio Switcher applies this volume after switching to the device. Leave unchecked to keep the current Windows volume.</sys:String>
     <sys:String x:Key="LOCAS_PlayniteName">自定义名称</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">显示在 Playnite 菜单和全屏选择器中的可选简称。留空则使用 Windows 设备名称。</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenDisplayMode">全屏显示</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeText">文本</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeTextAndIcon">文本和图标</sys:String>
-    <sys:String x:Key="LOCAS_DisplayModeIcon">仅图标</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenPreferredDevice">全屏首选设备</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">启用全屏快速切换 (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_ShowOnlyCustom">在全屏快速菜单中仅显示自定义设备</sys:String>
-    <sys:String x:Key="LOCAS_ApplyPreferredOnStartup">Playnite 以全屏启动时应用首选设备</sys:String>
     <sys:String x:Key="LOCAS_RestoreAfterGame">游戏专用配置停止后恢复之前的设备</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">游戏配置</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">从游戏的上下文菜单分配输出和输入设备。游戏启动时，Audio Switcher 可以自动切换到这些设备。</sys:String>
@@ -75,7 +67,6 @@
     <sys:String x:Key="LOCAS_NotifyMute">静音 / 取消静音更改</sys:String>
     <sys:String x:Key="LOCAS_NotifyGameProfile">游戏配置更改</sys:String>
     <sys:String x:Key="LOCAS_NotifySpatialSound">空间音效更改</sys:String>
-    <sys:String x:Key="LOCAS_QuickSwitchHelp">快速切换会在具有自定义名称的设备之间循环。请至少配置两个设备。</sys:String>
     <sys:String x:Key="LOCAS_MenuSwitchCustom">快速切换输出</sys:String>
     <sys:String x:Key="LOCAS_MenuRefreshDevices">刷新音频设备</sys:String>
     <sys:String x:Key="LOCAS_MenuChooseOutput">选择输出设备</sys:String>
@@ -83,7 +74,6 @@
     <sys:String x:Key="LOCAS_GameAudioDefault">游戏音频：默认</sys:String>
     <sys:String x:Key="LOCAS_GameAudio">游戏音频</sys:String>
     <sys:String x:Key="LOCAS_GameAudioProfile">游戏音频配置</sys:String>
-    <sys:String x:Key="LOCAS_UseDefaultDevice">使用默认设备</sys:String>
     <sys:String x:Key="LOCAS_DefaultAudio">默认音频</sys:String>
     <sys:String x:Key="LOCAS_AudioProfileFailed">音频配置失败</sys:String>
     <sys:String x:Key="LOCAS_UsePreferred">使用首选</sys:String>
@@ -103,7 +93,6 @@
     <sys:String x:Key="LOCAS_QuickSwitchHelpAll">快速切换会循环活动的输出设备。</sys:String>
     <sys:String x:Key="LOCAS_AudioDevices">音频设备</sys:String>
     <sys:String x:Key="LOCAS_DefaultDevice">默认设备</sys:String>
-    <sys:String x:Key="LOCAS_DefaultDeviceHelp">每次 Playnite 以全屏模式打开时都会使用此设备。</sys:String>
     <sys:String x:Key="LOCAS_CurrentDevice">当前</sys:String>
     <sys:String x:Key="LOCAS_NeedTwoSwitchDevices">至少需要两个活动音频设备才能切换。</sys:String>
     <sys:String x:Key="LOCAS_SelectorPanelHelp">选择 Windows 将用作默认音频输出的输出设备。</sys:String>
@@ -111,6 +100,8 @@
     <sys:String x:Key="LOCAS_DeviceIcon">设备图标</sys:String>
     <sys:String x:Key="LOCAS_Visible">在 Audio Switcher 中显示</sys:String>
     <sys:String x:Key="LOCAS_VisibleHelp">When unchecked, this device is hidden from menus, quick switch, and selectors. It remains available in Windows.</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitch">Include in quick switch</sys:String>
+    <sys:String x:Key="LOCAS_IncludeInQuickSwitchHelp">When Fullscreen quick switch is set to cycle a subset of devices, only checked devices are included. Devices with a custom name stay included until you change this.</sys:String>
     <sys:String x:Key="LOCAS_GameAudioDevice">音频设备</sys:String>
     <sys:String x:Key="LOCAS_DefaultProfile">默认</sys:String>
     <sys:String x:Key="LOCAS_ResetGameProfile">重置游戏配置</sys:String>

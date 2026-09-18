@@ -37,6 +37,8 @@ namespace PlayniteAudioSwitcher
 
         public bool IsVisible { get; set; } = true;
 
+        public bool? IncludeInQuickSwitch { get; set; }
+
         public int? DefaultVolumePercent { get; set; }
 
         public int? BatteryPercent { get; set; }
