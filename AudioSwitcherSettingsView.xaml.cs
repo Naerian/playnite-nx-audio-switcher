@@ -9,7 +9,6 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
 using System.Windows.Threading;
@@ -1112,6 +1111,11 @@ namespace PlayniteAudioSwitcher
             badge.SetResourceReference(Border.BackgroundProperty, backgroundKey);
         }
 
+        private void GameProfilesSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            RebuildGameProfileRows();
+        }
+
         private void RebuildGameProfileRows()
         {
             if (GameProfileRowsPanel == null || NoGameProfilesText == null || !(DataContext is AudioSwitcherSettings settings))
@@ -1120,8 +1124,30 @@ namespace PlayniteAudioSwitcher
             }
 
             GameProfileRowsPanel.Children.Clear();
-            var profiles = settings.AvailableGameProfiles.OrderBy(profile => profile.GameName).ToList();
-            NoGameProfilesText.Visibility = profiles.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            var query = GameProfilesSearchBox?.Text?.Trim() ?? string.Empty;
+            var profiles = settings.AvailableGameProfiles
+                .OrderBy(profile => profile.GameName)
+                .Where(profile =>
+                    string.IsNullOrWhiteSpace(query) ||
+                    (!string.IsNullOrWhiteSpace(profile.GameName) &&
+                     profile.GameName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0))
+                .ToList();
+
+            if (settings.AvailableGameProfiles.Count == 0)
+            {
+                NoGameProfilesText.Text = ResourceText("LOCAS_NoConfiguredGameProfiles", "No game profiles are configured.");
+                NoGameProfilesText.Visibility = Visibility.Visible;
+            }
+            else if (profiles.Count == 0)
+            {
+                NoGameProfilesText.Text = ResourceText("LOCAS_NoMatchingGameProfiles", "No game profiles match this search.");
+                NoGameProfilesText.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                NoGameProfilesText.Visibility = Visibility.Collapsed;
+            }
+
             foreach (var profile in profiles)
             {
                 GameProfileRowsPanel.Children.Add(CreateGameProfileRow(profile, settings));
@@ -1139,29 +1165,27 @@ namespace PlayniteAudioSwitcher
             };
             container.SetResourceReference(Border.BorderBrushProperty, "GlyphBrush");
 
-            var content = new StackPanel();
-            var titleRow = new Grid { Margin = new Thickness(0, 0, 0, 16) };
-            titleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            titleRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            titleRow.Children.Add(new TextBlock
+            var titleText = new TextBlock
             {
                 Text = profile.GameName,
                 FontSize = 14,
                 FontWeight = FontWeights.SemiBold,
                 TextWrapping = TextWrapping.Wrap,
                 VerticalAlignment = VerticalAlignment.Center
-            });
+            };
+
             var removeButton = CreatePreviewButton("LOCAS_RemoveProfile");
             removeButton.MinWidth = 90;
             removeButton.HorizontalAlignment = HorizontalAlignment.Right;
-            removeButton.Margin = new Thickness(8, 0, 0, 0);
+            removeButton.VerticalAlignment = VerticalAlignment.Center;
+            removeButton.Margin = new Thickness(12, 0, 0, 0);
             removeButton.Click += (_, __) =>
             {
                 var confirmed = settings.Plugin != null
                     ? settings.Plugin.ConfirmRemoveGameProfile(profile.GameName, false)
                     : MessageBox.Show(
                         string.Format(
-                            ResourceText("LOCAS_ConfirmRemoveProfilePendingMessage", "Remove the Audio Switcher profile for \"{0}\" when settings are saved? Canceling settings keeps the profile."),
+                            ResourceText("LOCAS_ConfirmRemoveProfilePendingMessage", "Remove the Audio Switcher profile for \"{0}\" when settings are saved? If you cancel, the profile is kept."),
                             profile.GameName),
                         ResourceText("LOCAS_ConfirmRemoveProfileTitle", "Remove game profile"),
                         MessageBoxButton.YesNo,
@@ -1174,11 +1198,15 @@ namespace PlayniteAudioSwitcher
                 settings.AvailableGameProfiles.Remove(profile);
                 RebuildGameProfileRows();
             };
-            Grid.SetColumn(removeButton, 1);
-            titleRow.Children.Add(removeButton);
-            content.Children.Add(titleRow);
 
-            var fields = new Grid();
+            var header = new Grid { Margin = new Thickness(0, 0, 0, 12) };
+            header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            header.Children.Add(titleText);
+            Grid.SetColumn(removeButton, 1);
+            header.Children.Add(removeButton);
+
+            var fields = new Grid { Margin = new Thickness(0, 0, 0, 0) };
             fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             fields.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -1259,8 +1287,6 @@ namespace PlayniteAudioSwitcher
             updateVolume();
             fields.Children.Add(CreateProfileField("LOCAS_GameVolumeTitle", volumeGrid, 3));
 
-            content.Children.Add(fields);
-
             var processSection = new StackPanel { Margin = new Thickness(0, 16, 0, 0) };
             var processLabel = new TextBlock
             {
@@ -1333,58 +1359,14 @@ namespace PlayniteAudioSwitcher
             };
             processHelp.SetResourceReference(TextBlock.TextProperty, "LOCAS_AudioProcessHelp");
             processSection.Children.Add(processHelp);
-            content.Children.Add(processSection);
 
-            var layout = new Grid();
-            var imageSource = LoadGameProfileImage(profile.GameImagePath);
-            if (imageSource != null)
-            {
-                layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(82) });
-                layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                var image = new Image
-                {
-                    Source = imageSource,
-                    Width = 68,
-                    Height = 96,
-                    Stretch = Stretch.Uniform,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    Margin = new Thickness(0, 0, 16, 0)
-                };
-                layout.Children.Add(image);
-                Grid.SetColumn(content, 1);
-            }
-            else
-            {
-                layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            }
+            var layout = new StackPanel();
+            layout.Children.Add(header);
+            layout.Children.Add(fields);
+            layout.Children.Add(processSection);
 
-            layout.Children.Add(content);
             container.Child = layout;
             return container;
-        }
-
-        private static ImageSource LoadGameProfileImage(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path) || !IoFile.Exists(path))
-            {
-                return null;
-            }
-
-            try
-            {
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = new Uri(path, UriKind.Absolute);
-                image.EndInit();
-                image.Freeze();
-                return image;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         private Button CreatePreviewButton(string contentResource)

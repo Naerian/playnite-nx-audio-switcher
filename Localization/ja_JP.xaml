@@ -53,10 +53,10 @@
     <sys:String x:Key="LOCAS_PlayniteName">カスタム名</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Playnite のメニューとフルスクリーンのセレクターに表示される任意の短い名前です。空欄のままにすると Windows のデバイス名が使われます。</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">フルスクリーンのクイック切り替えを有効化 (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGame">ゲーム固有プロファイル終了後に以前のデバイスを復元</sys:String>
+    <sys:String x:Key="LOCAS_SearchGameProfiles">ゲームプロファイルを検索</sys:String>
+    <sys:String x:Key="LOCAS_NoMatchingGameProfiles">この検索に一致するプロファイルはありません。</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">ゲームプロファイル</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">ゲームのコンテキストメニューから出力デバイスと入力デバイスを割り当てます。ゲーム起動時に Audio Switcher が自動でそれらのデバイスへ切り替えられます。</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfiles">ゲーム起動時にゲーム固有のオーディオプロファイルを適用</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">オーディオ変更通知を表示</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">通知</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Audio Switcher が情報通知を表示するタイミングを選びます。重要なエラーは常に表示されます。</sys:String>
@@ -217,12 +217,10 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">Wiki ドキュメント</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">問題を報告</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">設定済みプロファイル</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">保存済みのゲームプロファイルを確認、編集できます。新しいプロファイルはゲームの Audio Switcher コンテキストメニューから作成できます。</sys:String>
     <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">設定済みのゲームプロファイルはありません。</sys:String>
     <sys:String x:Key="LOCAS_RemoveProfile">削除</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileTitle">ゲームプロファイルを削除</sys:String>
-    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">設定の保存時に「{0}」の Audio Switcher プロファイルを削除しますか？設定をキャンセルするとプロファイルは保持されます。</sys:String>
+    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">設定の保存時に「{0}」の Audio Switcher プロファイルを削除しますか？キャンセルするとプロファイルは保持されます。</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileImmediateMessage">「{0}」の Audio Switcher プロファイル全体を今すぐ削除しますか？この操作は直ちに適用され、元に戻せません。</sys:String>
     <sys:String x:Key="LOCAS_ProfileDoNotChange">変更しない</sys:String>
     <sys:String x:Key="LOCAS_UnknownGame">不明なゲーム</sys:String>
@@ -266,8 +264,6 @@
     <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">デスクトップのトップバーでは設定したアイコンを表示し、バッテリー残量は表示しません。</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">設定したアイコンと報告されたバッテリー残量を一緒に表示します。</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">ゲーム開始時、Audio Switcher は保存済みの出力、入力、Spatial Sound、音量プロファイルを適用できます。</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">プロファイル付きゲームの終了後、開始前に使っていた出力・入力デバイスを復元します。</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher は選択した NirSoft ツールを呼び出します。ツールは同梱も自動ダウンロードもされません。</sys:String>
     <sys:String x:Key="LOCAS_ShowNotificationHelp">Audio Switcher が表示する情報通知を選びます。重要なエラーは常に表示されます。</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">既定の再生デバイスが変わったときに通知を表示します。</sys:String>

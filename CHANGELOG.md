@@ -2,6 +2,12 @@
 
 
 
+
+## 1.18.2 — 2026-09-21
+- Made per-game profile apply and restore automatic plugin behavior instead of optional settings toggles.
+- Simplified the Game profiles settings page with a live name search filter and without cover images in each row.
+- Renamed the profile action to Remove and clarified the confirmation dialog wording, including correct quotation marks.
+
 ## 1.18.1 — 2026-09-21
 - Moved Desktop and Fullscreen battery options into their own General tabs and removed the Battery section.
 - Styled the Fullscreen battery icon note and Spatial Sound notice as info callouts.

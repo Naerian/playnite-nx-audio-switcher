@@ -54,10 +54,10 @@
     <sys:String x:Key="LOCAS_PlayniteName">Custom name</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Optional short name shown in Playnite menus and the Fullscreen selector. Leave empty to keep the Windows device name.</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">Enable Fullscreen quick switch (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGame">Restore previous audio settings after a game-specific profile stops</sys:String>
+    <sys:String x:Key="LOCAS_SearchGameProfiles">Search game profiles</sys:String>
+    <sys:String x:Key="LOCAS_NoMatchingGameProfiles">No game profiles match this search.</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Game profiles</sys:String>
-    <sys:String x:Key="LOCAS_GameProfilesHelp">Assign output and input devices from a game's context menu. When the game starts, Audio Switcher can switch to those devices automatically.</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfiles">Apply game-specific audio profiles when games start</sys:String>
+    <sys:String x:Key="LOCAS_GameProfilesHelp">Assign output, input, Spatial Sound, and volume from a game's context menu, or edit saved profiles below. Profiles apply automatically when the game starts and restore previous audio when it closes.</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Show audio change notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Notifications</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Choose when Audio Switcher shows informational notifications. Important errors are always shown.</sys:String>
@@ -218,12 +218,10 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">Wiki documentation</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">Report an issue</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Configured profiles</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Review and edit every saved game profile. New profiles can be created from a game's Audio Switcher context menu.</sys:String>
     <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">No game profiles are configured.</sys:String>
     <sys:String x:Key="LOCAS_RemoveProfile">Remove</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileTitle">Remove game profile</sys:String>
-    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">Remove the Audio Switcher profile for "{0}" when settings are saved? Canceling settings keeps the profile.</sys:String>
+    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">Remove the Audio Switcher profile for "{0}" when settings are saved? If you cancel, the profile is kept.</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileImmediateMessage">Remove the complete Audio Switcher profile for "{0}" now? This action is immediate and cannot be undone.</sys:String>
     <sys:String x:Key="LOCAS_ProfileDoNotChange">Do not change</sys:String>
     <sys:String x:Key="LOCAS_UnknownGame">Unknown game</sys:String>
@@ -266,8 +264,6 @@
     <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Keep the configured icon in the Desktop top bar and do not show a battery percentage.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Show the configured icon and the reported battery percentage together.</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">When a game starts, Audio Switcher can apply its saved output, input, Spatial Sound, and volume profile.</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">After a profiled game closes, restore the previous output/input devices, Spatial Sound mode, and game session volume when those were changed by the profile.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher calls the selected NirSoft tool. The tools are not bundled or downloaded.</sys:String>
     <sys:String x:Key="LOCAS_ShowNotificationHelp">Choose which informational notifications Audio Switcher shows. Important errors are always shown.</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Show a notification when the default playback device changes.</sys:String>

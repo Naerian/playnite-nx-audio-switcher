@@ -33,8 +33,6 @@ namespace PlayniteAudioSwitcher
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
         private bool showMediaSessionIcons = true;
-        private bool gameProfilesEnabled = true;
-        private bool restoreDeviceAfterGameProfile = true;
         private bool spatialSoundIntegrationEnabled;
         private string spatialSoundToolPath;
         private string currentSpatialSoundMode;
@@ -76,8 +74,6 @@ namespace PlayniteAudioSwitcher
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
                 QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
                 ShowMediaSessionIcons = savedSettings.ShowMediaSessionIcons;
-                GameProfilesEnabled = savedSettings.GameProfilesEnabled;
-                RestoreDeviceAfterGameProfile = savedSettings.RestoreDeviceAfterGameProfile;
                 SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
                 SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
                 ShowOutputDeviceNotifications = savedSettings.ShowOutputDeviceNotifications;
@@ -330,18 +326,6 @@ namespace PlayniteAudioSwitcher
         {
             get => showMediaSessionIcons;
             set => SetValue(ref showMediaSessionIcons, value);
-        }
-
-        public bool GameProfilesEnabled
-        {
-            get => gameProfilesEnabled;
-            set => SetValue(ref gameProfilesEnabled, value);
-        }
-
-        public bool RestoreDeviceAfterGameProfile
-        {
-            get => restoreDeviceAfterGameProfile;
-            set => SetValue(ref restoreDeviceAfterGameProfile, value);
         }
 
         public bool SpatialSoundIntegrationEnabled
@@ -961,8 +945,6 @@ namespace PlayniteAudioSwitcher
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
             QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
             ShowMediaSessionIcons = editingClone.ShowMediaSessionIcons;
-            GameProfilesEnabled = editingClone.GameProfilesEnabled;
-            RestoreDeviceAfterGameProfile = editingClone.RestoreDeviceAfterGameProfile;
             SpatialSoundIntegrationEnabled = editingClone.SpatialSoundIntegrationEnabled;
             SpatialSoundToolPath = editingClone.SpatialSoundToolPath;
             VolumeStepPercent = editingClone.VolumeStepPercent;
@@ -1093,8 +1075,6 @@ namespace PlayniteAudioSwitcher
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,
                 ShowMediaSessionIcons = ShowMediaSessionIcons,
-                GameProfilesEnabled = GameProfilesEnabled,
-                RestoreDeviceAfterGameProfile = RestoreDeviceAfterGameProfile,
                 SpatialSoundIntegrationEnabled = SpatialSoundIntegrationEnabled,
                 SpatialSoundToolPath = SpatialSoundToolPath,
                 VolumeStepPercent = VolumeStepPercent,

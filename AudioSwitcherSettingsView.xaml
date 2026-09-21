@@ -915,22 +915,9 @@
                                         <TextBlock Text="{DynamicResource LOCAS_GameProfilesHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
                                     <StackPanel Style="{StaticResource FieldGroup}">
-                                    <CheckBox Content="{DynamicResource LOCAS_EnableGameProfiles}"
-                                              IsChecked="{Binding GameProfilesEnabled}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_EnableGameProfilesHelp}"
-                                               Style="{StaticResource IndentedHintText}" />
-                                    <StackPanel Margin="24,0,0,0" IsEnabled="{Binding GameProfilesEnabled}">
-                                        <CheckBox Content="{DynamicResource LOCAS_RestoreAfterGame}"
-                                                  IsChecked="{Binding RestoreDeviceAfterGameProfile}" />
-                                        <TextBlock Text="{DynamicResource LOCAS_RestoreAfterGameHelp}"
-                                                   Style="{StaticResource HintText}" />
-                                    </StackPanel>
-                                    </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}">
-                                        <Border Style="{StaticResource PageHeader}">
-                                            <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
-                                        </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_ConfiguredGameProfilesHelp}" Style="{StaticResource SectionSubtitleText}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_SearchGameProfiles}" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="GameProfilesSearchBox"
+                                                 TextChanged="GameProfilesSearchTextChanged" />
                                     </StackPanel>
                                     <TextBlock x:Name="NoGameProfilesText"
                                                Text="{DynamicResource LOCAS_NoConfiguredGameProfiles}"

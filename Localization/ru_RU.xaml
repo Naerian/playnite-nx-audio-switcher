@@ -53,10 +53,10 @@
     <sys:String x:Key="LOCAS_PlayniteName">Пользовательское имя</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Необязательное короткое имя, отображаемое в меню Playnite и полноэкранном выборе. Оставьте пустым, чтобы использовать имя Windows.</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">Включить быстрое переключение в полноэкранном режиме (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGame">Восстанавливать предыдущее устройство после завершения игрового профиля</sys:String>
+    <sys:String x:Key="LOCAS_SearchGameProfiles">Поиск игровых профилей</sys:String>
+    <sys:String x:Key="LOCAS_NoMatchingGameProfiles">Нет профилей, соответствующих этому поиску.</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Игровые профили</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Назначайте устройства вывода и ввода из контекстного меню игры. При запуске игры Audio Switcher может автоматически переключиться на эти устройства.</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfiles">Применять игровые аудиопрофили при запуске игр</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Показывать уведомления об изменениях аудио</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Уведомления</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Выберите, когда Audio Switcher показывает информационные уведомления. Важные ошибки отображаются всегда.</sys:String>
@@ -217,13 +217,11 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">Документация Wiki</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">Сообщить о проблеме</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Настроенные профили</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Просматривайте и изменяйте все сохранённые игровые профили. Новые профили можно создать через контекстное меню Audio Switcher для игры.</sys:String>
     <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">Игровые профили не настроены.</sys:String>
     <sys:String x:Key="LOCAS_RemoveProfile">Удалить</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileTitle">Удалить профиль игры</sys:String>
-    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">Удалить профиль Audio Switcher для «{0}» при сохранении настроек? При отмене настроек профиль будет сохранён.</sys:String>
-    <sys:String x:Key="LOCAS_ConfirmRemoveProfileImmediateMessage">Удалить весь профиль Audio Switcher для «{0}» сейчас? Действие выполняется немедленно и его нельзя отменить.</sys:String>
+    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">Удалить профиль Audio Switcher для "{0}" при сохранении настроек? Если отменить, профиль сохранится.</sys:String>
+    <sys:String x:Key="LOCAS_ConfirmRemoveProfileImmediateMessage">Удалить весь профиль Audio Switcher для "{0}" сейчас? Действие выполняется немедленно и его нельзя отменить.</sys:String>
     <sys:String x:Key="LOCAS_ProfileDoNotChange">Не изменять</sys:String>
     <sys:String x:Key="LOCAS_UnknownGame">Неизвестная игра</sys:String>
     <sys:String x:Key="LOCAS_DeviceStatusFormat">Состояние: {0}</sys:String>
@@ -266,8 +264,6 @@
     <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Оставляет настроенный значок на верхней панели рабочего стола и не показывает процент батареи.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Показывает вместе настроенный значок и сообщаемый процент батареи.</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">При запуске игры Audio Switcher может применить сохранённый профиль вывода, ввода, Spatial Sound и громкости.</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">После закрытия игры с профилем восстанавливает устройства вывода и ввода, которые были активны до запуска.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher вызывает выбранный инструмент NirSoft. Инструменты не входят в поставку и не загружаются.</sys:String>
     <sys:String x:Key="LOCAS_ShowNotificationHelp">Выберите, какие информационные уведомления показывает Audio Switcher. Важные ошибки отображаются всегда.</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Показывает уведомление при смене устройства воспроизведения по умолчанию.</sys:String>

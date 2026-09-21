@@ -992,11 +992,6 @@ namespace PlayniteAudioSwitcher
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
         {
-            if (!settings.GameProfilesEnabled)
-            {
-                return;
-            }
-
             var profile = gameProfiles.GetProfile(args.Game);
             if (profile == null ||
                 string.IsNullOrWhiteSpace(profile.DeviceId) &&
@@ -1087,13 +1082,8 @@ namespace PlayniteAudioSwitcher
             activeGameAudioSessionProcessIds = new HashSet<uint>();
             Theme?.Refresh();
 
-            if (!settings.GameProfilesEnabled || args.Game == null || args.StartedProcessId <= 0)
+            if (args.Game == null || args.StartedProcessId <= 0)
             {
-                if (args.Game != null && args.StartedProcessId > 0)
-                {
-                    ScheduleRefreshGameVolume(args.Game, args.StartedProcessId);
-                }
-
                 return;
             }
 
@@ -1138,11 +1128,6 @@ namespace PlayniteAudioSwitcher
             previousSpatialSoundModeByGame.Remove(args.Game.Id);
             previousGameSessionVolumesByGame.TryGetValue(args.Game.Id, out var previousVolumes);
             previousGameSessionVolumesByGame.Remove(args.Game.Id);
-
-            if (!settings.RestoreDeviceAfterGameProfile)
-            {
-                return;
-            }
 
             if (previousDevice != null)
             {

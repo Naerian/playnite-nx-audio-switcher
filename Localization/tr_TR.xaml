@@ -53,10 +53,10 @@
     <sys:String x:Key="LOCAS_PlayniteName">Özel ad</sys:String>
     <sys:String x:Key="LOCAS_CustomNameHelp">Playnite menülerinde ve Tam ekran seçicide gösterilen isteğe bağlı kısa ad. Windows aygıt adını kullanmak için boş bırakın.</sys:String>
     <sys:String x:Key="LOCAS_EnableQuickSwitch">Tam ekranda hızlı geçişi etkinleştir (Back + RB)</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGame">Oyuna özel profil durduktan sonra önceki aygıtı geri yükle</sys:String>
+    <sys:String x:Key="LOCAS_SearchGameProfiles">Oyun profillerinde ara</sys:String>
+    <sys:String x:Key="LOCAS_NoMatchingGameProfiles">Bu aramayla eşleşen profil yok.</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesTitle">Oyun profilleri</sys:String>
     <sys:String x:Key="LOCAS_GameProfilesHelp">Bir oyunun bağlam menüsünden çıkış ve giriş aygıtları atayın. Oyun başladığında Audio Switcher otomatik olarak bu aygıtlara geçebilir.</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfiles">Oyunlar başladığında oyuna özel ses profillerini uygula</sys:String>
     <sys:String x:Key="LOCAS_ShowNotification">Ses değişikliği bildirimlerini göster</sys:String>
     <sys:String x:Key="LOCAS_NotificationsTitle">Bildirimler</sys:String>
     <sys:String x:Key="LOCAS_NotificationsHelp">Audio Switcher'ın bilgilendirici bildirimleri ne zaman göstereceğini seçin. Önemli hatalar her zaman gösterilir.</sys:String>
@@ -217,12 +217,10 @@
     <sys:String x:Key="LOCAS_OpenGitHub">GitHub</sys:String>
     <sys:String x:Key="LOCAS_OpenWiki">Wiki belgelendirmesi</sys:String>
     <sys:String x:Key="LOCAS_ReportIssue">Sorun bildir</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesTitle">Yapılandırılmış profiller</sys:String>
-    <sys:String x:Key="LOCAS_ConfiguredGameProfilesHelp">Kaydedilmiş tüm oyun profillerini inceleyin ve düzenleyin. Yeni profiller oyunun Audio Switcher bağlam menüsünden oluşturulabilir.</sys:String>
     <sys:String x:Key="LOCAS_NoConfiguredGameProfiles">Yapılandırılmış oyun profili yok.</sys:String>
     <sys:String x:Key="LOCAS_RemoveProfile">Kaldır</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileTitle">Oyun profilini kaldır</sys:String>
-    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">Ayarlar kaydedildiğinde "{0}" için Audio Switcher profili kaldırılsın mı? Ayarları iptal etmek profili korur.</sys:String>
+    <sys:String x:Key="LOCAS_ConfirmRemoveProfilePendingMessage">Ayarlar kaydedildiğinde "{0}" için Audio Switcher profili kaldırılsın mı? İptal ederseniz profil korunur.</sys:String>
     <sys:String x:Key="LOCAS_ConfirmRemoveProfileImmediateMessage">"{0}" için Audio Switcher profilinin tamamı şimdi kaldırılsın mı? İşlem hemen uygulanır ve geri alınamaz.</sys:String>
     <sys:String x:Key="LOCAS_ProfileDoNotChange">Değiştirme</sys:String>
     <sys:String x:Key="LOCAS_UnknownGame">Bilinmeyen oyun</sys:String>
@@ -266,8 +264,6 @@
     <sys:String x:Key="LOCAS_VolumeStepRange">1–50</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconOnlyHelp">Masaüstü üst çubuğunda yapılandırılmış simgeyi tutar ve pil yüzdesini göstermez.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryIconAndPercentageHelp">Yapılandırılmış simgeyi ve bildirilen pil yüzdesini birlikte gösterir.</sys:String>
-    <sys:String x:Key="LOCAS_EnableGameProfilesHelp">Bir oyun başladığında Audio Switcher kaydedilmiş çıkış, giriş, Spatial Sound ve ses düzeyi profilini uygulayabilir.</sys:String>
-    <sys:String x:Key="LOCAS_RestoreAfterGameHelp">Profilli bir oyun kapandıktan sonra, başlamadan önce etkin olan çıkış ve giriş aygıtlarını geri yükler.</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundHelp">Audio Switcher seçilen NirSoft aracını çağırır. Araçlar pakete dahil edilmez ve indirilmez.</sys:String>
     <sys:String x:Key="LOCAS_ShowNotificationHelp">Audio Switcher’ın hangi bilgilendirme bildirimlerini göstereceğini seçin. Önemli hatalar her zaman gösterilir.</sys:String>
     <sys:String x:Key="LOCAS_NotifyOutputDeviceHelp">Varsayılan oynatma aygıtı değiştiğinde bir bildirim gösterir.</sys:String>
