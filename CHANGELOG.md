@@ -1,6 +1,12 @@
 # Changelog
 
 
+
+## 1.18.1 — 2026-09-21
+- Moved Desktop and Fullscreen battery options into their own General tabs and removed the Battery section.
+- Styled the Fullscreen battery icon note and Spatial Sound notice as info callouts.
+- Replaced Spatial Sound download links with Download SoundVolumeView and Download svcl buttons.
+
 ## 1.18.0 — 2026-09-18
 - Restored Spatial Sound and game session volume after profiled games stop, alongside output and input devices.
 - Added per-device "Include in quick switch" so quick switch can cycle a curated device list without relying only on custom names.

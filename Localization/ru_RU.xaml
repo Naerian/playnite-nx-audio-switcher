@@ -111,6 +111,8 @@
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Экспериментально: позволяет Audio Switcher вызывать внешний исполняемый файл SoundVolumeView или svcl для изменения пространственного звука Windows на текущем устройстве вывода по умолчанию.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundNotBundled">Audio Switcher не включает эти сторонние инструменты. Загрузите один из них с NirSoft и выберите здесь его исполняемый файл.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolInfo">SoundVolumeView — портативная аудиоутилита NirSoft для Windows с графическим интерфейсом и поддержкой командной строки. svcl — консольная версия того же инструмента с тем же синтаксисом команд.</sys:String>
+    <sys:String x:Key="LOCAS_DownloadSoundVolumeView">Скачать SoundVolumeView</sys:String>
+    <sys:String x:Key="LOCAS_DownloadSvcl">Скачать svcl</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Включить экспериментальную интеграцию пространственного звука</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolPath">Путь к SoundVolumeView.exe или svcl.exe</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundBrowseTitle">Выберите SoundVolumeView.exe или svcl.exe</sys:String>

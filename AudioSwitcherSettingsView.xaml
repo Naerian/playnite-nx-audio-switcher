@@ -60,6 +60,35 @@
             <Setter Property="FontStyle" Value="Italic" />
             <Setter Property="Margin" Value="0,8,0,0" />
         </Style>
+        <Style x:Key="InfoCallout" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Narian.BadgeBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Narian.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0,16,0,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="ClipToBounds" Value="True" />
+        </Style>
+        <Style x:Key="InfoCalloutAccentBar" TargetType="Border">
+            <Setter Property="Width" Value="3" />
+            <Setter Property="Background" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+        </Style>
+        <Style x:Key="InfoCalloutBody" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="LineHeight" Value="18" />
+            <Setter Property="Margin" Value="0" />
+        </Style>
+        <Style x:Key="InfoCalloutGlyph" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            <Setter Property="Foreground" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,1,10,0" />
+        </Style>
         <Style x:Key="WarningHintText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
             <Setter Property="Foreground" Value="#FFE24B4B" />
             <Setter Property="Opacity" Value="1" />
@@ -741,6 +770,30 @@
                                                    Style="{StaticResource HintText}" />
                                     </StackPanel>
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource PageSection}">
+                                        <Border Style="{StaticResource PageHeader}">
+                                            <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryHelp}" Style="{StaticResource SectionSubtitleText}" />
+                                    </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}"
+                                                IsEnabled="{Binding ShowDesktopBatteryIndicator}">
+                                        <RadioButton GroupName="DesktopBatteryMode"
+                                                     Content="{DynamicResource LOCAS_DesktopBatteryNone}"
+                                                     IsChecked="{Binding DesktopBatteryIconOnly, Mode=TwoWay}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryIconOnlyHelp}"
+                                                   Style="{StaticResource IndentedHintText}" />
+                                        <RadioButton GroupName="DesktopBatteryMode"
+                                                     Content="{DynamicResource LOCAS_DesktopBatteryIconAndPercentage}"
+                                                     IsChecked="{Binding DesktopBatteryIconAndPercentage, Mode=TwoWay}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryIconAndPercentageHelp}"
+                                                   Style="{StaticResource IndentedHintText}" />
+                                        <RadioButton GroupName="DesktopBatteryMode"
+                                                     Content="{DynamicResource LOCAS_DesktopBatteryPercentageInsteadOfIcon}"
+                                                     IsChecked="{Binding DesktopBatteryPercentageWithIconFallback, Mode=TwoWay}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryPercentageFallbackHelp}"
+                                                   Style="{StaticResource IndentedHintText}" />
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
@@ -805,73 +858,15 @@
                                     <TextBlock Text="{DynamicResource LOCAS_ShowMediaSessionIconsHelp}"
                                                Style="{StaticResource IndentedHintText}" />
                                     </StackPanel>
-                                </StackPanel>
-                            </ScrollViewer>
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource TabGlyph}" Text="&#xEBB5;" />
-                                    <TextBlock Text="{DynamicResource LOCAS_Battery}" Style="{StaticResource TabHeaderLabel}" />
-                                </StackPanel>
-                            </TabItem.Header>
-                            <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
-                                    <StackPanel Style="{StaticResource PageSection}">
-                                        <Border Style="{StaticResource PageHeader}">
-                                            <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorTitle}" Style="{StaticResource SectionHeaderText}" />
-                                        </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorHelp}" Style="{StaticResource SectionSubtitleText}" />
-                                    </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}">
-                                        <Border Style="{StaticResource PageHeader}">
-                                            <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryTitle}" Style="{StaticResource SectionHeaderText}" />
-                                        </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryHelp}" Style="{StaticResource SectionSubtitleText}" />
-                                    </StackPanel>
-                                    <StackPanel Style="{StaticResource FieldGroup}">
-                                    <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryRequiresIntegration}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock" BasedOn="{StaticResource HintText}">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                                <Setter Property="Margin" Value="0,0,0,16" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ShowDesktopBatteryIndicator}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Setter Property="Margin" Value="0" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <StackPanel IsEnabled="{Binding ShowDesktopBatteryIndicator}">
-                                        <RadioButton GroupName="DesktopBatteryMode"
-                                                     Content="{DynamicResource LOCAS_DesktopBatteryNone}"
-                                                     IsChecked="{Binding DesktopBatteryIconOnly, Mode=TwoWay}" />
-                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryIconOnlyHelp}"
-                                                   Style="{StaticResource IndentedHintText}" />
-                                        <RadioButton GroupName="DesktopBatteryMode"
-                                                     Content="{DynamicResource LOCAS_DesktopBatteryIconAndPercentage}"
-                                                     IsChecked="{Binding DesktopBatteryIconAndPercentage, Mode=TwoWay}" />
-                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryIconAndPercentageHelp}"
-                                                   Style="{StaticResource IndentedHintText}" />
-                                        <RadioButton GroupName="DesktopBatteryMode"
-                                                     Content="{DynamicResource LOCAS_DesktopBatteryPercentageInsteadOfIcon}"
-                                                     IsChecked="{Binding DesktopBatteryPercentageWithIconFallback, Mode=TwoWay}" />
-                                        <TextBlock Text="{DynamicResource LOCAS_DesktopBatteryPercentageFallbackHelp}"
-                                                   Style="{StaticResource IndentedHintText}" />
-                                    </StackPanel>
-                                    </StackPanel>
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
                                         <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryHelp}" Style="{StaticResource SectionSubtitleText}" />
                                     </StackPanel>
+                                    <StackPanel Style="{StaticResource FieldGroup}">
                                     <CheckBox Content="{DynamicResource LOCAS_HideBatteryWhenUnavailable}"
                                               IsChecked="{Binding HideBatteryIndicatorWhenUnavailable}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorHiddenHelp}"
-                                               Style="{StaticResource IndentedHintText}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryIndicatorDisplay}" Style="{StaticResource FieldLabel}" />
                                     <RadioButton GroupName="FullscreenBatteryMode"
                                                  Content="{DynamicResource LOCAS_BatteryDisplayIconAndPercentage}"
@@ -888,8 +883,19 @@
                                                  IsChecked="{Binding FullscreenBatteryPercentageOnly, Mode=TwoWay}" />
                                     <TextBlock Text="{DynamicResource LOCAS_BatteryDisplayPercentageOnlyHelp}"
                                                Style="{StaticResource IndentedHintText}" />
-                                    <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryIconFollowsDesktopHelp}"
-                                               Style="{StaticResource HintText}" />
+                                    <Border Style="{StaticResource InfoCallout}">
+                                        <DockPanel LastChildFill="True">
+                                            <Border DockPanel.Dock="Left" Style="{StaticResource InfoCalloutAccentBar}" />
+                                            <DockPanel Margin="12,10,12,10" LastChildFill="True">
+                                                <TextBlock DockPanel.Dock="Left"
+                                                           Style="{StaticResource InfoCalloutGlyph}"
+                                                           Text="&#xE946;" />
+                                                <TextBlock Text="{DynamicResource LOCAS_FullscreenBatteryIconFollowsDesktopHelp}"
+                                                           Style="{StaticResource InfoCalloutBody}" />
+                                            </DockPanel>
+                                        </DockPanel>
+                                    </Border>
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
@@ -979,20 +985,32 @@
                                         </Grid>
                                         <TextBlock x:Name="SpatialSoundToolStatus" Style="{StaticResource HintText}" />
                                     </StackPanel>
-                                    <TextBlock Style="{StaticResource NoteText}" Margin="0,24,0,0">
-                                        <Run FontWeight="SemiBold" Text="{DynamicResource LOCAS_NotePrefix}" />
-                                        <Run Text=" " />
-                                        <Run Text="{DynamicResource LOCAS_SpatialSoundNotBundled}" />
-                                    </TextBlock>
+                                    <Border Style="{StaticResource InfoCallout}" Margin="0,24,0,0">
+                                        <DockPanel LastChildFill="True">
+                                            <Border DockPanel.Dock="Left" Style="{StaticResource InfoCalloutAccentBar}" />
+                                            <DockPanel Margin="12,10,12,10" LastChildFill="True">
+                                                <TextBlock DockPanel.Dock="Left"
+                                                           Style="{StaticResource InfoCalloutGlyph}"
+                                                           Text="&#xE946;" />
+                                                <TextBlock Text="{DynamicResource LOCAS_SpatialSoundNotBundled}"
+                                                           Style="{StaticResource InfoCalloutBody}" />
+                                            </DockPanel>
+                                        </DockPanel>
+                                    </Border>
                                     <TextBlock Text="{DynamicResource LOCAS_SpatialSoundToolInfo}"
                                                Style="{StaticResource NoteText}" />
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Margin="0,0,16,0">
-                                            <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_view.html" RequestNavigate="OpenExternalLink">SoundVolumeView</Hyperlink>
-                                        </TextBlock>
-                                        <TextBlock>
-                                            <Hyperlink NavigateUri="https://www.nirsoft.net/utils/sound_volume_command_line.html" RequestNavigate="OpenExternalLink">svcl</Hyperlink>
-                                        </TextBlock>
+                                    <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                                        <Button Content="{DynamicResource LOCAS_DownloadSoundVolumeView}"
+                                                Tag="https://www.nirsoft.net/utils/sound_volume_view.html"
+                                                Click="OpenExternalButton"
+                                                MinWidth="180"
+                                                Margin="0,0,8,0"
+                                                HorizontalAlignment="Left" />
+                                        <Button Content="{DynamicResource LOCAS_DownloadSvcl}"
+                                                Tag="https://www.nirsoft.net/utils/sound_volume_command_line.html"
+                                                Click="OpenExternalButton"
+                                                MinWidth="140"
+                                                HorizontalAlignment="Left" />
                                     </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>

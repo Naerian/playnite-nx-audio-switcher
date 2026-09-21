@@ -111,6 +111,8 @@
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Deneysel: Audio Switcher'ın geçerli varsayılan çıkış aygıtında Windows Uzamsal Ses'i değiştirmek için harici SoundVolumeView veya svcl çalıştırılabilir dosyasını çağırmasına izin verir.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundNotBundled">Audio Switcher bu üçüncü taraf araçları içermez. NirSoft'tan birini indirin ve çalıştırılabilir dosyasını burada seçin.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolInfo">SoundVolumeView, NirSoft'un grafik arayüzlü ve komut satırı destekli taşınabilir Windows ses aracıdır. svcl aynı aracın yalnızca konsol sürümüdür ve aynı komut söz dizimini kullanır.</sys:String>
+    <sys:String x:Key="LOCAS_DownloadSoundVolumeView">SoundVolumeView indir</sys:String>
+    <sys:String x:Key="LOCAS_DownloadSvcl">svcl indir</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Deneysel Uzamsal Ses entegrasyonunu etkinleştir</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolPath">SoundVolumeView.exe veya svcl.exe yolu</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundBrowseTitle">SoundVolumeView.exe veya svcl.exe seç</sys:String>

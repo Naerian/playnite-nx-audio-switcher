@@ -1,5 +1,13 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.18.1
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-09-21
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.18.1/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_18_1.pext
+    Changelog:
+      - 'Moved Desktop and Fullscreen battery options into their own General tabs and removed the Battery section.'
+      - 'Styled the Fullscreen battery icon note and Spatial Sound notice as info callouts.'
+      - 'Replaced Spatial Sound download links with Download SoundVolumeView and Download svcl buttons.'
   - Version: 1.18.0
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-09-18

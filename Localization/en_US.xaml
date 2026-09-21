@@ -112,6 +112,8 @@
     <sys:String x:Key="LOCAS_SpatialSoundHelp">Experimental: allows Audio Switcher to call an external SoundVolumeView or svcl executable to change Windows Spatial Sound on the current default output device.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundNotBundled">Audio Switcher does not include these third-party tools. Download one of them from NirSoft and select its executable here.</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolInfo">SoundVolumeView is NirSoft's portable Windows audio utility with a graphical interface and command-line support. svcl is the console-only version of the same tool and uses the same command syntax.</sys:String>
+    <sys:String x:Key="LOCAS_DownloadSoundVolumeView">Download SoundVolumeView</sys:String>
+    <sys:String x:Key="LOCAS_DownloadSvcl">Download svcl</sys:String>
     <sys:String x:Key="LOCAS_EnableSpatialSoundIntegration">Enable experimental Spatial Sound integration</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundToolPath">SoundVolumeView.exe or svcl.exe path</sys:String>
     <sys:String x:Key="LOCAS_SpatialSoundBrowseTitle">Select SoundVolumeView.exe or svcl.exe</sys:String>
@@ -247,8 +249,8 @@
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageInsteadOfIcon">Show percentage instead of the icon</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryPercentageFallbackHelp">When no battery is reported, the configured icon returns as a fallback.</sys:String>
     <sys:String x:Key="LOCAS_FullscreenBatteryTitle">Fullscreen battery widget</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configure how the BatteryWidget shows battery data in compatible Fullscreen themes. Display modes are independent from Desktop; the icon follows the Desktop top-bar icon.</sys:String>
-    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">The widget icon uses the Desktop Audio Switcher icon: a fixed choice, the active device icon, or the default speaker as fallback.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryHelp">Configure how the BatteryWidget shows battery data in compatible Fullscreen themes. The icon follows the Desktop top-bar icon setting.</sys:String>
+    <sys:String x:Key="LOCAS_FullscreenBatteryIconFollowsDesktopHelp">The widget icon uses the Audio Switcher icon from Desktop view: a fixed choice, the active device icon, or the default speaker as fallback.</sys:String>
     <sys:String x:Key="LOCAS_ShowDesktopBatteryIndicator">Show in the Desktop top bar</sys:String>
     <sys:String x:Key="LOCAS_HideBatteryWhenUnavailable">Hide the Fullscreen widget when no battery is reported</sys:String>
     <sys:String x:Key="LOCAS_BatteryIndicatorDisplay">Display</sys:String>
@@ -278,7 +280,7 @@
     <sys:String x:Key="LOCAS_BatteryDisplayIconAndPercentageHelp">Show the BatteryWidget icon and the reported percentage together.</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayIconOnlyHelp">Show only the BatteryWidget icon.</sys:String>
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Show only the reported percentage in the BatteryWidget.</sys:String>
-    <sys:String x:Key="LOCAS_DesktopBatteryHelp">These options control how battery information appears in Playnite's Desktop top bar. They do not change the Fullscreen BatteryWidget.</sys:String>
+    <sys:String x:Key="LOCAS_DesktopBatteryHelp">Choose how battery information appears in Playnite's Desktop top bar. Requires Desktop integration above.</sys:String>
     <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
     <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
     <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
