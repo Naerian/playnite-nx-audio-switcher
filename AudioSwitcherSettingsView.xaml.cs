@@ -1442,6 +1442,66 @@ namespace PlayniteAudioSwitcher
             (DataContext as AudioSwitcherSettings)?.Plugin?.OpenSetupWizard();
         }
 
+        private void OpenSupportLogFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var plugin = settings?.Plugin;
+            if (plugin == null)
+            {
+                return;
+            }
+
+            if (!plugin.TryOpenSupportLogFile(out var error))
+            {
+                MessageBox.Show(
+                    (TryFindResource("LOCAS_DebugLogOpenFailed") as string ?? "Could not open the debug log.") +
+                    (string.IsNullOrWhiteSpace(error) ? string.Empty : "\n\n" + error),
+                    TryFindResource("LOCAS_PluginName") as string ?? "Audio Switcher",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+
+        private void ClearSupportLog_OnClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var plugin = settings?.Plugin;
+            if (plugin == null)
+            {
+                return;
+            }
+
+            var title = TryFindResource("LOCAS_PluginName") as string ?? "Audio Switcher";
+            var confirm = MessageBox.Show(
+                TryFindResource("LOCAS_DebugLogClearConfirm") as string
+                    ?? "Clear the debug log? This cannot be undone.",
+                title,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if (confirm != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            if (plugin.TryClearSupportLog(out var error))
+            {
+                MessageBox.Show(
+                    TryFindResource("LOCAS_DebugLogCleared") as string ?? "Debug log cleared.",
+                    title,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show(
+                    (TryFindResource("LOCAS_DebugLogClearFailed") as string ?? "Could not clear the debug log.") +
+                    (string.IsNullOrWhiteSpace(error) ? string.Empty : "\n\n" + error),
+                    title,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        }
+
         private void ExportSettingsBackup(object sender, RoutedEventArgs e)
         {
             (DataContext as AudioSwitcherSettings)?.ExportSettingsBackup();

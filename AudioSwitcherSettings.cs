@@ -48,6 +48,7 @@ namespace PlayniteAudioSwitcher
         private string batteryIndicatorIcon = string.Empty;
         private string appearancePreset = SettingsAppearance.Midnight;
         private bool setupWizardCompleted;
+        private bool enableVerboseLogging;
         private int settingsSchemaVersion;
 
         public const int CurrentSettingsSchemaVersion = 2;
@@ -98,6 +99,7 @@ namespace PlayniteAudioSwitcher
                 BatteryIndicatorIcon = savedSettings.BatteryIndicatorIcon ?? string.Empty;
                 AppearancePreset = savedSettings.AppearancePreset;
                 SetupWizardCompleted = savedSettings.SetupWizardCompleted;
+                EnableVerboseLogging = savedSettings.EnableVerboseLogging;
                 SettingsSchemaVersion = savedSettings.SettingsSchemaVersion;
             }
 
@@ -614,6 +616,13 @@ namespace PlayniteAudioSwitcher
             set => SetValue(ref setupWizardCompleted, value);
         }
 
+        /// <summary>When true, Debug/Trace lines are also written to the support log file.</summary>
+        public bool EnableVerboseLogging
+        {
+            get => enableVerboseLogging;
+            set => SetValue(ref enableVerboseLogging, value);
+        }
+
         public int SettingsSchemaVersion
         {
             get => settingsSchemaVersion;
@@ -960,6 +969,7 @@ namespace PlayniteAudioSwitcher
             BatteryIndicatorIcon = editingClone.DesktopTopPanelIcon;
             AppearancePreset = editingClone.AppearancePreset;
             SetupWizardCompleted = editingClone.SetupWizardCompleted;
+            EnableVerboseLogging = editingClone.EnableVerboseLogging;
             SettingsSchemaVersion = editingClone.SettingsSchemaVersion;
             AvailableGameProfiles = editingClone.AvailableGameProfiles.Select(profile => profile.Clone()).ToList();
             editingClone = null;
@@ -1089,6 +1099,7 @@ namespace PlayniteAudioSwitcher
                 BatteryIndicatorIcon = BatteryIndicatorIcon,
                 AppearancePreset = AppearancePreset,
                 SetupWizardCompleted = SetupWizardCompleted,
+                EnableVerboseLogging = EnableVerboseLogging,
                 SettingsSchemaVersion = SettingsSchemaVersion
             };
 
@@ -1182,7 +1193,9 @@ namespace PlayniteAudioSwitcher
             {
                 try
                 {
-                    Playnite.SDK.LogManager.GetLogger().Error(ex, "Failed to refresh Audio Switcher device list.");
+                    var settingsLogger = PlayniteAudioSwitcher.Logging.PluginFileLogger.Current
+                        ?? (Playnite.SDK.ILogger)Playnite.SDK.LogManager.GetLogger();
+                    settingsLogger.Error(ex, "Failed to refresh Audio Switcher device list.");
                 }
                 catch
                 {
@@ -1217,7 +1230,9 @@ namespace PlayniteAudioSwitcher
                 var unplugged = CountDeviceState(windowsDevices, AudioEndpointState.Unplugged);
                 var notPresent = CountDeviceState(windowsDevices, AudioEndpointState.NotPresent);
                 var unknown = CountDeviceState(windowsDevices, AudioEndpointState.Unknown);
-                Playnite.SDK.LogManager.GetLogger().Info(
+                var settingsLogger = PlayniteAudioSwitcher.Logging.PluginFileLogger.Current
+                    ?? (Playnite.SDK.ILogger)Playnite.SDK.LogManager.GetLogger();
+                settingsLogger.Info(
                     $"Audio Switcher {kind} enumeration: windows={windowsDevices.Count} (active={active}, disabled={disabled}, unplugged={unplugged}, notPresent={notPresent}, unknown={unknown}); settings list={settingsDevices.Count}.");
             }
             catch

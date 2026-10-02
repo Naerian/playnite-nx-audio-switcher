@@ -1,5 +1,12 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.18.3
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-10-02
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.18.3/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_18_3.pext
+    Changelog:
+      - 'Added a session-oriented support log with optional detailed logging under Advanced â†’ Maintenance.'
+      - 'Added Open log and Clear log actions with confirmation, matching the Metadata AI maintenance flow.'
   - Version: 1.18.2
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-09-21

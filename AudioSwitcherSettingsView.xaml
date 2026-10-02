@@ -1103,45 +1103,64 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
-                                    <StackPanel Style="{StaticResource PageSection}">
-                                        <Border Style="{StaticResource PageHeader}">
-                                            <TextBlock Text="{DynamicResource LOCAS_MaintenanceTab}" Style="{StaticResource SectionHeaderText}" />
-                                        </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}" Style="{StaticResource SectionSubtitleText}" />
-                                    </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}">
-                                        <Border Style="{StaticResource PageHeader}">
+                                <Grid Margin="8" HorizontalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,24">
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
                                             <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}" Style="{StaticResource SectionSubtitleText}" />
-                                    </StackPanel>
-                                    <StackPanel Style="{StaticResource FieldGroup}">
-                                        <Button Content="{DynamicResource LOCAS_AudioSessionDiagnostics}"
+                                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceDiagnosticsHelp}" Style="{StaticResource HintText}" />
+                                        <Button Content="{DynamicResource LOCAS_ExportDiagnostics}"
                                                 HorizontalAlignment="Left"
-                                                MinWidth="220"
-                                                Margin="0,0,0,0"
+                                                MinWidth="240"
                                                 Click="ExportAudioSessionDiagnostics" />
                                     </StackPanel>
-                                    <StackPanel Style="{StaticResource PageSection}">
-                                        <Border Style="{StaticResource PageHeader}">
+
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,24">
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
                                             <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupTitle}" Style="{StaticResource SectionHeaderText}" />
                                         </Border>
-                                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}" Style="{StaticResource SectionSubtitleText}" />
+                                        <TextBlock Text="{DynamicResource LOCAS_MaintenanceBackupHelp}" Style="{StaticResource HintText}" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource LOCAS_ExportSettingsBackup}"
+                                                    MinWidth="160"
+                                                    Margin="0,0,8,0"
+                                                    Click="ExportSettingsBackup" />
+                                            <Button Content="{DynamicResource LOCAS_ImportSettingsBackup}"
+                                                    MinWidth="160"
+                                                    Click="ImportSettingsBackup" />
+                                        </StackPanel>
                                     </StackPanel>
-                                    <WrapPanel>
-                                        <Button Content="{DynamicResource LOCAS_ExportSettingsBackup}"
-                                                MinWidth="180"
-                                                HorizontalAlignment="Left"
-                                                Margin="0,0,8,8"
-                                                Click="ExportSettingsBackup" />
-                                        <Button Content="{DynamicResource LOCAS_ImportSettingsBackup}"
-                                                MinWidth="180"
-                                                HorizontalAlignment="Left"
-                                                Margin="0,0,0,8"
-                                                Click="ImportSettingsBackup" />
-                                    </WrapPanel>
-                                </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="0"
+                                                Margin="0,0,0,24">
+                                        <Border Style="{StaticResource SectionHeaderBorder}">
+                                            <TextBlock Text="{DynamicResource LOCAS_DebugLogTitle}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_DebugLogHelp}" Style="{StaticResource HintText}" />
+                                        <CheckBox Content="{DynamicResource LOCAS_VerboseDebugLog}"
+                                                  IsChecked="{Binding EnableVerboseLogging}"
+                                                  Margin="0,0,0,10" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{DynamicResource LOCAS_OpenDebugLog}"
+                                                    MinWidth="160"
+                                                    Margin="0,0,8,0"
+                                                    Click="OpenSupportLogFile_OnClick" />
+                                            <Button Content="{DynamicResource LOCAS_ClearDebugLog}"
+                                                    MinWidth="160"
+                                                    Click="ClearSupportLog_OnClick" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
                             </ScrollViewer>
                         </TabItem>
                     </TabControl>

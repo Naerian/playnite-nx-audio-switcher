@@ -18,12 +18,14 @@ using Playnite.SDK.Data;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
+using PlayniteAudioSwitcher.Logging;
 
 namespace PlayniteAudioSwitcher
 {
     public sealed class AudioSwitcherPlugin : GenericPlugin
     {
         private readonly ILogger logger;
+        private readonly PluginFileLogger fileLogger;
         private readonly HashSet<ControllerInput> pressedInputs = new HashSet<ControllerInput>();
         private readonly object mediaSourceSessionIdsLock = new object();
         private readonly Dictionary<Guid, AudioDevice> previousDevicesByGame = new Dictionary<Guid, AudioDevice>();
@@ -65,7 +67,12 @@ namespace PlayniteAudioSwitcher
 
         public AudioSwitcherPlugin(IPlayniteAPI playniteApi) : base(playniteApi)
         {
-            logger = LogManager.GetLogger();
+            var playniteLogger = LogManager.GetLogger();
+            fileLogger = new PluginFileLogger(
+                GetPluginUserDataPath(),
+                playniteLogger,
+                () => settings?.EnableVerboseLogging == true);
+            logger = fileLogger;
             Properties = new GenericPluginProperties
             {
                 HasSettings = true
@@ -108,6 +115,117 @@ namespace PlayniteAudioSwitcher
 
             ReloadSettings();
             gameProfiles = new GameAudioProfileStore(GetPluginUserDataPath());
+            logger.Info("Audio Switcher loaded. Support log: " + fileLogger.LogFilePath);
+        }
+
+        public string SupportLogFilePath => fileLogger?.LogFilePath;
+
+        public string SupportLogDirectory => fileLogger?.LogDirectory;
+
+        public bool TryOpenSupportLogFolder(out string error)
+        {
+            error = null;
+            try
+            {
+                var dir = SupportLogDirectory;
+                if (string.IsNullOrWhiteSpace(dir))
+                {
+                    error = "Log directory is not available.";
+                    return false;
+                }
+
+                Directory.CreateDirectory(dir);
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = dir,
+                    UseShellExecute = true
+                });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                logger.Warn(ex, "Failed to open support log folder.");
+                return false;
+            }
+        }
+
+        public bool TryOpenSupportLogFile(out string error)
+        {
+            error = null;
+            try
+            {
+                var path = SupportLogFilePath;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    error = "Log file path is not available.";
+                    return false;
+                }
+
+                Directory.CreateDirectory(Path.GetDirectoryName(path) ?? SupportLogDirectory);
+                if (!File.Exists(path))
+                {
+                    fileLogger.Clear();
+                }
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                logger.Warn(ex, "Failed to open support log file.");
+                return false;
+            }
+        }
+
+        public bool TryCopySupportLogPath(out string error)
+        {
+            error = null;
+            try
+            {
+                var path = SupportLogFilePath;
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    error = "Log file path is not available.";
+                    return false;
+                }
+
+                Clipboard.SetText(path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                logger.Warn(ex, "Failed to copy support log path.");
+                return false;
+            }
+        }
+
+        public bool TryClearSupportLog(out string error)
+        {
+            error = null;
+            try
+            {
+                if (fileLogger == null)
+                {
+                    error = "Log is not available.";
+                    return false;
+                }
+
+                fileLogger.Clear();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                logger.Warn(ex, "Failed to clear support log.");
+                return false;
+            }
         }
 
         public AudioSwitcherSettings Settings => settings;
@@ -1082,6 +1200,11 @@ namespace PlayniteAudioSwitcher
             activeGameAudioSessionProcessIds = new HashSet<uint>();
             Theme?.Refresh();
 
+            if (args.Game != null)
+            {
+                fileLogger?.SessionBegin(args.Game.Id, args.Game.Name);
+            }
+
             if (args.Game == null || args.StartedProcessId <= 0)
             {
                 return;
@@ -1107,6 +1230,11 @@ namespace PlayniteAudioSwitcher
         {
             if (args.Game != null && activeGameId == args.Game.Id)
             {
+                if (fileLogger?.HasOpenSession == true)
+                {
+                    fileLogger.SessionEnd(true);
+                }
+
                 activeGameId = null;
                 activeGameProcessId = 0;
                 activeGameName = null;

@@ -3,6 +3,11 @@
 
 
 
+
+## 1.18.3 — 2026-10-02
+- Added a session-oriented support log with optional detailed logging under Advanced â†’ Maintenance.
+- Added Open log and Clear log actions with confirmation, matching the Metadata AI maintenance flow.
+
 ## 1.18.2 — 2026-09-21
 - Made per-game profile apply and restore automatic plugin behavior instead of optional settings toggles.
 - Simplified the Game profiles settings page with a live name search filter and without cover images in each row.
