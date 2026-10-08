@@ -20,6 +20,9 @@
         ToggleSelectorCommand opens/closes the selector state exposed by the plugin.
         CurrentDeviceIconGeometry and CurrentDeviceName reflect the active output device.
         CurrentDeviceBatteryLabel is empty when Windows does not report a battery.
+        API 1.5.0 also raises LastChangeType "low-battery" and LowBatteryLabel when the
+        active device crosses the on-screen low-battery threshold. Style the built-in
+        toast from AudioSwitcher/theme-bridge.json; see Examples/theme-bridge.json.
     -->
     <Button Command="{PluginSettings Plugin=AudioSwitcher, Path=ToggleSelectorCommand}">
         <StackPanel Orientation="Horizontal">

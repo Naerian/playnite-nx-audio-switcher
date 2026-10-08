@@ -22,14 +22,9 @@ namespace PlayniteAudioSwitcher
         private string favoriteDeviceBName;
         private string preferredOutputDeviceId = string.Empty;
         private string preferredInputDeviceId = string.Empty;
-        private bool showNotifications = true;
-        private bool showOutputDeviceNotifications = true;
-        private bool showInputDeviceNotifications = true;
-        private bool showVolumeNotifications;
-        private bool showMuteNotifications;
-        private bool showGameProfileNotifications = true;
-        private bool showSpatialSoundNotifications = true;
-        private bool showDiagnosticNotifications = true;
+        private AudioNotificationSurface desktopNotification = AudioNotificationPresets.CreateDefault(true);
+        private AudioNotificationSurface fullscreenNotification = AudioNotificationPresets.CreateDefault(false);
+        private string lowBatteryNotificationThreshold = AudioLowBatteryTracker.ThresholdLow;
         private bool quickSwitchEnabled;
         private bool quickSwitchAllDevices = true;
         private bool showMediaSessionIcons = true;
@@ -71,19 +66,14 @@ namespace PlayniteAudioSwitcher
                 InputDeviceAliases = savedSettings.InputDeviceAliases ?? new List<AudioDeviceAlias>();
                 PreferredOutputDeviceId = savedSettings.PreferredOutputDeviceId;
                 PreferredInputDeviceId = savedSettings.PreferredInputDeviceId;
-                ShowNotifications = savedSettings.ShowNotifications;
+                DesktopNotification = savedSettings.DesktopNotification;
+                FullscreenNotification = savedSettings.FullscreenNotification;
+                LowBatteryNotificationThreshold = savedSettings.LowBatteryNotificationThreshold;
                 QuickSwitchEnabled = savedSettings.QuickSwitchEnabled;
                 QuickSwitchAllDevices = savedSettings.QuickSwitchAllDevices;
                 ShowMediaSessionIcons = savedSettings.ShowMediaSessionIcons;
                 SpatialSoundIntegrationEnabled = savedSettings.SpatialSoundIntegrationEnabled;
                 SpatialSoundToolPath = savedSettings.SpatialSoundToolPath;
-                ShowOutputDeviceNotifications = savedSettings.ShowOutputDeviceNotifications;
-                ShowInputDeviceNotifications = savedSettings.ShowInputDeviceNotifications;
-                ShowVolumeNotifications = savedSettings.ShowVolumeNotifications;
-                ShowMuteNotifications = savedSettings.ShowMuteNotifications;
-                ShowGameProfileNotifications = savedSettings.ShowGameProfileNotifications;
-                ShowSpatialSoundNotifications = savedSettings.ShowSpatialSoundNotifications;
-                ShowDiagnosticNotifications = savedSettings.ShowDiagnosticNotifications;
                 VolumeStepPercent = savedSettings.VolumeStepPercent <= 0 ? 2 : savedSettings.VolumeStepPercent;
                 ShowDesktopBatteryIndicator = savedSettings.ShowDesktopBatteryIndicator;
                 ColorDesktopIndicatorByBattery = savedSettings.ColorDesktopIndicatorByBattery;
@@ -111,6 +101,9 @@ namespace PlayniteAudioSwitcher
                 ? "IconAndPercentage"
                 : DesktopBatteryDisplayMode;
             AppearancePreset = SettingsAppearance.Normalize(AppearancePreset);
+            DesktopNotification = NormalizeNotificationSurface(DesktopNotification, true);
+            FullscreenNotification = NormalizeNotificationSurface(FullscreenNotification, false);
+            LowBatteryNotificationThreshold = AudioLowBatteryTracker.NormalizeThreshold(LowBatteryNotificationThreshold);
 
             MigrateSettings(savedSettings != null);
             MigrateFavoritesToAliases();
@@ -264,52 +257,39 @@ namespace PlayniteAudioSwitcher
             };
         }
 
-        public bool ShowNotifications
+        public AudioNotificationSurface DesktopNotification
         {
-            get => showNotifications;
-            set => SetValue(ref showNotifications, value);
+            get => desktopNotification;
+            set => SetValue(ref desktopNotification, value ?? AudioNotificationPresets.CreateDefault(true));
         }
 
-        public bool ShowOutputDeviceNotifications
+        public AudioNotificationSurface FullscreenNotification
         {
-            get => showOutputDeviceNotifications;
-            set => SetValue(ref showOutputDeviceNotifications, value);
+            get => fullscreenNotification;
+            set => SetValue(ref fullscreenNotification, value ?? AudioNotificationPresets.CreateDefault(false));
         }
 
-        public bool ShowInputDeviceNotifications
+        public string LowBatteryNotificationThreshold
         {
-            get => showInputDeviceNotifications;
-            set => SetValue(ref showInputDeviceNotifications, value);
+            get => lowBatteryNotificationThreshold;
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    SetValue(ref lowBatteryNotificationThreshold, AudioLowBatteryTracker.NormalizeThreshold(value));
+                }
+            }
         }
 
-        public bool ShowVolumeNotifications
+        private static AudioNotificationSurface NormalizeNotificationSurface(AudioNotificationSurface surface, bool desktop)
         {
-            get => showVolumeNotifications;
-            set => SetValue(ref showVolumeNotifications, value);
-        }
+            if (surface == null)
+            {
+                return AudioNotificationPresets.CreateDefault(desktop);
+            }
 
-        public bool ShowMuteNotifications
-        {
-            get => showMuteNotifications;
-            set => SetValue(ref showMuteNotifications, value);
-        }
-
-        public bool ShowGameProfileNotifications
-        {
-            get => showGameProfileNotifications;
-            set => SetValue(ref showGameProfileNotifications, value);
-        }
-
-        public bool ShowSpatialSoundNotifications
-        {
-            get => showSpatialSoundNotifications;
-            set => SetValue(ref showSpatialSoundNotifications, value);
-        }
-
-        public bool ShowDiagnosticNotifications
-        {
-            get => showDiagnosticNotifications;
-            set => SetValue(ref showDiagnosticNotifications, value);
+            surface.StylePreset = AudioNotificationPresets.Normalize(surface.StylePreset);
+            return surface;
         }
 
         public bool QuickSwitchEnabled
@@ -943,14 +923,9 @@ namespace PlayniteAudioSwitcher
             InputDeviceAliases = editingClone.InputDeviceAliases;
             PreferredOutputDeviceId = editingClone.PreferredOutputDeviceId;
             PreferredInputDeviceId = editingClone.PreferredInputDeviceId;
-            ShowNotifications = editingClone.ShowNotifications;
-            ShowOutputDeviceNotifications = editingClone.ShowOutputDeviceNotifications;
-            ShowInputDeviceNotifications = editingClone.ShowInputDeviceNotifications;
-            ShowVolumeNotifications = editingClone.ShowVolumeNotifications;
-            ShowMuteNotifications = editingClone.ShowMuteNotifications;
-            ShowGameProfileNotifications = editingClone.ShowGameProfileNotifications;
-            ShowSpatialSoundNotifications = editingClone.ShowSpatialSoundNotifications;
-            ShowDiagnosticNotifications = editingClone.ShowDiagnosticNotifications;
+            DesktopNotification = editingClone.DesktopNotification?.Clone();
+            FullscreenNotification = editingClone.FullscreenNotification?.Clone();
+            LowBatteryNotificationThreshold = editingClone.LowBatteryNotificationThreshold;
             QuickSwitchEnabled = editingClone.QuickSwitchEnabled;
             QuickSwitchAllDevices = editingClone.QuickSwitchAllDevices;
             ShowMediaSessionIcons = editingClone.ShowMediaSessionIcons;
@@ -1074,14 +1049,9 @@ namespace PlayniteAudioSwitcher
                 }).ToList(),
                 PreferredOutputDeviceId = PreferredOutputDeviceId,
                 PreferredInputDeviceId = PreferredInputDeviceId,
-                ShowNotifications = ShowNotifications,
-                ShowOutputDeviceNotifications = ShowOutputDeviceNotifications,
-                ShowInputDeviceNotifications = ShowInputDeviceNotifications,
-                ShowVolumeNotifications = ShowVolumeNotifications,
-                ShowMuteNotifications = ShowMuteNotifications,
-                ShowGameProfileNotifications = ShowGameProfileNotifications,
-                ShowSpatialSoundNotifications = ShowSpatialSoundNotifications,
-                ShowDiagnosticNotifications = ShowDiagnosticNotifications,
+                DesktopNotification = DesktopNotification?.Clone(),
+                FullscreenNotification = FullscreenNotification?.Clone(),
+                LowBatteryNotificationThreshold = LowBatteryNotificationThreshold,
                 QuickSwitchEnabled = QuickSwitchEnabled,
                 QuickSwitchAllDevices = QuickSwitchAllDevices,
                 ShowMediaSessionIcons = ShowMediaSessionIcons,

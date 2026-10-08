@@ -205,7 +205,7 @@ foreach ($required in @(
         throw "Package is missing required file: $required"
     }
 }
-foreach ($requiredPrefix in @("Localization/", "Icons/", "Examples/")) {
+foreach ($requiredPrefix in @("Localization/", "Icons/", "Examples/", "Fonts/")) {
     if (-not ($contents | Where-Object { $_.StartsWith($requiredPrefix, [StringComparison]::Ordinal) })) {
         throw "Package contains no files under $requiredPrefix"
     }

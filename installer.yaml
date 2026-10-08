@@ -1,5 +1,14 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.18.4
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-10-08
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.18.4/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_18_4.pext
+    Changelog:
+      - 'Replaced Playnite popup notifications with on-screen low-battery toasts styled like Controller Manager, including Soft, Compact, Bold, Arcade, Minimal, and Cinematic presets.'
+      - 'Added Appearance settings for Desktop and Fullscreen looks, full toast customization, theme bridge via AudioSwitcher/theme-bridge.json, and layout packs themes can ship under AudioSwitcher/.'
+      - 'Added export and import of shareable .asvisual visual profiles from Appearance > Looks, with imported designs selectable and deletable in the preset list.'
+      - 'Low-battery notices fire once per discharge for the active output or input device, and stay silent when Windows does not report a battery level.'
   - Version: 1.18.3
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-10-02

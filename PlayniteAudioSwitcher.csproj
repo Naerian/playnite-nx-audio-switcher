@@ -6,9 +6,9 @@
     <Nullable>disable</Nullable>
     <AssemblyName>PlayniteAudioSwitcher</AssemblyName>
     <RootNamespace>PlayniteAudioSwitcher</RootNamespace>
-    <Version>1.18.3</Version>
-    <AssemblyVersion>1.18.3.0</AssemblyVersion>
-    <FileVersion>1.18.3.0</FileVersion>
+    <Version>1.18.4</Version>
+    <AssemblyVersion>1.18.4.0</AssemblyVersion>
+    <FileVersion>1.18.4.0</FileVersion>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
@@ -19,6 +19,8 @@
       <Private>false</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <PackageReference Include="PlayniteSDK" Version="6.16.0" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net462" Version="1.0.3" PrivateAssets="all" />
   </ItemGroup>
@@ -31,5 +33,8 @@
     <None Include="Icons\LICENSE-TABLER.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="media\icon.png" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Examples\*.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Examples\theme-bridge.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Examples\theme-layout\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Fonts\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

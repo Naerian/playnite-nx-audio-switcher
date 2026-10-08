@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:PlayniteAudioSwitcher"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              MinWidth="980"
@@ -41,6 +42,80 @@
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontSize" Value="20" />
         </Style>
+        <Style x:Key="AppearanceGroupHeader" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+        <Style x:Key="AppearancePresetItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Foreground" Value="{DynamicResource Narian.Text}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="PresetItemBackground" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="2" TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="PresetItemBackground" Property="Background" Value="{DynamicResource Narian.Hover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="PresetItemBackground" Property="Background" Value="{DynamicResource Narian.Accent}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Narian.AccentOn}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsHeader}" Value="True">
+                    <Setter Property="IsHitTestVisible" Value="False" />
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="Margin" Value="0,8,0,0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="AppearancePresetItemTemplate">
+            <Border x:Name="PresetRow" Padding="7,3" BorderThickness="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="PresetLabel" Text="{Binding DisplayName}" VerticalAlignment="Center" Foreground="{DynamicResource Narian.Text}" />
+                    <Button x:Name="DeletePresetButton" Grid.Column="1" Content="&#xE74D;" FontFamily="Segoe MDL2 Assets"
+                            Width="28" Height="24" MinWidth="28" MinHeight="24" Padding="0"
+                            Margin="16,0,0,0" Tag="{Binding Key}" Click="DeleteImportedVisualProfileClick"
+                            ToolTip="{DynamicResource LOCAS_DeleteImportedDesign}"
+                            FontWeight="Normal" Visibility="Collapsed" />
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}}" Value="True">
+                    <Setter TargetName="PresetLabel" Property="Foreground" Value="{DynamicResource Narian.AccentOn}" />
+                    <Setter TargetName="PresetLabel" Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding CanDelete}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type ComboBoxItem}}, Path=IsVisible, FallbackValue=False}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="DeletePresetButton" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="DeletePresetButton" Property="FontWeight" Value="Normal" />
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding IsHeader}" Value="True">
+                    <Setter TargetName="PresetRow" Property="BorderBrush" Value="{DynamicResource Narian.Accent}" />
+                    <Setter TargetName="PresetRow" Property="BorderThickness" Value="0,0,0,1" />
+                    <Setter TargetName="PresetRow" Property="Padding" Value="7,3,7,6" />
+                    <Setter TargetName="PresetLabel" Property="Foreground" Value="{DynamicResource Narian.Accent}" />
+                    <Setter TargetName="PresetLabel" Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
         <Style x:Key="HintText" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource GlyphBrush}" />
             <Setter Property="FontSize" Value="12" />
@@ -365,6 +440,64 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="FieldHintText" TargetType="TextBlock" BasedOn="{StaticResource HintText}">
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="Opacity" Value="0.78" />
+        </Style>
+        <!-- Compact nested expanders (no hint row), matching Controller Manager. -->
+        <Style x:Key="AppearanceSectionExpander" TargetType="Expander" BasedOn="{StaticResource SettingsExpander}">
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <DockPanel LastChildFill="True">
+                            <Border x:Name="HeaderChrome" DockPanel.Dock="Top" MinHeight="40" ClipToBounds="False" Cursor="Hand">
+                                <Grid ClipToBounds="False">
+                                    <Rectangle x:Name="ExpanderFill" RadiusX="4" RadiusY="4" Fill="{DynamicResource Narian.Surface}" />
+                                    <Rectangle x:Name="ExpanderAccent" Width="4" HorizontalAlignment="Left" RadiusX="4" RadiusY="4" Fill="Transparent" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <ToggleButton Style="{StaticResource ExpanderHeaderButton}"
+                                                      Foreground="{DynamicResource TextBrush}"
+                                                      IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                            <ContentPresenter x:Name="ExpanderHeader" ContentSource="Header" RecognizesAccessKey="True"
+                                                              Margin="16,8,8,8" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                                                              TextElement.Foreground="{DynamicResource TextBrush}" />
+                                        </ToggleButton>
+                                        <Button x:Name="ExpanderChevron" Grid.Column="1" Style="{StaticResource IconSquareButton}"
+                                                VerticalAlignment="Center" Click="ExpanderChevronButton_OnClick">
+                                            <Path x:Name="ExpanderArrow" Width="12" Height="7" Stretch="Uniform" Data="M0,0 L6,6 L12,0"
+                                                  Stroke="{DynamicResource TextBrush}" StrokeThickness="1.75"
+                                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <Border x:Name="ExpanderContent" Visibility="Collapsed" Padding="16,12,16,12"
+                                    TextElement.Foreground="{DynamicResource TextBrush}" TextElement.FontSize="14">
+                                <ContentPresenter HorizontalAlignment="Stretch" />
+                            </Border>
+                        </DockPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger SourceName="HeaderChrome" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource Narian.Hover}" />
+                            </Trigger>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="ExpanderContent" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="ExpanderFill" Property="Fill" Value="{DynamicResource Narian.Hover}" />
+                                <Setter TargetName="ExpanderAccent" Property="Fill" Value="{DynamicResource HighlightGlyphBrush}" />
+                                <Setter TargetName="ExpanderArrow" Property="Data" Value="M0,6 L6,0 L12,6" />
+                                <Setter TargetName="ExpanderHeader" Property="TextElement.FontWeight" Value="SemiBold" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="SettingsNavigationTabItem" TargetType="TabItem">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -427,7 +560,7 @@
                                 <DockPanel LastChildFill="True">
                                     <TextBlock DockPanel.Dock="Top" Text="{TemplateBinding Tag}"
                                                Foreground="{DynamicResource Narian.Accent}" FontSize="14" FontWeight="SemiBold"
-                                               Margin="8,8,8,16" TextWrapping="Wrap" />
+                                               Margin="16,16,16,16" TextWrapping="Wrap" />
                                     <StackPanel x:Name="HeaderPanel" IsItemsHost="True" />
                                 </DockPanel>
                             </Border>
@@ -508,6 +641,119 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="NotifChoicePanel" TargetType="StackPanel">
+            <Setter Property="Width" Value="240" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,0,16,16" />
+        </Style>
+        <Style x:Key="NotifSliderPanel" TargetType="StackPanel" BasedOn="{StaticResource CompactSliderPanel}">
+            <Setter Property="Margin" Value="0,0,16,16" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+        <Style x:Key="NotifColorPanel" TargetType="StackPanel">
+            <Setter Property="Width" Value="240" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,0,16,16" />
+        </Style>
+        <Style x:Key="NotifGroupHeader" TargetType="TextBlock" BasedOn="{StaticResource BodyText}">
+            <Setter Property="Foreground" Value="{DynamicResource Narian.Accent}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,8,0,12" />
+        </Style>
+        <Style x:Key="ColorPickerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="38" />
+            <Setter Property="MinWidth" Value="38" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="6,0,0,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <local:HexColorBrushConverter x:Key="HexColorBrushConverter" />
+        <local:NotificationFontPreviewConverter x:Key="NotificationFontPreviewConverter" />
+        <DataTemplate x:Key="NotificationSurfaceEditor" DataType="{x:Type local:AudioNotificationSurface}">
+            <StackPanel>
+<Expander Style="{StaticResource AppearanceSectionExpander}" IsExpanded="False" Header="{DynamicResource LOCAS_NotifSectionAlerts}" Margin="0,8,0,8"><StackPanel><CheckBox Content="{DynamicResource LOCAS_ShowLowBatteryNotifications}" IsChecked="{Binding ShowLowBatteryNotifications}"/>
+<StackPanel Margin="0,12,0,0"><TextBlock Text="{DynamicResource LOCAS_LowBatteryNotificationThreshold}" Style="{StaticResource FieldLabel}"/><ComboBox MinWidth="240" HorizontalAlignment="Left" SelectedValue="{Binding DataContext.LowBatteryNotificationThreshold, RelativeSource={RelativeSource AncestorType=UserControl}}" SelectedValuePath="Tag"><ComboBoxItem Tag="Low" Content="{DynamicResource LOCAS_LowBatteryThresholdLow}"/><ComboBoxItem Tag="Empty" Content="{DynamicResource LOCAS_LowBatteryThresholdEmpty}"/></ComboBox></StackPanel>
+<TextBlock Text="{DynamicResource LOCAS_LowBatteryNotificationHelp}" Style="{StaticResource HintText}" Margin="0,8,0,0"/></StackPanel></Expander>
+<Expander Style="{StaticResource AppearanceSectionExpander}" IsExpanded="False" Header="{DynamicResource LOCAS_NotifSectionLayout}" Margin="0,0,0,8"><StackPanel><WrapPanel><StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotificationPosition}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding Position}" SelectedValuePath="Tag"><ComboBoxItem Tag="TopRight" Content="{DynamicResource LOCAS_PositionTopRight}"/><ComboBoxItem Tag="TopLeft" Content="{DynamicResource LOCAS_PositionTopLeft}"/><ComboBoxItem Tag="BottomRight" Content="{DynamicResource LOCAS_PositionBottomRight}"/><ComboBoxItem Tag="BottomLeft" Content="{DynamicResource LOCAS_PositionBottomLeft}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifAnimation}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding Animation}" SelectedValuePath="Tag"><ComboBoxItem Tag="None" Content="{DynamicResource LOCAS_NotifAnimationNone}"/><ComboBoxItem Tag="Fade" Content="{DynamicResource LOCAS_NotifAnimationFade}"/><ComboBoxItem Tag="Slide" Content="{DynamicResource LOCAS_NotifAnimationSlide}"/><ComboBoxItem Tag="Scale" Content="{DynamicResource LOCAS_NotifAnimationScale}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifWidth}"/><TextBlock DockPanel.Dock="Right" Text="{Binding Width}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="280" Maximum="900" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding Width, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="280–900" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifScale}"/><TextBlock DockPanel.Dock="Right" Text="{Binding ScalePercent}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="80" Maximum="160" TickFrequency="2" IsSnapToTickEnabled="True" Value="{Binding ScalePercent, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="80–160" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotificationDuration}"/><TextBlock DockPanel.Dock="Right" Text="{Binding DurationMilliseconds}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="2000" Maximum="15000" TickFrequency="100" IsSnapToTickEnabled="True" Value="{Binding DurationMilliseconds, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="2000–15000" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifScreenMargin}"/><TextBlock DockPanel.Dock="Right" Text="{Binding ScreenMargin}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="8" Maximum="64" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding ScreenMargin, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="8–64" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifShowShadow}" IsChecked="{Binding ShowShadow}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel></WrapPanel></StackPanel></Expander>
+<Expander Style="{StaticResource AppearanceSectionExpander}" IsExpanded="False" Header="{DynamicResource LOCAS_NotifSectionContent}" Margin="0,0,0,8"><StackPanel>
+<WrapPanel><StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifShowTitle}" IsChecked="{Binding ShowTitle}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifUppercaseTitle}" IsChecked="{Binding UppercaseTitle}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifTextOrder}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding TextOrder}" SelectedValuePath="Tag"><ComboBoxItem Tag="TitleFirst" Content="{DynamicResource LOCAS_NotifTextOrderTitleFirst}"/><ComboBoxItem Tag="MessageFirst" Content="{DynamicResource LOCAS_NotifTextOrderMessageFirst}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifTextAlignment}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding TextAlignment}" SelectedValuePath="Tag"><ComboBoxItem Tag="Left" Content="{DynamicResource LOCAS_NotifAlignLeft}"/><ComboBoxItem Tag="Center" Content="{DynamicResource LOCAS_NotifAlignCenter}"/><ComboBoxItem Tag="Right" Content="{DynamicResource LOCAS_NotifAlignRight}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifTitleFont}" Style="{StaticResource FieldLabel}"/><ComboBox ItemsSource="{x:Static local:AudioNotificationFontLists.Families}" SelectedItem="{Binding TitleFontFamily}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" FontFamily="{Binding Converter={StaticResource NotificationFontPreviewConverter}}" FontSize="15"/></DataTemplate></ComboBox.ItemTemplate></ComboBox><ComboBox SelectedValue="{Binding TitleFontWeight}" SelectedValuePath="Tag" Margin="0,6,0,0"><ComboBoxItem Tag="Regular" Content="{DynamicResource LOCAS_NotifWeightRegular}"/><ComboBoxItem Tag="SemiBold" Content="{DynamicResource LOCAS_NotifWeightSemiBold}"/><ComboBoxItem Tag="Bold" Content="{DynamicResource LOCAS_NotifWeightBold}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifMessageFont}" Style="{StaticResource FieldLabel}"/><ComboBox ItemsSource="{x:Static local:AudioNotificationFontLists.Families}" SelectedItem="{Binding MessageFontFamily}"><ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" FontFamily="{Binding Converter={StaticResource NotificationFontPreviewConverter}}" FontSize="15"/></DataTemplate></ComboBox.ItemTemplate></ComboBox><ComboBox SelectedValue="{Binding MessageFontWeight}" SelectedValuePath="Tag" Margin="0,6,0,0"><ComboBoxItem Tag="Regular" Content="{DynamicResource LOCAS_NotifWeightRegular}"/><ComboBoxItem Tag="SemiBold" Content="{DynamicResource LOCAS_NotifWeightSemiBold}"/><ComboBoxItem Tag="Bold" Content="{DynamicResource LOCAS_NotifWeightBold}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifTitleSize}"/><TextBlock DockPanel.Dock="Right" Text="{Binding TitleFontSize}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="12" Maximum="36" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding TitleFontSize, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="12–36" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifMessageSize}"/><TextBlock DockPanel.Dock="Right" Text="{Binding MessageFontSize}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="10" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding MessageFontSize, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="10–30" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifMessageMaxLines}"/><TextBlock DockPanel.Dock="Right" Text="{Binding MessageMaxLines}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="1" Maximum="6" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding MessageMaxLines, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="1–6" Style="{StaticResource SliderRangeText}"/></StackPanel></WrapPanel>
+
+<WrapPanel><StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifIconPosition}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding IconPosition}" SelectedValuePath="Tag"><ComboBoxItem Tag="Left" Content="{DynamicResource LOCAS_NotifAlignLeft}"/><ComboBoxItem Tag="Right" Content="{DynamicResource LOCAS_NotifAlignRight}"/><ComboBoxItem Tag="Top" Content="{DynamicResource LOCAS_NotifSideTop}"/><ComboBoxItem Tag="Bottom" Content="{DynamicResource LOCAS_NotifSideBottom}"/><ComboBoxItem Tag="Hidden" Content="{DynamicResource LOCAS_NotifIconHidden}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifIconSize}"/><TextBlock DockPanel.Dock="Right" Text="{Binding IconSize}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="16" Maximum="128" TickFrequency="2" IsSnapToTickEnabled="True" Value="{Binding IconSize, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="16–128" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifIconSpacing}"/><TextBlock DockPanel.Dock="Right" Text="{Binding IconSpacing}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding IconSpacing, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–40" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifShowIconContainer}" IsChecked="{Binding ShowIconContainer}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding ShowIconContainer}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifContainerPadding}"/><TextBlock DockPanel.Dock="Right" Text="{Binding IconContainerPadding}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding IconContainerPadding, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–24" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding ShowIconContainer}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifContainerThickness}"/><TextBlock DockPanel.Dock="Right" Text="{Binding IconContainerBorderThickness}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="8" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding IconContainerBorderThickness, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–8" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding ShowIconContainer}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifContainerRadius}"/><TextBlock DockPanel.Dock="Right" Text="{Binding IconContainerCornerRadius}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding IconContainerCornerRadius, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–40" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}" IsEnabled="{Binding ShowIconContainer}"><TextBlock Text="{DynamicResource LOCAS_NotifContainerColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="IconContainerColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding IconContainerColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding IconContainerColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}" IsEnabled="{Binding ShowIconContainer}"><TextBlock Text="{DynamicResource LOCAS_NotifContainerBorderColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="IconContainerBorderColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding IconContainerBorderColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding IconContainerBorderColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel></WrapPanel></StackPanel></Expander>
+<Expander Style="{StaticResource AppearanceSectionExpander}" IsExpanded="False" Header="{DynamicResource LOCAS_NotifSectionShape}" Margin="0,0,0,8"><StackPanel>
+<WrapPanel><StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifPadding}"/><TextBlock DockPanel.Dock="Right" Text="{Binding Padding}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Padding, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–40" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifElementSpacing}"/><TextBlock DockPanel.Dock="Right" Text="{Binding ElementSpacing}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding ElementSpacing, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–40" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifCornerRadius}"/><TextBlock DockPanel.Dock="Right" Text="{Binding CornerRadius}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding CornerRadius, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–40" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><TextBlock Text="{DynamicResource LOCAS_NotifAccentMode}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding AccentMode}" SelectedValuePath="Tag"><ComboBoxItem Tag="IconAndBorder" Content="{DynamicResource LOCAS_NotifAccentIconAndBorder}"/><ComboBoxItem Tag="IconOnly" Content="{DynamicResource LOCAS_NotifAccentIconOnly}"/><ComboBoxItem Tag="TintedBackground" Content="{DynamicResource LOCAS_NotifAccentTinted}"/><ComboBoxItem Tag="SolidBackground" Content="{DynamicResource LOCAS_NotifAccentSolid}"/></ComboBox></StackPanel></WrapPanel>
+
+<WrapPanel><StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifShowBorder}" IsChecked="{Binding ShowBorder}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}" IsEnabled="{Binding ShowBorder}"><CheckBox Content="{DynamicResource LOCAS_NotifIndependentBorders}" IsChecked="{Binding UseIndependentBorders}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}" IsEnabled="{Binding ShowBorder}"><TextBlock Text="{DynamicResource LOCAS_NotifBorderSide}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding BorderPosition}" SelectedValuePath="Tag"><ComboBoxItem Tag="Left" Content="{DynamicResource LOCAS_NotifAlignLeft}"/><ComboBoxItem Tag="Top" Content="{DynamicResource LOCAS_NotifSideTop}"/><ComboBoxItem Tag="Right" Content="{DynamicResource LOCAS_NotifAlignRight}"/><ComboBoxItem Tag="Bottom" Content="{DynamicResource LOCAS_NotifSideBottom}"/><ComboBoxItem Tag="Full" Content="{DynamicResource LOCAS_NotifSideFull}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding ShowBorder}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifBorderThickness}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderThickness}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderThickness, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–10" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseIndependentBorders}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifBorderLeft}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderLeftThickness}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="12" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderLeftThickness, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–12" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseIndependentBorders}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifBorderTop}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderTopThickness}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="12" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderTopThickness, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–12" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseIndependentBorders}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifBorderRight}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderRightThickness}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="12" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderRightThickness, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–12" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseIndependentBorders}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifBorderBottom}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderBottomThickness}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="12" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderBottomThickness, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–12" Style="{StaticResource SliderRangeText}"/></StackPanel></WrapPanel>
+
+<WrapPanel><StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifBorderGradient}" IsChecked="{Binding UseBorderGradient}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseBorderGradient}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifBorderGradientAngle}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderGradientAngle}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="359" TickFrequency="5" Value="{Binding BorderGradientAngle, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–359" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}"><CheckBox Content="{DynamicResource LOCAS_NotifBorderGlow}" IsChecked="{Binding ShowBorderGlow}" VerticalAlignment="Center" Margin="0,6,0,0"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding ShowBorderGlow}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifGlowBlur}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderGlowBlur}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderGlowBlur, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–40" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding ShowBorderGlow}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifGlowOpacity}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BorderGlowOpacity}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding BorderGlowOpacity, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–100" Style="{StaticResource SliderRangeText}"/></StackPanel></WrapPanel></StackPanel></Expander>
+<Expander Style="{StaticResource AppearanceSectionExpander}" IsExpanded="False" Header="{DynamicResource LOCAS_NotifSectionColors}" Margin="0,0,0,8"><StackPanel>
+<TextBlock Text="{DynamicResource LOCAS_NotifSectionImage}" Style="{StaticResource AppearanceGroupHeader}"/>
+<StackPanel Margin="0,0,0,20">
+<CheckBox Content="{DynamicResource LOCAS_NotifUseBackgroundImage}" IsChecked="{Binding UseBackgroundImage}"/>
+<DockPanel Margin="0,10,0,0" IsEnabled="{Binding UseBackgroundImage}"><Button DockPanel.Dock="Right" Content="{DynamicResource LOCAS_NotifClearImage}" Margin="8,0,0,0" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContentControl}}" Click="ClearNotificationBackgroundImageClick"/><Button DockPanel.Dock="Right" Content="{DynamicResource LOCAS_NotifSelectImage}" Margin="8,0,0,0" Tag="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContentControl}}" Click="SelectNotificationBackgroundImageClick"/><Border Style="{StaticResource SummaryPill}" Padding="10,6" HorizontalAlignment="Stretch"><TextBlock Text="{Binding BackgroundImagePath}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center" HorizontalAlignment="Left"/></Border></DockPanel>
+<TextBlock Text="{DynamicResource LOCAS_NotifImageHint}" Style="{StaticResource HintText}" Margin="0,6,0,12"/>
+<WrapPanel><StackPanel Style="{StaticResource NotifChoicePanel}" IsEnabled="{Binding UseBackgroundImage}"><TextBlock Text="{DynamicResource LOCAS_NotifImageFit}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding BackgroundImageStretch}" SelectedValuePath="Tag"><ComboBoxItem Tag="UniformToFill" Content="{DynamicResource LOCAS_NotifImageFitCover}"/><ComboBoxItem Tag="Uniform" Content="{DynamicResource LOCAS_NotifImageFitContain}"/><ComboBoxItem Tag="Fill" Content="{DynamicResource LOCAS_NotifImageFitStretch}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}" IsEnabled="{Binding UseBackgroundImage}"><TextBlock Text="{DynamicResource LOCAS_NotifHorizontalAlignment}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding BackgroundImageHorizontalAlignment}" SelectedValuePath="Tag"><ComboBoxItem Tag="Left" Content="{DynamicResource LOCAS_NotifAlignLeft}"/><ComboBoxItem Tag="Center" Content="{DynamicResource LOCAS_NotifAlignCenter}"/><ComboBoxItem Tag="Right" Content="{DynamicResource LOCAS_NotifAlignRight}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifChoicePanel}" IsEnabled="{Binding UseBackgroundImage}"><TextBlock Text="{DynamicResource LOCAS_NotifVerticalAlignment}" Style="{StaticResource FieldLabel}"/><ComboBox SelectedValue="{Binding BackgroundImageVerticalAlignment}" SelectedValuePath="Tag"><ComboBoxItem Tag="Top" Content="{DynamicResource LOCAS_NotifSideTop}"/><ComboBoxItem Tag="Center" Content="{DynamicResource LOCAS_NotifAlignCenter}"/><ComboBoxItem Tag="Bottom" Content="{DynamicResource LOCAS_NotifSideBottom}"/></ComboBox></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseBackgroundImage}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifImageOpacity}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BackgroundImageOpacity}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding BackgroundImageOpacity, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–100" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseBackgroundImage}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifImageTintOpacity}"/><TextBlock DockPanel.Dock="Right" Text="{Binding BackgroundImageTintOpacity}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding BackgroundImageTintOpacity, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–100" Style="{StaticResource SliderRangeText}"/></StackPanel></WrapPanel>
+</StackPanel>
+<TextBlock Text="{DynamicResource LOCAS_NotifGroupBase}" Style="{StaticResource AppearanceGroupHeader}"/><TextBlock Text="{DynamicResource LOCAS_NotifThemeOverrideHint}" Style="{StaticResource HintText}" Margin="0,0,0,8"/>
+
+<WrapPanel><StackPanel Style="{StaticResource NotifColorPanel}"><TextBlock Text="{DynamicResource LOCAS_NotifBackgroundColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="BackgroundColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding BackgroundColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding BackgroundColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}"><CheckBox Content="{DynamicResource LOCAS_NotifUseGradient}" IsChecked="{Binding UseGradient}" Margin="0,0,0,4"/><DockPanel IsEnabled="{Binding UseGradient}"><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="GradientColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding GradientColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding GradientColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifSliderPanel}" IsEnabled="{Binding UseGradient}"><DockPanel><TextBlock Text="{DynamicResource LOCAS_NotifGradientAngle}"/><TextBlock DockPanel.Dock="Right" Text="{Binding GradientAngle}" Style="{StaticResource SliderValueText}"/></DockPanel><Slider Minimum="0" Maximum="359" TickFrequency="5" Value="{Binding GradientAngle, UpdateSourceTrigger=PropertyChanged}"/><TextBlock Text="0–359" Style="{StaticResource SliderRangeText}"/></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}"><TextBlock Text="{DynamicResource LOCAS_NotifTextColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="TextColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding TextColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding TextColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}"><TextBlock Text="{DynamicResource LOCAS_NotifSecondaryTextColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="SecondaryTextColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding SecondaryTextColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding SecondaryTextColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel></WrapPanel>
+
+<WrapPanel><StackPanel Style="{StaticResource NotifColorPanel}"><TextBlock Text="{DynamicResource LOCAS_NotifLowBatteryColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="LowBatteryColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding LowBatteryColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding LowBatteryColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}"><CheckBox Content="{DynamicResource LOCAS_NotifUseAlertBackground}" IsChecked="{Binding UseStateBackgroundColors}" Margin="0,0,0,4"/><DockPanel IsEnabled="{Binding UseStateBackgroundColors}"><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="LowBatteryBackgroundColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding LowBatteryBackgroundColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding LowBatteryBackgroundColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}"><CheckBox Content="{DynamicResource LOCAS_NotifUseAlertBorder}" IsChecked="{Binding UseStateBorderColors}" Margin="0,0,0,4"/><DockPanel IsEnabled="{Binding UseStateBorderColors}"><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="LowBatteryBorderColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding LowBatteryBorderColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding LowBatteryBorderColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel></WrapPanel>
+
+<WrapPanel><StackPanel Style="{StaticResource NotifColorPanel}" IsEnabled="{Binding UseBorderGradient}"><TextBlock Text="{DynamicResource LOCAS_NotifBorderGradientStart}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="BorderGradientStartColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding BorderGradientStartColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding BorderGradientStartColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}" IsEnabled="{Binding UseBorderGradient}"><TextBlock Text="{DynamicResource LOCAS_NotifBorderGradientEnd}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="BorderGradientEndColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding BorderGradientEndColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding BorderGradientEndColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel>
+<StackPanel Style="{StaticResource NotifColorPanel}" IsEnabled="{Binding ShowBorderGlow}"><TextBlock Text="{DynamicResource LOCAS_NotifGlowColor}" Style="{StaticResource FieldLabel}"/><DockPanel><Button DockPanel.Dock="Right" Style="{StaticResource ColorPickerButton}" Tag="BorderGlowColor" Click="SelectColorClick"><Border Width="18" Height="18" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource Narian.Border}" Background="{Binding BorderGlowColor, Converter={StaticResource HexColorBrushConverter}}"/></Button><TextBox Text="{Binding BorderGlowColor, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/></DockPanel></StackPanel></WrapPanel></StackPanel></Expander>
+            </StackPanel>
+        </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -521,7 +767,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,8,8,16">
+                    <StackPanel Margin="16,16,16,16">
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <DockPanel LastChildFill="True">
@@ -652,7 +898,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_OutputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -692,7 +938,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_InputDevicesTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -747,7 +993,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_DesktopIntegrationTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -805,7 +1051,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_MenuSwitchCustom}" Style="{StaticResource SectionHeaderText}" />
@@ -907,7 +1153,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_GameProfilesTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -935,7 +1181,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SpatialSoundTitle}" Style="{StaticResource SectionHeaderText}" />
@@ -1009,58 +1255,132 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource TabGlyph}" Text="&#xEA8F;" />
-                        <TextBlock Text="{DynamicResource LOCAS_NotificationsTitle}" Style="{StaticResource TabHeaderLabel}" />
+                        <TextBlock Style="{StaticResource TabGlyph}" Text="&#xE790;" />
+                        <TextBlock Text="{DynamicResource LOCAS_AppearanceTitle}" Style="{StaticResource TabHeaderLabel}" />
                     </StackPanel>
                 </TabItem.Header>
-                <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,8,8,16">
-                        <StackPanel Style="{StaticResource PageSection}">
-                            <Border Style="{StaticResource PageHeader}">
-                                <TextBlock Text="{DynamicResource LOCAS_NotificationsTitle}" Style="{StaticResource SectionHeaderText}" />
-                            </Border>
-                            <TextBlock Text="{DynamicResource LOCAS_NotificationsHelp}" Style="{StaticResource SectionSubtitleText}" />
-                        </StackPanel>
-                        <CheckBox Content="{DynamicResource LOCAS_ShowNotification}"
-                                  IsChecked="{Binding ShowNotifications}" />
-                        <TextBlock Text="{DynamicResource LOCAS_ShowNotificationHelp}"
-                                   Style="{StaticResource IndentedHintText}" />
-                        <Expander Style="{StaticResource SettingsExpander}"
-                                  IsExpanded="False"
-                                  Header="{DynamicResource LOCAS_NotificationCategories}">
-                            <StackPanel IsEnabled="{Binding ShowNotifications}">
-                                <CheckBox Content="{DynamicResource LOCAS_NotifyOutputDevice}"
-                                          IsChecked="{Binding ShowOutputDeviceNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifyOutputDeviceHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                                <CheckBox Content="{DynamicResource LOCAS_NotifyInputDevice}"
-                                          IsChecked="{Binding ShowInputDeviceNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifyInputDeviceHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                                <CheckBox Content="{DynamicResource LOCAS_NotifyVolume}"
-                                          IsChecked="{Binding ShowVolumeNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifyVolumeHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                                <CheckBox Content="{DynamicResource LOCAS_NotifyMute}"
-                                          IsChecked="{Binding ShowMuteNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifyMuteHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                                <CheckBox Content="{DynamicResource LOCAS_NotifyGameProfile}"
-                                          IsChecked="{Binding ShowGameProfileNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifyGameProfileHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                                <CheckBox Content="{DynamicResource LOCAS_NotifySpatialSound}"
-                                          IsChecked="{Binding ShowSpatialSoundNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifySpatialSoundHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                                <CheckBox Content="{DynamicResource LOCAS_NotifyDiagnostics}"
-                                          IsChecked="{Binding ShowDiagnosticNotifications}" />
-                                <TextBlock Text="{DynamicResource LOCAS_NotifyDiagnosticsHelp}"
-                                           Style="{StaticResource IndentedHintText}" />
-                            </StackPanel>
-                        </Expander>
-                    </StackPanel>
-                </ScrollViewer>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <TabControl Style="{StaticResource SettingsNavigationTabControl}"
+                                Tag="{DynamicResource LOCAS_AppearanceTitle}"
+                                SelectionChanged="RootTabsSelectionChanged">
+                        <TabItem>
+                            <TabItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource TabGlyph}" Text="&#xE790;" />
+                                    <TextBlock Text="{DynamicResource LOCAS_AppearanceLooks}" Style="{StaticResource TabHeaderLabel}" />
+                                </StackPanel>
+                            </TabItem.Header>
+                            <ScrollViewer Style="{StaticResource FillScrollViewer}">
+                                <StackPanel Margin="16,16,16,16">
+                                    <StackPanel Style="{StaticResource PageSection}">
+                                        <Border Style="{StaticResource PageHeader}">
+                                            <TextBlock Text="{DynamicResource LOCAS_AppearanceLooks}" Style="{StaticResource SectionHeaderText}" />
+                                        </Border>
+                                        <TextBlock Text="{DynamicResource LOCAS_AppearanceLooksHelp}" Style="{StaticResource SectionSubtitleText}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{DynamicResource LOCAS_VisualProfileHelp}" Style="{StaticResource FieldHintText}" Margin="0,0,0,8" />
+                                    <WrapPanel Margin="0,0,0,16">
+                                        <Button Content="{DynamicResource LOCAS_ExportVisualProfile}" MinWidth="180" Margin="0,0,8,8" Click="ExportVisualProfileClick" />
+                                        <Button Content="{DynamicResource LOCAS_ImportVisualProfile}" MinWidth="180" Margin="0,0,8,8" Click="ImportVisualProfileClick" />
+                                    </WrapPanel>
+                                    <TextBlock Text="{DynamicResource LOCAS_AppearanceLooksDesktop}" Style="{StaticResource AppearanceGroupHeader}" Margin="0,0,0,4" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <ComboBox x:Name="DesktopNotificationPresetSelector" Width="360" HorizontalAlignment="Left"
+                                                  IsSynchronizedWithCurrentItem="False"
+                                                  ItemContainerStyle="{StaticResource AppearancePresetItemStyle}"
+                                                  ItemTemplate="{StaticResource AppearancePresetItemTemplate}"
+                                                  SelectedValuePath="Key"
+                                                  SelectionChanged="NotificationPresetSelector_OnSelectionChanged" />
+                                        <Button Content="{DynamicResource LOCAS_LooksPreview}" Tag="Desktop" MinWidth="88" Margin="8,0,0,0" VerticalAlignment="Center" Click="PreviewNotificationClick" />
+                                    </StackPanel>
+                                    <CheckBox Content="{DynamicResource LOCAS_UsePlayniteThemeAppearance}" IsChecked="{Binding DesktopNotification.UsePlayniteThemeAppearance}" Margin="0,0,0,16" />
+                                    <TextBlock Text="{DynamicResource LOCAS_AppearanceLooksFullscreen}" Style="{StaticResource AppearanceGroupHeader}" Margin="0,0,0,4" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <ComboBox x:Name="FullscreenNotificationPresetSelector" Width="360" HorizontalAlignment="Left"
+                                                  IsSynchronizedWithCurrentItem="False"
+                                                  ItemContainerStyle="{StaticResource AppearancePresetItemStyle}"
+                                                  ItemTemplate="{StaticResource AppearancePresetItemTemplate}"
+                                                  SelectedValuePath="Key"
+                                                  SelectionChanged="NotificationPresetSelector_OnSelectionChanged" />
+                                        <Button Content="{DynamicResource LOCAS_LooksPreview}" Tag="Fullscreen" MinWidth="88" Margin="8,0,0,0" VerticalAlignment="Center" Click="PreviewNotificationClick" />
+                                    </StackPanel>
+                                    <CheckBox Content="{DynamicResource LOCAS_UsePlayniteThemeAppearance}" IsChecked="{Binding FullscreenNotification.UsePlayniteThemeAppearance}" Margin="0,0,0,8" />
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource TabGlyph}" Text="&#xE7F4;" />
+                                    <TextBlock Text="{DynamicResource LOCAS_OnScreenNotificationsTitle}" Style="{StaticResource TabHeaderLabel}" />
+                                </StackPanel>
+                            </TabItem.Header>
+                            <Grid>
+                                <TabControl Style="{StaticResource TopTabs}"
+                                            Tag="{DynamicResource LOCAS_OnScreenNotificationsTitle}"
+                                            Margin="16,8,16,0"
+                                            SelectionChanged="RootTabsSelectionChanged">
+                                    <TabItem>
+                                        <TabItem.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource TabGlyph}" Text="&#xE7F4;" />
+                                                <TextBlock Text="{DynamicResource LOCAS_OnScreenNotificationDesktop}" Style="{StaticResource TabHeaderLabel}" />
+                                            </StackPanel>
+                                        </TabItem.Header>
+                                        <ScrollViewer Style="{StaticResource FillScrollViewer}">
+                                            <StackPanel Margin="16,16,16,16">
+                                                <StackPanel Style="{StaticResource PageSection}">
+                                                    <Border Style="{StaticResource PageHeader}">
+                                                        <TextBlock Text="{DynamicResource LOCAS_DesktopNotificationsTitle}" Style="{StaticResource SectionHeaderText}" />
+                                                    </Border>
+                                                    <TextBlock Text="{DynamicResource LOCAS_OnScreenNotificationsHelp}" Style="{StaticResource SectionSubtitleText}" />
+                                                </StackPanel>
+                                                <TextBlock Text="{DynamicResource LOCAS_CopyFullscreenStyleToDesktop}" Style="{StaticResource AppearanceGroupHeader}" Margin="0,0,0,4" />
+                                                <TextBlock Text="{DynamicResource LOCAS_CopyFullscreenStyleHelp}" Style="{StaticResource FieldHintText}" Margin="0,0,0,8" />
+                                                <Button Content="{DynamicResource LOCAS_CopyFullscreenStyleToDesktop}" Tag="Desktop"
+                                                        HorizontalAlignment="Left" Margin="0,0,0,16" Click="CopyNotificationStyleClick" />
+                                                <TextBlock Text="{DynamicResource LOCAS_PreviewNotification}" Style="{StaticResource AppearanceGroupHeader}" Margin="0,0,0,8" />
+                                                <WrapPanel Margin="0,0,0,8">
+                                                    <Button Content="{DynamicResource LOCAS_LowBatteryToast}" Tag="Desktop"
+                                                            Margin="0,0,8,8" VerticalAlignment="Center" Click="PreviewNotificationClick" />
+                                                </WrapPanel>
+                                                <ContentControl x:Name="DesktopNotificationStyleEditor" Content="{Binding DesktopNotification}" Tag="Desktop" ContentTemplate="{StaticResource NotificationSurfaceEditor}" IsTabStop="False" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
+                                    <TabItem>
+                                        <TabItem.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource TabGlyph}" Text="&#xE7F4;" />
+                                                <TextBlock Text="{DynamicResource LOCAS_OnScreenNotificationFullscreen}" Style="{StaticResource TabHeaderLabel}" />
+                                            </StackPanel>
+                                        </TabItem.Header>
+                                        <ScrollViewer Style="{StaticResource FillScrollViewer}">
+                                            <StackPanel Margin="16,16,16,16">
+                                                <StackPanel Style="{StaticResource PageSection}">
+                                                    <Border Style="{StaticResource PageHeader}">
+                                                        <TextBlock Text="{DynamicResource LOCAS_FullscreenNotificationsTitle}" Style="{StaticResource SectionHeaderText}" />
+                                                    </Border>
+                                                    <TextBlock Text="{DynamicResource LOCAS_OnScreenNotificationsHelp}" Style="{StaticResource SectionSubtitleText}" />
+                                                </StackPanel>
+                                                <TextBlock Text="{DynamicResource LOCAS_CopyDesktopStyleToFullscreen}" Style="{StaticResource AppearanceGroupHeader}" Margin="0,0,0,4" />
+                                                <TextBlock Text="{DynamicResource LOCAS_CopyDesktopStyleHelp}" Style="{StaticResource FieldHintText}" Margin="0,0,0,8" />
+                                                <Button Content="{DynamicResource LOCAS_CopyDesktopStyleToFullscreen}" Tag="Fullscreen"
+                                                        HorizontalAlignment="Left" Margin="0,0,0,16" Click="CopyNotificationStyleClick" />
+                                                <TextBlock Text="{DynamicResource LOCAS_PreviewNotification}" Style="{StaticResource AppearanceGroupHeader}" Margin="0,0,0,8" />
+                                                <WrapPanel Margin="0,0,0,8">
+                                                    <Button Content="{DynamicResource LOCAS_LowBatteryToast}" Tag="Fullscreen"
+                                                            Margin="0,0,8,8" VerticalAlignment="Center" Click="PreviewNotificationClick" />
+                                                </WrapPanel>
+                                                <ContentControl x:Name="FullscreenNotificationStyleEditor" Content="{Binding FullscreenNotification}" Tag="Fullscreen" ContentTemplate="{StaticResource NotificationSurfaceEditor}" IsTabStop="False" />
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
+                                </TabControl>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
             </TabItem>
 
             <TabItem>
@@ -1081,7 +1401,7 @@
                                 </StackPanel>
                             </TabItem.Header>
                             <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                                <StackPanel Margin="8,8,8,16">
+                                <StackPanel Margin="16,16,16,16">
                                     <StackPanel Style="{StaticResource PageSection}">
                                         <Border Style="{StaticResource PageHeader}">
                                             <TextBlock Text="{DynamicResource LOCAS_SetupTab}" Style="{StaticResource SectionHeaderText}" />
@@ -1175,7 +1495,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <ScrollViewer Style="{StaticResource FillScrollViewer}">
-                    <StackPanel Margin="8,8,8,16">
+                    <StackPanel Margin="16,16,16,16">
                         <StackPanel Style="{StaticResource PageSection}">
                             <Border Style="{StaticResource PageHeader}">
                                 <TextBlock Text="{DynamicResource LOCAS_AboutTab}" Style="{StaticResource SectionHeaderText}" />

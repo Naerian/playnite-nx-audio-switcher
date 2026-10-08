@@ -92,6 +92,10 @@ namespace PlayniteAudioSwitcher
         private string lastChangeMessage;
         private DateTime lastChangeAt;
         private Geometry lastChangeIconGeometry;
+        private bool hasLowBatteryAlert;
+        private string lowBatteryDeviceName = string.Empty;
+        private int lowBatteryPercent = -1;
+        private string lowBatteryLabel = string.Empty;
         private int volumeStepPercent;
         private bool isRefreshingVolume;
         private bool isRefreshingInputVolume;
@@ -175,7 +179,7 @@ namespace PlayniteAudioSwitcher
 
         public ObservableCollection<AudioSwitcherThemeMediaSession> MediaSessions { get; }
 
-        public string ApiVersion => "1.4.0";
+        public string ApiVersion => "1.5.0";
 
         public bool SupportsOutputDevices => true;
 
@@ -202,6 +206,10 @@ namespace PlayniteAudioSwitcher
         public bool SupportsDesktopIndicatorConfiguration => true;
 
         public bool SupportsDesktopBatteryColor => true;
+
+        public bool SupportsOnScreenNotifications => true;
+
+        public bool SupportsThemeAppearanceBridge => true;
 
         internal bool IsMediaSessionVolumeWritePending => mediaVolumeWriter.HasPendingWork;
 
@@ -784,6 +792,30 @@ namespace PlayniteAudioSwitcher
             private set => SetValue(ref lastChangeIconGeometry, value);
         }
 
+        public bool HasLowBatteryAlert
+        {
+            get => hasLowBatteryAlert;
+            private set => SetValue(ref hasLowBatteryAlert, value);
+        }
+
+        public string LowBatteryDeviceName
+        {
+            get => lowBatteryDeviceName;
+            private set => SetValue(ref lowBatteryDeviceName, value);
+        }
+
+        public int LowBatteryPercent
+        {
+            get => lowBatteryPercent;
+            private set => SetValue(ref lowBatteryPercent, value);
+        }
+
+        public string LowBatteryLabel
+        {
+            get => lowBatteryLabel;
+            private set => SetValue(ref lowBatteryLabel, value);
+        }
+
         public int VolumeStepPercent
         {
             get => volumeStepPercent;
@@ -945,6 +977,15 @@ namespace PlayniteAudioSwitcher
             LastChangeMessage = message ?? string.Empty;
             LastChangeIconGeometry = iconGeometry;
             LastChangeAt = DateTime.Now;
+        }
+
+        public void RecordLowBattery(string deviceName, int percent, string label, Geometry iconGeometry = null)
+        {
+            HasLowBatteryAlert = true;
+            LowBatteryDeviceName = deviceName ?? string.Empty;
+            LowBatteryPercent = percent;
+            LowBatteryLabel = label ?? string.Empty;
+            RecordChange("low-battery", string.IsNullOrWhiteSpace(deviceName) ? label : deviceName + ": " + label, iconGeometry);
         }
 
         private void SetCurrentDeviceBattery(AudioDevice device)

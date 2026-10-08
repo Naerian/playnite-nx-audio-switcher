@@ -43,6 +43,7 @@ namespace PlayniteAudioSwitcher
                 SubscribeLiveAudioGraph();
                 ApplyAppearancePreset();
                 BuildAppearancePresetChips();
+                BindNotificationLookSelectors();
                 RebuildDeviceRows();
                 UpdateOverview();
             };
@@ -54,6 +55,7 @@ namespace PlayniteAudioSwitcher
         {
             ApplyAppearancePreset();
             BuildAppearancePresetChips();
+            BindNotificationLookSelectors();
             ApplyPreferredWindowSize();
             AttachToHost();
             Dispatcher.BeginInvoke(new Action(AttachToHost), DispatcherPriority.Loaded);
@@ -62,6 +64,418 @@ namespace PlayniteAudioSwitcher
             Dispatcher.BeginInvoke(new Action(FillSelectedContentHosts), DispatcherPriority.ApplicationIdle);
             SubscribeLiveAudioGraph();
             RefreshOnLoad();
+        }
+
+        private bool suppressNotificationPresetChange;
+        private bool applyingNotificationPreset;
+        private AudioNotificationSurface watchedDesktopSurface;
+        private AudioNotificationSurface watchedFullscreenSurface;
+
+        private void BindNotificationLookSelectors()
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            WatchNotificationSurface(ref watchedDesktopSurface, settings?.DesktopNotification);
+            WatchNotificationSurface(ref watchedFullscreenSurface, settings?.FullscreenNotification);
+            RefreshNotificationPresetSelectors();
+        }
+
+        private void RefreshNotificationPresetSelectors()
+        {
+            if (DesktopNotificationPresetSelector == null || FullscreenNotificationPresetSelector == null)
+            {
+                return;
+            }
+
+            var settings = DataContext as AudioSwitcherSettings;
+            suppressNotificationPresetChange = true;
+            try
+            {
+                FillNotificationPresetSelector(DesktopNotificationPresetSelector, settings?.DesktopNotification, true);
+                FillNotificationPresetSelector(FullscreenNotificationPresetSelector, settings?.FullscreenNotification, false);
+            }
+            finally
+            {
+                suppressNotificationPresetChange = false;
+            }
+        }
+
+        private void WatchNotificationSurface(ref AudioNotificationSurface watched, AudioNotificationSurface next)
+        {
+            if (ReferenceEquals(watched, next))
+            {
+                return;
+            }
+
+            if (watched != null)
+            {
+                watched.PropertyChanged -= NotificationSurface_OnPropertyChanged;
+            }
+
+            watched = next;
+            if (watched != null)
+            {
+                watched.PropertyChanged += NotificationSurface_OnPropertyChanged;
+            }
+        }
+
+        private void UnwatchNotificationSurfaces()
+        {
+            WatchNotificationSurface(ref watchedDesktopSurface, null);
+            WatchNotificationSurface(ref watchedFullscreenSurface, null);
+        }
+
+        private void NotificationSurface_OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var surface = sender as AudioNotificationSurface;
+            if (surface == null || applyingNotificationPreset)
+            {
+                return;
+            }
+
+            var name = e.PropertyName;
+            if (string.Equals(name, nameof(AudioNotificationSurface.StylePreset), StringComparison.Ordinal))
+            {
+                RefreshNotificationPresetSelectors();
+                return;
+            }
+
+            if (string.Equals(name, nameof(AudioNotificationSurface.UsePlayniteThemeAppearance), StringComparison.Ordinal))
+            {
+                AudioThemeLayoutPack.InvalidateCache();
+                RefreshNotificationPresetSelectors();
+                return;
+            }
+
+            if (string.Equals(name, nameof(AudioNotificationSurface.ShowLowBatteryNotifications), StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            // Any manual tweak turns the named look into "Custom" (same behavior as Controller Manager).
+            var current = surface.StylePreset ?? string.Empty;
+            if (AudioNotificationPresets.IsNamedPluginPreset(current) ||
+                current.StartsWith(ImportedVisualProfileCatalog.IdPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                surface.StylePreset = AudioNotificationPresets.Custom;
+            }
+        }
+
+        private void FillNotificationPresetSelector(ComboBox combo, AudioNotificationSurface surface, bool desktop)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var plugin = settings?.Plugin;
+            var options = new System.Collections.Generic.List<NotificationPresetOption>();
+            var themeActive = plugin != null && plugin.UsesEmbeddedThemeLayout(desktop);
+            if (themeActive || (plugin != null && AudioThemeLayoutPack.HasLayout(plugin.PlayniteApi, !desktop)))
+            {
+                options.Add(new NotificationPresetOption
+                {
+                    Key = AudioThemeLayoutPack.PlayniteThemeLookKey,
+                    DisplayName = plugin == null
+                        ? "Playnite theme pack"
+                        : AudioThemeLayoutPack.GetDisplayName(plugin.PlayniteApi, !desktop)
+                });
+            }
+
+            options.Add(CreatePresetOption(AudioNotificationPresets.Custom));
+            options.Add(new NotificationPresetOption
+            {
+                DisplayName = TryFindResource("LOCAS_PresetGroupPlugin") as string ?? "Plugin presets",
+                IsHeader = true
+            });
+            foreach (var preset in AudioNotificationPresets.Named)
+            {
+                options.Add(CreatePresetOption(preset));
+            }
+
+            var imported = ImportedVisualProfileCatalog.GetIds();
+            if (imported.Length > 0)
+            {
+                options.Add(new NotificationPresetOption
+                {
+                    DisplayName = TryFindResource("LOCAS_ImportedDesigns") as string ?? "Imported designs",
+                    IsHeader = true
+                });
+                foreach (var id in imported)
+                {
+                    options.Add(new NotificationPresetOption
+                    {
+                        Key = id,
+                        DisplayName = ImportedVisualProfileCatalog.GetName(id),
+                        CanDelete = true
+                    });
+                }
+            }
+
+            combo.ItemsSource = options;
+            combo.IsEnabled = !themeActive;
+            combo.SelectedValue = themeActive
+                ? AudioThemeLayoutPack.PlayniteThemeLookKey
+                : AudioNotificationPresets.Normalize(surface?.StylePreset);
+            var editor = desktop ? DesktopNotificationStyleEditor : FullscreenNotificationStyleEditor;
+            if (editor != null)
+            {
+                editor.IsEnabled = !themeActive;
+                editor.Opacity = themeActive ? 0.42 : 1.0;
+            }
+        }
+
+        private NotificationPresetOption CreatePresetOption(string preset)
+        {
+            var key = AudioNotificationPresets.LocKey(preset);
+            return new NotificationPresetOption
+            {
+                Key = preset,
+                DisplayName = (key == null ? null : TryFindResource(key) as string) ?? preset
+            };
+        }
+
+        internal sealed class NotificationPresetOption
+        {
+            public string Key { get; set; }
+            public string DisplayName { get; set; }
+            public bool IsHeader { get; set; }
+            public bool CanDelete { get; set; }
+        }
+
+        private void NotificationPresetSelector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (suppressNotificationPresetChange)
+            {
+                return;
+            }
+
+            var settings = DataContext as AudioSwitcherSettings;
+            var combo = sender as ComboBox;
+            var preset = combo?.SelectedValue as string;
+            if (settings == null || string.IsNullOrWhiteSpace(preset))
+            {
+                return;
+            }
+
+            var desktop = ReferenceEquals(combo, DesktopNotificationPresetSelector);
+            if (string.Equals(preset, AudioThemeLayoutPack.PlayniteThemeLookKey, StringComparison.OrdinalIgnoreCase))
+            {
+                var surface = desktop ? settings.DesktopNotification : settings.FullscreenNotification;
+                if (surface != null)
+                {
+                    surface.UsePlayniteThemeAppearance = true;
+                }
+
+                RefreshNotificationPresetSelectors();
+                return;
+            }
+
+            if (settings.Plugin != null && settings.Plugin.UsesEmbeddedThemeLayout(desktop))
+            {
+                RefreshNotificationPresetSelectors();
+                return;
+            }
+
+            if (ImportedVisualProfileCatalog.Contains(preset))
+            {
+                applyingNotificationPreset = true;
+                try
+                {
+                    settings.Plugin?.ApplyImportedVisualProfile(settings, preset, null);
+                }
+                finally
+                {
+                    applyingNotificationPreset = false;
+                }
+
+                RefreshNotificationPresetSelectors();
+                return;
+            }
+
+            var target = desktop ? settings.DesktopNotification : settings.FullscreenNotification;
+            applyingNotificationPreset = true;
+            try
+            {
+                if (target != null)
+                {
+                    target.UsePlayniteThemeAppearance = false;
+                }
+
+                AudioNotificationPresets.Apply(target, preset, desktop);
+            }
+            finally
+            {
+                applyingNotificationPreset = false;
+            }
+        }
+
+        private void PreviewNotificationClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var desktop = string.Equals((sender as FrameworkElement)?.Tag as string, "Desktop", StringComparison.Ordinal);
+            settings?.Plugin?.PreviewLowBatteryNotification(desktop);
+        }
+
+        private void CopyNotificationStyleClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            if (settings?.DesktopNotification == null || settings.FullscreenNotification == null)
+            {
+                return;
+            }
+
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            var toDesktop = string.Equals(tag, "Desktop", StringComparison.Ordinal);
+            var confirmKey = toDesktop
+                ? "LOCAS_CopyFullscreenStyleConfirm"
+                : "LOCAS_CopyDesktopStyleConfirm";
+            var message = TryFindResource(confirmKey) as string ?? confirmKey;
+            if (MessageBox.Show(message,
+                    TryFindResource("LOCAS_CopyNotificationStyle") as string ?? "Copy design",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            applyingNotificationPreset = true;
+            try
+            {
+                if (toDesktop)
+                {
+                    var theme = settings.DesktopNotification.UsePlayniteThemeAppearance;
+                    var alerts = settings.DesktopNotification.ShowLowBatteryNotifications;
+                    settings.DesktopNotification.CopyFrom(settings.FullscreenNotification);
+                    settings.DesktopNotification.UsePlayniteThemeAppearance = theme;
+                    settings.DesktopNotification.ShowLowBatteryNotifications = alerts;
+                }
+                else
+                {
+                    var theme = settings.FullscreenNotification.UsePlayniteThemeAppearance;
+                    var alerts = settings.FullscreenNotification.ShowLowBatteryNotifications;
+                    settings.FullscreenNotification.CopyFrom(settings.DesktopNotification);
+                    settings.FullscreenNotification.UsePlayniteThemeAppearance = theme;
+                    settings.FullscreenNotification.ShowLowBatteryNotifications = alerts;
+                }
+            }
+            finally
+            {
+                applyingNotificationPreset = false;
+            }
+
+            RefreshNotificationPresetSelectors();
+        }
+
+        private void ExportVisualProfileClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            settings?.Plugin?.ExportVisualProfile(settings);
+        }
+
+        private void ImportVisualProfileClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            settings?.Plugin?.ImportVisualProfile(settings, RefreshNotificationPresetSelectors);
+        }
+
+        private void DeleteImportedVisualProfileClick(object sender, RoutedEventArgs e)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            var profileId = (sender as FrameworkElement)?.Tag as string;
+            if (settings?.Plugin == null || string.IsNullOrWhiteSpace(profileId))
+            {
+                return;
+            }
+
+            if (settings.Plugin.DeleteImportedVisualProfile(settings, profileId))
+            {
+                RefreshNotificationPresetSelectors();
+            }
+        }
+
+        private void SelectColorClick(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var surface = button?.DataContext as AudioNotificationSurface;
+            var propertyName = button?.Tag as string;
+            var property = string.IsNullOrWhiteSpace(propertyName) || surface == null
+                ? null
+                : typeof(AudioNotificationSurface).GetProperty(propertyName);
+            if (property == null || property.PropertyType != typeof(string))
+            {
+                return;
+            }
+
+            Color current;
+            try
+            {
+                current = (Color)ColorConverter.ConvertFromString(property.GetValue(surface, null) as string);
+            }
+            catch
+            {
+                current = Colors.White;
+            }
+
+            var settings = DataContext as AudioSwitcherSettings;
+            var dialog = new ColorPickerDialog(current, key => TryFindResource(key) as string ?? key);
+            var owner = Window.GetWindow(this);
+            if (owner != null)
+            {
+                dialog.Owner = owner;
+            }
+
+            SettingsAppearance.ApplyWindow(dialog, settings != null ? settings.AppearancePreset : SettingsAppearance.Midnight);
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var selected = dialog.SelectedColor;
+            property.SetValue(surface, ColorPickerMath.ToHex(selected.A, selected.R, selected.G, selected.B), null);
+        }
+
+        private void SelectNotificationBackgroundImageClick(object sender, RoutedEventArgs e)
+        {
+            var surface = GetSurfaceForTag(sender);
+            if (surface == null)
+            {
+                return;
+            }
+
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp;*.webp;*.gif|All files|*.*",
+                CheckFileExists = true
+            };
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            surface.BackgroundImagePath = dialog.FileName;
+            surface.UseBackgroundImage = true;
+        }
+
+        private void ClearNotificationBackgroundImageClick(object sender, RoutedEventArgs e)
+        {
+            var surface = GetSurfaceForTag(sender);
+            if (surface == null)
+            {
+                return;
+            }
+
+            surface.BackgroundImagePath = string.Empty;
+            surface.UseBackgroundImage = false;
+        }
+
+        private AudioNotificationSurface GetSurfaceForTag(object sender)
+        {
+            var settings = DataContext as AudioSwitcherSettings;
+            if (settings == null)
+            {
+                return null;
+            }
+
+            var tag = (sender as FrameworkElement)?.Tag as string;
+            return string.Equals(tag, "Desktop", StringComparison.Ordinal)
+                ? settings.DesktopNotification
+                : settings.FullscreenNotification;
         }
 
         private void ApplyAppearancePreset()
@@ -303,6 +717,7 @@ namespace PlayniteAudioSwitcher
         private void OnUnloaded(object sender, RoutedEventArgs args)
         {
             UnsubscribeLiveAudioGraph();
+            UnwatchNotificationSurfaces();
             DetachFromHost();
         }
 

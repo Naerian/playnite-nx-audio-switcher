@@ -4,6 +4,15 @@
 
 
 
+
+## 1.18.4 — 2026-10-08
+- Replaced Playnite popup notifications with on-screen low-battery toasts styled like Controller Manager, including Soft, Compact, Bold, Arcade, Minimal, and Cinematic presets.
+- Added Appearance settings for Desktop and Fullscreen looks, full toast customization, theme bridge via AudioSwitcher/theme-bridge.json, and layout packs themes can ship under AudioSwitcher/.
+- Added export and import of shareable .asvisual visual profiles from Appearance > Looks, with imported designs selectable and deletable in the preset list.
+- Low-battery notices fire once per discharge for the active output or input device, and stay silent when Windows does not report a battery level.
+
+## Unreleased
+
 ## 1.18.3 — 2026-10-02
 - Added a session-oriented support log with optional detailed logging under Advanced â†’ Maintenance.
 - Added Open log and Clear log actions with confirmation, matching the Metadata AI maintenance flow.

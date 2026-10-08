@@ -53,6 +53,8 @@ namespace PlayniteAudioSwitcher
         private DispatcherTimer endpointTopologyTimer;
         private bool isMediaSessionDiscoveryRunning;
         private Task deviceBatteryRefreshTask;
+        private readonly AudioLowBatteryTracker lowBatteryTracker = new AudioLowBatteryTracker();
+        private bool lowBatteryToastStateInitialized;
         private string lastMediaSessionDiscoverySignature;
         private TopPanelItem batteryTopPanelItem;
         private bool openingStandaloneSettings;
@@ -115,6 +117,7 @@ namespace PlayniteAudioSwitcher
 
             ReloadSettings();
             gameProfiles = new GameAudioProfileStore(GetPluginUserDataPath());
+            ImportedVisualProfileCatalog.Configure(GetPluginUserDataPath());
             logger.Info("Audio Switcher loaded. Support log: " + fileLogger.LogFilePath);
         }
 
@@ -500,7 +503,6 @@ namespace PlayniteAudioSwitcher
                         Action = _ =>
                         {
                             gameProfiles.SetDevice(game, deviceId);
-                            ShowGameProfileInfoMessage($"{game.Name}: {displayName}");
                         }
                     });
                 }
@@ -526,7 +528,6 @@ namespace PlayniteAudioSwitcher
                         Action = _ =>
                         {
                             gameProfiles.SetInputDevice(game, deviceId);
-                            ShowGameProfileInfoMessage($"{game.Name}: {displayName}");
                         }
                     });
                 }
@@ -543,7 +544,6 @@ namespace PlayniteAudioSwitcher
                             Action = _ =>
                             {
                                 gameProfiles.SetSpatialSoundMode(game, modeId);
-                                ShowGameProfileInfoMessage($"{game.Name}: {mode.Name}");
                             }
                         });
                     }
@@ -564,7 +564,6 @@ namespace PlayniteAudioSwitcher
                         }
 
                         gameProfiles.ClearProfile(game);
-                        ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_GameProfileReset")}");
                     }
                 });
 
@@ -914,6 +913,7 @@ namespace PlayniteAudioSwitcher
                 var reportedDeviceCount = await AudioDevices.RefreshDeviceBatteriesAsync();
                 Theme?.Refresh();
                 RefreshBatteryTopPanelItem();
+                UpdateLowBatteryNotifications();
                 activeThemeSelectorList?.Refresh();
                 foreach (var inputList in activeInputDeviceLists.ToList())
                 {
@@ -1182,7 +1182,7 @@ namespace PlayniteAudioSwitcher
 
                 if (appliedParts.Count > 0)
                 {
-                    ShowGameProfileAppliedMessage(args.Game?.Name, appliedParts);
+                    logger.Info($"Applied audio profile for {args.Game?.Name}: {string.Join(", ", appliedParts)}.");
                 }
             }
             catch (Exception ex)
@@ -1365,7 +1365,6 @@ namespace PlayniteAudioSwitcher
                                     }
 
                                     Theme?.Refresh();
-                                    ShowGameProfileAppliedMessage(gameName, new[] { $"{Loc("LOCAS_GameVolumeTitle")} {volumePercent}%" });
                                 }));
                                 return;
                             }
@@ -2629,10 +2628,6 @@ namespace PlayniteAudioSwitcher
                     RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
                 }
 
-                if (notify && ShouldShowVolumeNotifications())
-                {
-                    ShowVolumeInfoMessage();
-                }
             }
             catch (Exception ex)
             {
@@ -2667,10 +2662,6 @@ namespace PlayniteAudioSwitcher
                     RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
                 }
 
-                if (notify && ShouldShowVolumeNotifications())
-                {
-                    ShowInputVolumeInfoMessage();
-                }
             }
             catch (Exception ex)
             {
@@ -2723,10 +2714,6 @@ namespace PlayniteAudioSwitcher
                     RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
                 }
 
-                if (notify && ShouldShowVolumeNotifications())
-                {
-                    ShowGameVolumeInfoMessage();
-                }
             }
             catch (Exception ex)
             {
@@ -2743,10 +2730,6 @@ namespace PlayniteAudioSwitcher
                 AudioDevices.ChangeDefaultPlaybackVolume(step * Math.Sign(direction));
                 Theme?.RefreshOutputVolume();
                 RecordThemeChange("volume", $"{Loc("LOCAS_VolumeTitle")}: {GetCurrentVolumeState().VolumePercent}%", Theme?.CurrentOutputVolumeIconGeometry);
-                if (ShouldShowVolumeNotifications())
-                {
-                    ShowVolumeInfoMessage();
-                }
             }
             catch (Exception ex)
             {
@@ -2763,10 +2746,6 @@ namespace PlayniteAudioSwitcher
                 AudioDevices.ChangeDefaultRecordingVolume(step * Math.Sign(direction));
                 Theme?.RefreshInputVolume();
                 RecordThemeChange("input-volume", $"{Loc("LOCAS_AudioInput")}: {GetCurrentInputVolumeState().VolumePercent}%", Theme?.CurrentInputVolumeIconGeometry);
-                if (ShouldShowVolumeNotifications())
-                {
-                    ShowInputVolumeInfoMessage();
-                }
             }
             catch (Exception ex)
             {
@@ -2805,10 +2784,6 @@ namespace PlayniteAudioSwitcher
 
                 Theme?.RefreshGameVolumeState();
                 RecordThemeChange("game-volume", $"{Loc("LOCAS_GameVolumeTitle")}: {GetCurrentGameVolumeState().VolumePercent}%", Theme?.CurrentGameVolumeIconGeometry);
-                if (ShouldShowVolumeNotifications())
-                {
-                    ShowGameVolumeInfoMessage();
-                }
             }
             catch (Exception ex)
             {
@@ -2825,7 +2800,6 @@ namespace PlayniteAudioSwitcher
                 Theme?.RefreshOutputVolume();
                 var state = AudioDevices.GetDefaultPlaybackVolume();
                 RecordThemeChange("mute", state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"), Theme?.CurrentOutputVolumeIconGeometry);
-                ShowMuteInfoMessage(state.IsMuted ? Loc("LOCAS_Muted") : Loc("LOCAS_Unmuted"));
             }
             catch (Exception ex)
             {
@@ -2842,7 +2816,6 @@ namespace PlayniteAudioSwitcher
                 Theme?.RefreshInputVolume();
                 var state = AudioDevices.GetDefaultRecordingVolume();
                 RecordThemeChange("input-mute", state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"), Theme?.CurrentInputVolumeIconGeometry);
-                ShowMuteInfoMessage(state.IsMuted ? Loc("LOCAS_InputMuted") : Loc("LOCAS_InputUnmuted"));
             }
             catch (Exception ex)
             {
@@ -2881,7 +2854,6 @@ namespace PlayniteAudioSwitcher
                 Theme?.RefreshGameVolumeState();
                 var currentGameState = GetCurrentGameVolumeState();
                 RecordThemeChange("game-mute", currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"), Theme?.CurrentGameVolumeIconGeometry);
-                ShowMuteInfoMessage(currentGameState.IsMuted ? Loc("LOCAS_GameMuted") : Loc("LOCAS_GameUnmuted"));
             }
             catch (Exception ex)
             {
@@ -3050,10 +3022,6 @@ namespace PlayniteAudioSwitcher
                 settings.RefreshDevices();
                 Theme?.Refresh();
                 RecordThemeChange("output-device", GetOutputNotificationText(deviceName), GetCurrentDeviceIconGeometry());
-                if (notify && ShouldShowOutputDeviceNotifications())
-                {
-                    ShowMessage(GetOutputNotificationText(deviceName));
-                }
             }
             catch (Exception ex)
             {
@@ -3076,10 +3044,6 @@ namespace PlayniteAudioSwitcher
                 settings.RefreshDevices();
                 Theme?.Refresh();
                 RecordThemeChange("input-device", $"{Loc("LOCAS_AudioInput")}: {deviceName}", GetCurrentInputDeviceIconGeometry());
-                if (notify && ShouldShowInputDeviceNotifications())
-                {
-                    ShowMessage($"{Loc("LOCAS_AudioInput")}: {deviceName}");
-                }
             }
             catch (Exception ex)
             {
@@ -3492,10 +3456,6 @@ namespace PlayniteAudioSwitcher
                 }
 
                 logger.Info($"Audio session diagnostics exported to {path}.");
-                if (ShouldShowDiagnosticNotifications())
-                {
-                    ShowMessage($"{Loc("LOCAS_AudioSessionDiagnosticsSaved")}: {path}");
-                }
 
                 if (PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
                 {
@@ -3593,7 +3553,6 @@ namespace PlayniteAudioSwitcher
                 Action = _ =>
                 {
                     gameProfiles.SetGameVolumePercent(game, null);
-                    ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_GameVolumeDefault")}");
                 }
             });
 
@@ -3608,7 +3567,6 @@ namespace PlayniteAudioSwitcher
                     Action = _ =>
                     {
                         gameProfiles.SetGameVolumePercent(game, value);
-                        ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_GameVolumeTitle")} {text}");
                     }
                 });
             }
@@ -3636,7 +3594,6 @@ namespace PlayniteAudioSwitcher
                 Action = _ =>
                 {
                     gameProfiles.SetAudioProcessName(game, null);
-                    ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_AudioProcessAutomatic")}");
                 }
             });
 
@@ -3674,7 +3631,6 @@ namespace PlayniteAudioSwitcher
                     Action = _ =>
                     {
                         gameProfiles.SetAudioProcessName(game, processName);
-                        ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_AudioProcessTitle")} {processName}.exe");
                     }
                 });
             }
@@ -3750,7 +3706,6 @@ namespace PlayniteAudioSwitcher
             }
 
             gameProfiles.SetAudioProcessName(game, processName);
-            ShowGameProfileInfoMessage($"{game.Name}: {Loc("LOCAS_AudioProcessTitle")} {processName}.exe");
         }
 
         private bool ApplySpatialSoundMode(string modeId, bool notify)
@@ -3806,11 +3761,6 @@ namespace PlayniteAudioSwitcher
                 }
 
                 settings.CurrentSpatialSoundMode = mode.Id;
-                if (notify && ShouldShowSpatialSoundNotifications())
-                {
-                    ShowMessage($"{Loc("LOCAS_SpatialSoundTitle")}: {mode.Name}");
-                }
-
                 return true;
             }
             catch (Exception ex)
@@ -4342,123 +4292,286 @@ namespace PlayniteAudioSwitcher
             return prefix + displayName;
         }
 
-        private void ShowVolumeInfoMessage()
+        internal void PreviewLowBatteryNotification(bool desktop)
         {
+            var threshold = AudioLowBatteryTracker.NormalizeThreshold(settings.LowBatteryNotificationThreshold);
+            var percent = AudioLowBatteryTracker.LimitFor(threshold);
+            ShowLowBatteryToast(
+                desktop,
+                Loc(percent <= AudioLowBatteryTracker.EmptyPercent ? "LOCAS_BatteryEmptyToast" : "LOCAS_LowBatteryToast"),
+                "Headphones · " + AudioLowBatteryTracker.FormatPercent(percent),
+                GetIconGeometry("headphones") ?? GetIconGeometry("volume-2"),
+                replace: true);
+        }
+
+        private void UpdateLowBatteryNotifications()
+        {
+            var dispatcher = System.Windows.Application.Current?.Dispatcher;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+            {
+                dispatcher.BeginInvoke(new Action(UpdateLowBatteryNotifications));
+                return;
+            }
+
+            AudioDevice output = null;
+            AudioDevice input = null;
             try
             {
-                var state = AudioDevices.GetDefaultPlaybackVolume();
-                ShowInfoMessage($"{Loc("LOCAS_VolumeTitle")}: {state.VolumePercent}%");
+                output = SafeGetDefaultPlaybackDevice("checking output battery");
+                input = SafeGetDefaultRecordingDevice("checking input battery");
             }
-            catch
+            catch (Exception ex)
             {
+                logger.Debug(ex, "Skipped low-battery notification because the active devices could not be read.");
+                return;
+            }
+
+            var devices = new List<AudioDevice>();
+            if (output != null)
+            {
+                devices.Add(output);
+            }
+
+            if (input != null && devices.All(device => !string.Equals(device.Id, input.Id, StringComparison.OrdinalIgnoreCase)))
+            {
+                devices.Add(input);
+            }
+
+            var threshold = settings.LowBatteryNotificationThreshold;
+            if (!lowBatteryToastStateInitialized)
+            {
+                lowBatteryTracker.Clear();
+                lowBatteryTracker.SeedWithoutNotify(devices
+                    .Where(device => AudioLowBatteryTracker.IsAtOrBelowThreshold(device.BatteryPercent, device.IsBatteryCharging, threshold))
+                    .Select(device => device.Id));
+                lowBatteryToastStateInitialized = true;
+                return;
+            }
+
+            lowBatteryTracker.RetainOnly(devices.Select(device => device.Id));
+            var desktopMode = PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop;
+            var showDesktop = desktopMode && settings.DesktopNotification.ShowLowBatteryNotifications;
+            var showFullscreen = !desktopMode && settings.FullscreenNotification.ShowLowBatteryNotifications;
+            foreach (var device in devices)
+            {
+                if (!lowBatteryTracker.ShouldShow(device.Id, device.BatteryPercent, device.IsBatteryCharging, threshold, true))
+                {
+                    continue;
+                }
+
+                if (!showDesktop && !showFullscreen)
+                {
+                    continue;
+                }
+
+                var percent = device.BatteryPercent.GetValueOrDefault();
+                var name = string.Equals(device.Id, input?.Id, StringComparison.OrdinalIgnoreCase)
+                    ? GetInputDeviceDisplayName(device)
+                    : GetDeviceDisplayName(device);
+                var label = AudioLowBatteryTracker.FormatPercent(percent);
+                var title = Loc(percent <= AudioLowBatteryTracker.EmptyPercent
+                    ? "LOCAS_BatteryEmptyToast"
+                    : "LOCAS_LowBatteryToast");
+                var icon = GetDeviceIconGeometryForTheme(device, string.Equals(device.Id, input?.Id, StringComparison.OrdinalIgnoreCase))
+                    ?? GetIconGeometry("headphones");
+                ShowLowBatteryToast(desktopMode, title, name + " · " + label, icon);
+                Theme?.RecordLowBattery(name, percent, label, icon);
             }
         }
 
-        private void ShowInputVolumeInfoMessage()
+        private void ShowLowBatteryToast(bool desktop, string title, string message, System.Windows.Media.Geometry icon,
+            bool replace = false)
         {
-            try
+            var source = desktop ? settings.DesktopNotification : settings.FullscreenNotification;
+            var surface = source?.Clone() ?? AudioNotificationPresets.CreateDefault(desktop);
+            if (surface.UsePlayniteThemeAppearance)
             {
-                var state = AudioDevices.GetDefaultRecordingVolume();
-                ShowInfoMessage($"{Loc("LOCAS_AudioInput")}: {state.VolumePercent}%");
+                AudioThemeLayoutPack.TryApply(PlayniteApi, surface, fullscreen: !desktop);
             }
-            catch
+
+            AudioThemeAppearanceBridge.ApplyLiveColors(PlayniteApi, surface, fullscreenTheme: !desktop);
+            AudioOnScreenToast.Show(new AudioToastRequest
             {
-            }
+                Title = title,
+                Message = message,
+                Icon = icon,
+                Surface = surface,
+                Replace = replace
+            });
         }
 
-        private void ShowGameVolumeInfoMessage()
+        internal bool UsesEmbeddedThemeLayout(bool desktop)
+        {
+            var surface = desktop ? settings?.DesktopNotification : settings?.FullscreenNotification;
+            return surface != null &&
+                surface.UsePlayniteThemeAppearance &&
+                AudioThemeLayoutPack.HasLayout(PlayniteApi, fullscreen: !desktop);
+        }
+
+        internal string GetNotificationBackgroundDirectory()
+        {
+            var path = Path.Combine(GetPluginUserDataPath(), "NotificationBackgrounds");
+            Directory.CreateDirectory(path);
+            return path;
+        }
+
+        public void ExportVisualProfile(AudioSwitcherSettings targetSettings)
         {
             try
             {
-                var state = GetCurrentGameVolumeState();
-                if (!state.IsAvailable)
+                if (targetSettings == null)
                 {
                     return;
                 }
 
-                var prefix = string.IsNullOrWhiteSpace(activeGameName)
-                    ? Loc("LOCAS_GameVolumeTitle")
-                    : $"{Loc("LOCAS_GameVolumeTitle")}: {activeGameName}";
-                ShowInfoMessage($"{prefix}: {state.VolumePercent}%");
+                var nameResult = PlayniteApi.Dialogs.SelectString(
+                    Loc("LOCAS_VisualProfileNamePrompt"),
+                    Loc("LOCAS_ExportVisualProfile"),
+                    "Audio Switcher");
+                if (!nameResult.Result || string.IsNullOrWhiteSpace(nameResult.SelectedString))
+                {
+                    return;
+                }
+
+                var profileName = nameResult.SelectedString.Trim();
+                var invalid = Path.GetInvalidFileNameChars();
+                var safeFileName = new string(profileName.Select(a => invalid.Contains(a) ? '_' : a).ToArray());
+                if (string.IsNullOrWhiteSpace(safeFileName))
+                {
+                    safeFileName = "AudioSwitcher_Visual";
+                }
+
+                var dialog = new SaveFileDialog
+                {
+                    Title = Loc("LOCAS_ExportVisualProfile"),
+                    Filter = Loc("LOCAS_VisualProfileFileFilter"),
+                    FileName = safeFileName + AudioVisualProfileSnapshot.FileExtension,
+                    DefaultExt = AudioVisualProfileSnapshot.FileExtension.TrimStart('.')
+                };
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var snapshot = AudioVisualProfileSnapshot.FromSettings(targetSettings, profileName);
+                AudioVisualProfilePortableStore.Export(snapshot, dialog.FileName);
+                PlayniteApi.Dialogs.ShowMessage(
+                    string.Format(Loc("LOCAS_VisualProfileExported"), dialog.FileName),
+                    Loc("LOCAS_VisualProfileTitle"));
             }
-            catch
+            catch (Exception ex)
             {
+                logger.Error(ex, "Failed to export visual profile.");
+                PlayniteApi.Dialogs.ShowErrorMessage(ex.Message, Loc("LOCAS_VisualProfileTitle"));
             }
         }
 
-        private void ShowGameProfileAppliedMessage(string gameName, IReadOnlyList<string> appliedParts)
+        public void ImportVisualProfile(AudioSwitcherSettings targetSettings, Action onApplied)
         {
-            if (!ShouldShowGameProfileNotifications())
+            try
             {
-                return;
+                if (targetSettings == null)
+                {
+                    return;
+                }
+
+                var dialog = new OpenFileDialog
+                {
+                    Title = Loc("LOCAS_ImportVisualProfile"),
+                    Filter = Loc("LOCAS_VisualProfileFileFilter")
+                };
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var snapshot = AudioVisualProfilePortableStore.Import(dialog.FileName);
+                var profileName = string.IsNullOrWhiteSpace(snapshot.Name)
+                    ? Path.GetFileNameWithoutExtension(dialog.FileName)
+                    : snapshot.Name;
+                if (PlayniteApi.Dialogs.ShowMessage(
+                        string.Format(Loc("LOCAS_VisualProfileImportConfirm"), profileName),
+                        Loc("LOCAS_ImportVisualProfile"),
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+                var importedId = ImportedVisualProfileCatalog.Import(dialog.FileName);
+                ApplyImportedVisualProfile(targetSettings, importedId, null);
+                onApplied?.Invoke();
+                PlayniteApi.Dialogs.ShowMessage(
+                    string.Format(Loc("LOCAS_VisualProfileImported"), profileName),
+                    Loc("LOCAS_VisualProfileTitle"));
             }
-
-            var title = string.IsNullOrWhiteSpace(gameName)
-                ? Loc("LOCAS_GameProfileApplied")
-                : $"{Loc("LOCAS_GameProfileApplied")}: {gameName}";
-            var detail = appliedParts == null || appliedParts.Count == 0
-                ? string.Empty
-                : $" - {string.Join(" + ", appliedParts.Where(a => !string.IsNullOrWhiteSpace(a)))}";
-            ShowMessage(title + detail);
-        }
-
-        private void ShowGameProfileInfoMessage(string message)
-        {
-            if (ShouldShowGameProfileNotifications())
+            catch (Exception ex)
             {
-                ShowMessage(message);
+                logger.Error(ex, "Failed to import visual profile.");
+                PlayniteApi.Dialogs.ShowErrorMessage(ex.Message, Loc("LOCAS_VisualProfileTitle"));
             }
         }
 
-        private void ShowMuteInfoMessage(string message)
+        public bool ApplyImportedVisualProfile(AudioSwitcherSettings targetSettings, string profileId,
+            Action onApplied)
         {
-            if (ShouldShowMuteNotifications())
+            AudioVisualProfileSnapshot snapshot;
+            if (targetSettings == null ||
+                !ImportedVisualProfileCatalog.TryGetSnapshot(profileId, out snapshot))
             {
-                ShowMessage(message);
+                return false;
             }
-        }
 
-        private void ShowInfoMessage(string message)
-        {
-            if (settings.ShowNotifications)
+            snapshot.ApplyTo(targetSettings, GetNotificationBackgroundDirectory());
+            if (targetSettings.DesktopNotification != null)
             {
-                ShowMessage(message);
+                targetSettings.DesktopNotification.StylePreset = profileId;
             }
+
+            if (targetSettings.FullscreenNotification != null)
+            {
+                targetSettings.FullscreenNotification.StylePreset = profileId;
+            }
+
+            onApplied?.Invoke();
+            return true;
         }
 
-        private bool ShouldShowOutputDeviceNotifications()
+        public bool DeleteImportedVisualProfile(AudioSwitcherSettings targetSettings, string profileId)
         {
-            return settings.ShowNotifications && settings.ShowOutputDeviceNotifications;
-        }
+            if (!ImportedVisualProfileCatalog.Contains(profileId))
+            {
+                return false;
+            }
 
-        private bool ShouldShowInputDeviceNotifications()
-        {
-            return settings.ShowNotifications && settings.ShowInputDeviceNotifications;
-        }
+            var name = ImportedVisualProfileCatalog.GetName(profileId);
+            if (PlayniteApi.Dialogs.ShowMessage(
+                    string.Format(Loc("LOCAS_DeleteImportedDesignConfirm"), name),
+                    Loc("LOCAS_ImportedDesigns"),
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                return false;
+            }
 
-        private bool ShouldShowVolumeNotifications()
-        {
-            return settings.ShowNotifications && settings.ShowVolumeNotifications;
-        }
+            if (!ImportedVisualProfileCatalog.Delete(profileId))
+            {
+                return false;
+            }
 
-        private bool ShouldShowMuteNotifications()
-        {
-            return settings.ShowNotifications && settings.ShowMuteNotifications;
-        }
+            if (targetSettings?.DesktopNotification != null &&
+                string.Equals(targetSettings.DesktopNotification.StylePreset, profileId, StringComparison.OrdinalIgnoreCase))
+            {
+                AudioNotificationPresets.Apply(targetSettings.DesktopNotification, AudioNotificationPresets.Soft, true);
+            }
 
-        private bool ShouldShowGameProfileNotifications()
-        {
-            return settings.ShowNotifications && settings.ShowGameProfileNotifications;
-        }
+            if (targetSettings?.FullscreenNotification != null &&
+                string.Equals(targetSettings.FullscreenNotification.StylePreset, profileId, StringComparison.OrdinalIgnoreCase))
+            {
+                AudioNotificationPresets.Apply(targetSettings.FullscreenNotification, AudioNotificationPresets.Soft, false);
+            }
 
-        private bool ShouldShowSpatialSoundNotifications()
-        {
-            return settings.ShowNotifications && settings.ShowSpatialSoundNotifications;
-        }
-
-        private bool ShouldShowDiagnosticNotifications()
-        {
-            return settings.ShowNotifications && settings.ShowDiagnosticNotifications;
+            return true;
         }
 
         private void ShowMessage(string message)

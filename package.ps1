@@ -56,7 +56,8 @@ $required = @(
     (Join-Path $build "Localization"),
     (Join-Path $build "Icons"),
     (Join-Path $build "media"),
-    (Join-Path $build "Examples")
+    (Join-Path $build "Examples"),
+    (Join-Path $build "Fonts")
 )
 foreach ($path in $required) {
     if (-not (Test-Path -LiteralPath $path)) {
@@ -91,6 +92,7 @@ Copy-Item -LiteralPath (Join-Path $build "Localization") -Destination $stage -Re
 Copy-Item -LiteralPath (Join-Path $build "Icons") -Destination $stage -Recurse
 Copy-Item -LiteralPath (Join-Path $build "media") -Destination $stage -Recurse
 Copy-Item -LiteralPath (Join-Path $build "Examples") -Destination $stage -Recurse
+Copy-Item -LiteralPath (Join-Path $build "Fonts") -Destination $stage -Recurse
 
 & $ToolboxPath pack $stage $distVersion
 $packExit = $LASTEXITCODE
