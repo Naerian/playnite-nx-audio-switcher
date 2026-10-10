@@ -426,7 +426,8 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">BatteryWidget içinde yalnızca bildirilen yüzdeyi gösterir.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">Bu seçenekler pil bilgisinin Playnite Masaüstü üst çubuğunda nasıl görüneceğini kontrol eder. Tam ekran BatteryWidget’ı değiştirmezler.</sys:String>
     <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
-    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">Ön ayarlar yalnızca renkleri değiştirir. Düzen, yazı boyutu ve boşluklar sabit kalır. Varsayılan, Playnite metin/vurgu renklerini kullanır ve mümkünse tema yüzeylerini uyarlar.</sys:String>
+    <sys:String x:Key="LOCAS_PresetDefault">Varsayılan</sys:String>
     <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
     <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
     <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>

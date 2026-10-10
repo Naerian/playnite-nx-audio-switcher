@@ -426,7 +426,8 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Muestra solo el porcentaje informado en el BatteryWidget.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">Elige cómo se muestra la batería en la barra superior de Escritorio. Requiere la integración de Escritorio de arriba.</sys:String>
     <sys:String x:Key="LOCAS_AppearancePreset">Apariencia</sys:String>
-    <sys:String x:Key="LOCAS_AppearancePresetHelp">Solo colores. Tipografía, espaciado y tamaños de control no cambian.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">Los presets solo cambian colores. Layout, tipografía y espaciado se mantienen. Por defecto usa texto/acento de Playnite y adapta las superficies del tema cuando puede.</sys:String>
+    <sys:String x:Key="LOCAS_PresetDefault">Por defecto</sys:String>
     <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
     <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
     <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>

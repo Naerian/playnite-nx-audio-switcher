@@ -1,5 +1,13 @@
 AddonId: PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1
 Packages:
+  - Version: 1.18.5
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-10-10
+    PackageUrl: https://github.com/Naerian/playnite-nx-audio-switcher/releases/download/v1.18.5/PlayniteAudioSwitcher_708b6ec4-bf96-4c0d-bd9d-fe0aa04d6bf1_1_18_5.pext
+    Changelog:
+      - 'Overview Appearance uses a ComboBox dropdown instead of preset chips, with the same card title styling as the other Overview cards.'
+      - 'New Default appearance preset: Playnite TextBrush / HighlightGlyphBrush, plus theme bg/surface when the theme exposes an opaque pair (WindowBackgourndBrush/PopupBackgroundBrush or Fullscreen control brushes); otherwise derives a second surface level or falls back to Midnight (new installs default to it).'
+      - 'Settings window remembers size and maximized state when reopened.'
   - Version: 1.18.4
     RequiredApiVersion: 6.16.0
     ReleaseDate: 2026-10-08

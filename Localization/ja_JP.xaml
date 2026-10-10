@@ -426,7 +426,8 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">BatteryWidget では報告された残量のみを表示します。</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">これらのオプションは、Playnite デスクトップのトップバーでのバッテリー表示を制御します。フルスクリーンの BatteryWidget は変更しません。</sys:String>
     <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
-    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">プリセットは色のみを変更します。レイアウト、文字サイズ、間隔は固定です。デフォルトは Playnite の文字色/アクセントを使い、可能ならテーマの面も合わせます。</sys:String>
+    <sys:String x:Key="LOCAS_PresetDefault">デフォルト</sys:String>
     <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
     <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
     <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>

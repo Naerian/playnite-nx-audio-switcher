@@ -786,11 +786,18 @@
                             </Border>
                             <TextBlock Text="{DynamicResource LOCAS_OverviewHelp}" Style="{StaticResource SectionSubtitleText}" />
                         </StackPanel>
-                        <Border Style="{StaticResource SettingsCard}" Margin="0,0,0,24">
+                        <Border Style="{StaticResource SummaryCard}" Margin="0,0,0,24" MinHeight="0">
                             <StackPanel>
-                                <TextBlock Text="{DynamicResource LOCAS_AppearancePreset}" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource SummaryTitleSeparator}">
+                                    <TextBlock Text="{DynamicResource LOCAS_AppearancePreset}" Style="{StaticResource SummaryCardTitle}" />
+                                </Border>
                                 <TextBlock Text="{DynamicResource LOCAS_AppearancePresetHelp}" Style="{StaticResource HintText}" Margin="0,0,0,8" />
-                                <WrapPanel x:Name="AppearancePresetChips" Orientation="Horizontal" />
+                                <ComboBox x:Name="AppearancePresetSelector"
+                                          Width="280"
+                                          HorizontalAlignment="Left"
+                                          DisplayMemberPath="DisplayName"
+                                          SelectedValuePath="Value"
+                                          SelectionChanged="AppearancePresetSelector_OnSelectionChanged" />
                             </StackPanel>
                         </Border>
                         <Grid>

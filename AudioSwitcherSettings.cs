@@ -41,7 +41,10 @@ namespace PlayniteAudioSwitcher
         private bool showDisabledInputDevices;
         private string batteryIndicatorDisplayMode = "IconAndPercentage";
         private string batteryIndicatorIcon = string.Empty;
-        private string appearancePreset = SettingsAppearance.Midnight;
+        private string appearancePreset = SettingsAppearance.Default;
+        private double settingsWindowWidth;
+        private double settingsWindowHeight;
+        private bool settingsWindowMaximized;
         private bool setupWizardCompleted;
         private bool enableVerboseLogging;
         private int settingsSchemaVersion;
@@ -88,6 +91,9 @@ namespace PlayniteAudioSwitcher
                     : savedSettings.BatteryIndicatorDisplayMode;
                 BatteryIndicatorIcon = savedSettings.BatteryIndicatorIcon ?? string.Empty;
                 AppearancePreset = savedSettings.AppearancePreset;
+                SettingsWindowWidth = savedSettings.SettingsWindowWidth;
+                SettingsWindowHeight = savedSettings.SettingsWindowHeight;
+                SettingsWindowMaximized = savedSettings.SettingsWindowMaximized;
                 SetupWizardCompleted = savedSettings.SetupWizardCompleted;
                 EnableVerboseLogging = savedSettings.EnableVerboseLogging;
                 SettingsSchemaVersion = savedSettings.SettingsSchemaVersion;
@@ -590,6 +596,24 @@ namespace PlayniteAudioSwitcher
             }
         }
 
+        public double SettingsWindowWidth
+        {
+            get => settingsWindowWidth;
+            set => SetValue(ref settingsWindowWidth, value);
+        }
+
+        public double SettingsWindowHeight
+        {
+            get => settingsWindowHeight;
+            set => SetValue(ref settingsWindowHeight, value);
+        }
+
+        public bool SettingsWindowMaximized
+        {
+            get => settingsWindowMaximized;
+            set => SetValue(ref settingsWindowMaximized, value);
+        }
+
         public bool SetupWizardCompleted
         {
             get => setupWizardCompleted;
@@ -612,6 +636,7 @@ namespace PlayniteAudioSwitcher
         [DontSerialize]
         public List<AppearancePresetOption> AppearancePresetOptions => new List<AppearancePresetOption>
         {
+            new AppearancePresetOption { Value = SettingsAppearance.Default, DisplayName = plugin?.Loc("LOCAS_PresetDefault") ?? "Default" },
             new AppearancePresetOption { Value = SettingsAppearance.Midnight, DisplayName = plugin?.Loc("LOCAS_PresetMidnight") ?? "Midnight" },
             new AppearancePresetOption { Value = SettingsAppearance.Paper, DisplayName = plugin?.Loc("LOCAS_PresetPaper") ?? "Paper" },
             new AppearancePresetOption { Value = SettingsAppearance.Oled, DisplayName = plugin?.Loc("LOCAS_PresetOled") ?? "OLED" },
@@ -968,6 +993,39 @@ namespace PlayniteAudioSwitcher
             editingClone = null;
         }
 
+        /// <summary>
+        /// Persists settings-window size/maximized state without committing in-progress edits.
+        /// </summary>
+        internal void PersistSettingsWindowLayout(double width, double height, bool maximized)
+        {
+            SettingsWindowWidth = width;
+            SettingsWindowHeight = height;
+            SettingsWindowMaximized = maximized;
+
+            if (editingClone != null)
+            {
+                editingClone.SettingsWindowWidth = width;
+                editingClone.SettingsWindowHeight = height;
+                editingClone.SettingsWindowMaximized = maximized;
+            }
+
+            if (plugin == null)
+            {
+                return;
+            }
+
+            var saved = plugin.LoadPluginSettings<AudioSwitcherSettings>();
+            if (saved == null)
+            {
+                return;
+            }
+
+            saved.SettingsWindowWidth = width;
+            saved.SettingsWindowHeight = height;
+            saved.SettingsWindowMaximized = maximized;
+            plugin.SavePluginSettings(saved);
+        }
+
         public bool VerifySettings(out List<string> errors)
         {
             errors = new List<string>();
@@ -1068,6 +1126,9 @@ namespace PlayniteAudioSwitcher
                 BatteryIndicatorDisplayMode = BatteryIndicatorDisplayMode,
                 BatteryIndicatorIcon = BatteryIndicatorIcon,
                 AppearancePreset = AppearancePreset,
+                SettingsWindowWidth = SettingsWindowWidth,
+                SettingsWindowHeight = SettingsWindowHeight,
+                SettingsWindowMaximized = SettingsWindowMaximized,
                 SetupWizardCompleted = SetupWizardCompleted,
                 EnableVerboseLogging = EnableVerboseLogging,
                 SettingsSchemaVersion = SettingsSchemaVersion

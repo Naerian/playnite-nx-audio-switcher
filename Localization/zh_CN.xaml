@@ -426,7 +426,8 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">在 BatteryWidget 中仅显示报告的百分比。</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">这些选项控制电池信息在 Playnite 桌面顶栏中的显示方式。它们不会更改全屏 BatteryWidget。</sys:String>
     <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
-    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">预设只改变颜色。布局、字号和间距保持固定。默认使用 Playnite 文字色/强调色，并在可能时适配主题表面。</sys:String>
+    <sys:String x:Key="LOCAS_PresetDefault">默认</sys:String>
     <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
     <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
     <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>

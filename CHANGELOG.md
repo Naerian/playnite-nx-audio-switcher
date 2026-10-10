@@ -1,17 +1,16 @@
 # Changelog
 
 
-
-
-
+## 1.18.5 — 2026-10-10
+- Overview Appearance uses a ComboBox dropdown instead of preset chips, with the same card title styling as the other Overview cards.
+- New Default appearance preset: Playnite TextBrush / HighlightGlyphBrush, plus theme bg/surface when the theme exposes an opaque pair (WindowBackgourndBrush/PopupBackgroundBrush or Fullscreen control brushes); otherwise derives a second surface level or falls back to Midnight (new installs default to it).
+- Settings window remembers size and maximized state when reopened.
 
 ## 1.18.4 — 2026-10-08
 - Replaced Playnite popup notifications with on-screen low-battery toasts styled like Controller Manager, including Soft, Compact, Bold, Arcade, Minimal, and Cinematic presets.
 - Added Appearance settings for Desktop and Fullscreen looks, full toast customization, theme bridge via AudioSwitcher/theme-bridge.json, and layout packs themes can ship under AudioSwitcher/.
 - Added export and import of shareable .asvisual visual profiles from Appearance > Looks, with imported designs selectable and deletable in the preset list.
 - Low-battery notices fire once per discharge for the active output or input device, and stay silent when Windows does not report a battery level.
-
-## Unreleased
 
 ## 1.18.3 — 2026-10-02
 - Added a session-oriented support log with optional detailed logging under Advanced â†’ Maintenance.

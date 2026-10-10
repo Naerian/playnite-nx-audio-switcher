@@ -23,7 +23,9 @@ namespace PlayniteAudioSwitcher
         private readonly bool themeStandaloneWindow;
         private ScrollViewer hostScrollViewer;
         private Window hostWindow;
+        private Window layoutHostWindow;
         private AudioSwitcherPlugin subscribedPlugin;
+        private bool restoringWindowLayout;
 
         public AudioSwitcherSettingsView() : this(false)
         {
@@ -42,7 +44,7 @@ namespace PlayniteAudioSwitcher
             {
                 SubscribeLiveAudioGraph();
                 ApplyAppearancePreset();
-                BuildAppearancePresetChips();
+                BindAppearancePresetSelector();
                 BindNotificationLookSelectors();
                 RebuildDeviceRows();
                 UpdateOverview();
@@ -54,9 +56,10 @@ namespace PlayniteAudioSwitcher
         private void OnLoaded(object sender, RoutedEventArgs args)
         {
             ApplyAppearancePreset();
-            BuildAppearancePresetChips();
+            BindAppearancePresetSelector();
             BindNotificationLookSelectors();
             ApplyPreferredWindowSize();
+            AttachWindowLayoutPersistence();
             AttachToHost();
             Dispatcher.BeginInvoke(new Action(AttachToHost), DispatcherPriority.Loaded);
             Dispatcher.BeginInvoke(new Action(AttachToHost), DispatcherPriority.ApplicationIdle);
@@ -420,7 +423,7 @@ namespace PlayniteAudioSwitcher
                 dialog.Owner = owner;
             }
 
-            SettingsAppearance.ApplyWindow(dialog, settings != null ? settings.AppearancePreset : SettingsAppearance.Midnight);
+            SettingsAppearance.ApplyWindow(dialog, settings != null ? settings.AppearancePreset : SettingsAppearance.Default);
             if (dialog.ShowDialog() != true)
             {
                 return;
@@ -478,12 +481,14 @@ namespace PlayniteAudioSwitcher
                 : settings.FullscreenNotification;
         }
 
+        private bool suppressAppearancePresetChange;
+
         private void ApplyAppearancePreset()
         {
             var settings = DataContext as AudioSwitcherSettings;
             var preset = settings != null
                 ? settings.AppearancePreset
-                : SettingsAppearance.Midnight;
+                : SettingsAppearance.Default;
             SettingsAppearance.Apply(this, preset);
 
             if (themeStandaloneWindow)
@@ -491,137 +496,66 @@ namespace PlayniteAudioSwitcher
                 SettingsAppearance.ApplyWindow(Window.GetWindow(this), preset);
             }
 
-            RefreshAppearancePresetChips();
+            SyncAppearancePresetSelector(preset);
         }
 
-        private void BuildAppearancePresetChips()
+        private void BindAppearancePresetSelector()
         {
-            if (AppearancePresetChips == null)
+            if (AppearancePresetSelector == null)
             {
                 return;
             }
 
-            AppearancePresetChips.Children.Clear();
             var settings = DataContext as AudioSwitcherSettings;
-            var options = settings != null ? settings.AppearancePresetOptions : null;
-            if (options == null)
+            suppressAppearancePresetChange = true;
+            try
+            {
+                AppearancePresetSelector.ItemsSource = settings != null
+                    ? settings.AppearancePresetOptions
+                    : null;
+                SyncAppearancePresetSelector(settings != null
+                    ? settings.AppearancePreset
+                    : SettingsAppearance.Default);
+            }
+            finally
+            {
+                suppressAppearancePresetChange = false;
+            }
+        }
+
+        private void SyncAppearancePresetSelector(string preset)
+        {
+            if (AppearancePresetSelector == null)
             {
                 return;
             }
 
-            foreach (var option in options)
-            {
-                if (option == null || string.IsNullOrWhiteSpace(option.Value))
-                {
-                    continue;
-                }
-
-                var button = new Button
-                {
-                    Content = option.DisplayName,
-                    Tag = option.Value,
-                    MinHeight = 36,
-                    Height = 36,
-                    MinWidth = 88,
-                    Padding = new Thickness(12, 0, 12, 0),
-                    Margin = new Thickness(0, 0, 8, 8),
-                    Cursor = Cursors.Hand,
-                    Focusable = true,
-                    BorderThickness = new Thickness(1),
-                    FontSize = 14,
-                    Template = CreateAppearanceChipTemplate()
-                };
-                button.Click += AppearancePresetChip_OnClick;
-                button.MouseEnter += AppearancePresetChip_OnMouseEnter;
-                button.MouseLeave += AppearancePresetChip_OnMouseLeave;
-                AppearancePresetChips.Children.Add(button);
-            }
-
-            RefreshAppearancePresetChips();
-        }
-
-        private static ControlTemplate CreateAppearanceChipTemplate()
-        {
-            var template = new ControlTemplate(typeof(Button));
-            var border = new FrameworkElementFactory(typeof(Border));
-            border.Name = "Bd";
-            border.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
-            border.SetValue(Border.SnapsToDevicePixelsProperty, true);
-            border.SetBinding(Border.BackgroundProperty, new Binding("Background")
-            {
-                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
-            });
-            border.SetBinding(Border.BorderBrushProperty, new Binding("BorderBrush")
-            {
-                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
-            });
-            border.SetBinding(Border.BorderThicknessProperty, new Binding("BorderThickness")
-            {
-                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
-            });
-            border.SetBinding(Border.PaddingProperty, new Binding("Padding")
-            {
-                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
-            });
-            var presenter = new FrameworkElementFactory(typeof(ContentPresenter));
-            presenter.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-            presenter.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
-            presenter.SetBinding(TextElement.ForegroundProperty, new Binding("Foreground")
-            {
-                RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent)
-            });
-            border.AppendChild(presenter);
-            template.VisualTree = border;
-            return template;
-        }
-
-        private void AppearancePresetChip_OnMouseEnter(object sender, MouseEventArgs e)
-        {
-            var button = sender as Button;
-            if (button == null || IsAppearanceChipSelected(button))
+            var normalized = SettingsAppearance.Normalize(preset);
+            if (Equals(AppearancePresetSelector.SelectedValue, normalized))
             {
                 return;
             }
 
-            var palette = GetCurrentAppearancePalette();
-            button.Background = new SolidColorBrush(palette.Hover);
+            suppressAppearancePresetChange = true;
+            try
+            {
+                AppearancePresetSelector.SelectedValue = normalized;
+            }
+            finally
+            {
+                suppressAppearancePresetChange = false;
+            }
         }
 
-        private void AppearancePresetChip_OnMouseLeave(object sender, MouseEventArgs e)
+        private void AppearancePresetSelector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var button = sender as Button;
-            if (button == null || IsAppearanceChipSelected(button))
+            if (suppressAppearancePresetChange)
             {
                 return;
             }
 
-            var palette = GetCurrentAppearancePalette();
-            button.Background = new SolidColorBrush(palette.BadgeBg);
-        }
-
-        private bool IsAppearanceChipSelected(Button button)
-        {
             var settings = DataContext as AudioSwitcherSettings;
-            var selected = settings != null
-                ? SettingsAppearance.Normalize(settings.AppearancePreset)
-                : SettingsAppearance.Midnight;
-            return string.Equals(button.Tag as string, selected, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private SettingsAppearance.Palette GetCurrentAppearancePalette()
-        {
-            var settings = DataContext as AudioSwitcherSettings;
-            var selected = settings != null
-                ? settings.AppearancePreset
-                : SettingsAppearance.Midnight;
-            return SettingsAppearance.GetPalette(selected);
-        }
-
-        private void AppearancePresetChip_OnClick(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            var preset = button == null ? null : button.Tag as string;
-            var settings = DataContext as AudioSwitcherSettings;
+            var preset = AppearancePresetSelector?.SelectedValue as string;
             if (settings == null || string.IsNullOrWhiteSpace(preset))
             {
                 return;
@@ -629,44 +563,6 @@ namespace PlayniteAudioSwitcher
 
             settings.AppearancePreset = preset;
             ApplyAppearancePreset();
-        }
-
-        private void RefreshAppearancePresetChips()
-        {
-            if (AppearancePresetChips == null)
-            {
-                return;
-            }
-
-            var settings = DataContext as AudioSwitcherSettings;
-            var selected = settings != null
-                ? SettingsAppearance.Normalize(settings.AppearancePreset)
-                : SettingsAppearance.Midnight;
-            var palette = SettingsAppearance.GetPalette(selected);
-            var accent = new SolidColorBrush(palette.Accent);
-            var accentOn = new SolidColorBrush(palette.AccentOn);
-            var badgeBg = new SolidColorBrush(palette.BadgeBg);
-            var text = new SolidColorBrush(palette.Text);
-            accent.Freeze();
-            accentOn.Freeze();
-            badgeBg.Freeze();
-            text.Freeze();
-
-            foreach (var child in AppearancePresetChips.Children)
-            {
-                var button = child as Button;
-                if (button == null)
-                {
-                    continue;
-                }
-
-                var isSelected = string.Equals(button.Tag as string, selected, StringComparison.OrdinalIgnoreCase);
-                button.Background = isSelected ? accent : badgeBg;
-                button.Foreground = isSelected ? accentOn : text;
-                button.BorderBrush = isSelected ? accent : new SolidColorBrush(palette.Border);
-                button.BorderThickness = new Thickness(1);
-                button.FontWeight = isSelected ? FontWeights.SemiBold : FontWeights.Normal;
-            }
         }
 
         private void SubscribeLiveAudioGraph()
@@ -716,6 +612,8 @@ namespace PlayniteAudioSwitcher
 
         private void OnUnloaded(object sender, RoutedEventArgs args)
         {
+            PersistWindowLayout();
+            DetachWindowLayoutPersistence();
             UnsubscribeLiveAudioGraph();
             UnwatchNotificationSurfaces();
             DetachFromHost();
@@ -937,23 +835,130 @@ namespace PlayniteAudioSwitcher
                 return;
             }
 
-            window.SizeToContent = SizeToContent.Manual;
-            if (window.MinWidth < 1000)
+            restoringWindowLayout = true;
+            try
             {
-                window.MinWidth = 1000;
+                window.SizeToContent = SizeToContent.Manual;
+                if (window.MinWidth < 1000)
+                {
+                    window.MinWidth = 1000;
+                }
+                if (window.MinHeight < 700)
+                {
+                    window.MinHeight = 700;
+                }
+
+                var settings = DataContext as AudioSwitcherSettings;
+                var savedWidth = settings != null ? settings.SettingsWindowWidth : 0;
+                var savedHeight = settings != null ? settings.SettingsWindowHeight : 0;
+                var savedMaximized = settings != null && settings.SettingsWindowMaximized;
+
+                if (savedWidth >= 1000)
+                {
+                    window.Width = savedWidth;
+                }
+                else if (window.ActualWidth < 1100 && window.Width < 1100)
+                {
+                    window.Width = 1100;
+                }
+
+                if (savedHeight >= 700)
+                {
+                    window.Height = savedHeight;
+                }
+                else if (window.ActualHeight < 780 && window.Height < 780)
+                {
+                    window.Height = 780;
+                }
+
+                if (savedMaximized)
+                {
+                    window.WindowState = WindowState.Maximized;
+                }
             }
-            if (window.MinHeight < 700)
+            finally
             {
-                window.MinHeight = 700;
+                restoringWindowLayout = false;
             }
-            if (window.ActualWidth < 1100 && window.Width < 1100)
+        }
+
+        private void AttachWindowLayoutPersistence()
+        {
+            DetachWindowLayoutPersistence();
+            layoutHostWindow = Window.GetWindow(this);
+            if (layoutHostWindow == null)
             {
-                window.Width = 1100;
+                return;
             }
-            if (window.ActualHeight < 780 && window.Height < 780)
+
+            layoutHostWindow.Closing += OnLayoutHostWindowClosing;
+            layoutHostWindow.StateChanged += OnLayoutHostWindowStateChanged;
+        }
+
+        private void DetachWindowLayoutPersistence()
+        {
+            if (layoutHostWindow == null)
             {
-                window.Height = 780;
+                return;
             }
+
+            layoutHostWindow.Closing -= OnLayoutHostWindowClosing;
+            layoutHostWindow.StateChanged -= OnLayoutHostWindowStateChanged;
+            layoutHostWindow = null;
+        }
+
+        private void OnLayoutHostWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            PersistWindowLayout();
+        }
+
+        private void OnLayoutHostWindowStateChanged(object sender, EventArgs e)
+        {
+            if (restoringWindowLayout)
+            {
+                return;
+            }
+
+            PersistWindowLayout();
+        }
+
+        private void PersistWindowLayout()
+        {
+            var window = layoutHostWindow ?? Window.GetWindow(this);
+            var settings = DataContext as AudioSwitcherSettings;
+            if (window == null || settings == null || window.WindowState == WindowState.Minimized)
+            {
+                return;
+            }
+
+            double width;
+            double height;
+            var maximized = window.WindowState == WindowState.Maximized;
+            if (maximized)
+            {
+                var restore = window.RestoreBounds;
+                width = restore.Width > 0 ? restore.Width : window.Width;
+                height = restore.Height > 0 ? restore.Height : window.Height;
+            }
+            else
+            {
+                width = window.ActualWidth > 0 ? window.ActualWidth : window.Width;
+                height = window.ActualHeight > 0 ? window.ActualHeight : window.Height;
+            }
+
+            if (width < 1000 || height < 700)
+            {
+                return;
+            }
+
+            if (Math.Abs(settings.SettingsWindowWidth - width) < 0.5 &&
+                Math.Abs(settings.SettingsWindowHeight - height) < 0.5 &&
+                settings.SettingsWindowMaximized == maximized)
+            {
+                return;
+            }
+
+            settings.PersistSettingsWindowLayout(width, height, maximized);
         }
 
         private async void RefreshOverview(object sender, RoutedEventArgs e)

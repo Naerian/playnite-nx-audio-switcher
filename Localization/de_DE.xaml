@@ -426,7 +426,8 @@
     <sys:String x:Key="LOCAS_BatteryDisplayPercentageOnlyHelp">Zeigt im BatteryWidget nur den gemeldeten Prozentwert an.</sys:String>
     <sys:String x:Key="LOCAS_DesktopBatteryHelp">Diese Optionen steuern, wie Akkudaten in der oberen Desktop-Leiste von Playnite angezeigt werden. Sie ändern das Fullscreen-BatteryWidget nicht.</sys:String>
     <sys:String x:Key="LOCAS_AppearancePreset">Appearance preset</sys:String>
-    <sys:String x:Key="LOCAS_AppearancePresetHelp">Colors only. Type, spacing and control sizes stay fixed.</sys:String>
+    <sys:String x:Key="LOCAS_AppearancePresetHelp">Voreinstellungen ändern nur Farben. Layout, Schriftgröße und Abstände bleiben fest. Standard nutzt Playnite-Text/Akzent und passt Flächen vom Theme an, wenn möglich.</sys:String>
+    <sys:String x:Key="LOCAS_PresetDefault">Standard</sys:String>
     <sys:String x:Key="LOCAS_PresetMidnight">Midnight</sys:String>
     <sys:String x:Key="LOCAS_PresetPaper">Paper</sys:String>
     <sys:String x:Key="LOCAS_PresetOled">OLED</sys:String>
